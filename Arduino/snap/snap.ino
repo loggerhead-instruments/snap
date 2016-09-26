@@ -344,7 +344,7 @@ void setup() {
     startTime += 300; //move forward
     stopTime = startTime + rec_dur;  // this will be set on start of recording
   }
-  if (recMode==MODE_DIEL) checkDielTime();  
+ // if (recMode==MODE_DIEL) checkDielTime();  
   
   nbufs_per_file = (long) (rec_dur * audio_srate / 256.0);
   long ss = rec_int - wakeahead;
@@ -413,7 +413,7 @@ void loop() {
         
         stopTime = startTime + rec_dur;
         startTime = stopTime + rec_int;
-        if (recMode==MODE_DIEL) checkDielTime();
+      //  if (recMode==MODE_DIEL) checkDielTime();
 
         Serial.print("Current Time: ");
         printTime(getTeensy3Time());
@@ -441,7 +441,7 @@ void loop() {
   if (mode == 1) {
     continueRecording();  // download data  
     
-    if(printDiags){  //this is to see if code still running when queue fails
+     // update clock while recording
       recLoopCount++;
       if(recLoopCount>50){
         recLoopCount = 0;
@@ -459,7 +459,7 @@ void loop() {
         displayClock(t, BOTTOM);
         display.display();
       }
-    }
+   
     
     // write Pressure & Temperature to file
     if(time2writePT==1)
