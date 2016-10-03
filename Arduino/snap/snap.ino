@@ -310,8 +310,7 @@ void setup() {
       display.println("SD error. Restart.");
       displayClock(getTeensy3Time(), BOTTOM);
       display.display();
-      delay(1000);
-      
+      delay(1000);  
     }
   }
   //SdFile::dateTimeCallback(file_date_time);
@@ -883,13 +882,7 @@ void FileInit()
    // log file
    SdFile::dateTimeCallback(file_date_time);
 
-   float voltage;
-   voltage = 0;
-   for(int n = 0; n<8; n++){
-    voltage += (float) analogRead(vSense) / 1024.0;
-    delay(2);
-   }
-   voltage = voltage / 8.0;
+   float voltage = readVoltage();
    
    if(File logFile = SD.open("LOG.CSV",  O_CREAT | O_APPEND | O_WRITE)){
       logFile.print(filename);
@@ -898,7 +891,15 @@ void FileInit()
         logFile.print(myID[n]);
       }
       logFile.print(',');
-      logFile.println(5.9 * voltage);  //fudging scaling based on actual measurements; shoud be max of 3.3V at 1023
+      logFile.println(voltage); 
+      if(voltage < 3.0){
+        logFile.println("Stopping because Voltage less than 3.0 V");
+        logFile.close();  
+        // low voltage hang but keep checking voltage
+        while(readVoltage() < 3.0){
+            delay(30000);
+        }
+      }
       logFile.close();
    }
    else{
@@ -1218,3 +1219,14 @@ void read_myID() {
   read_EE(0xf,myID,4); // xx xx xx xx
 
 }
+
+float readVoltage(){
+   float  voltage = 0;
+   for(int n = 0; n<8; n++){
+    voltage += (float) analogRead(vSense) / 1024.0;
+    delay(2);
+   }
+   voltage = 5.9 * voltage / 8.0;   //fudging scaling based on actual measurements; shoud be max of 3.3V at 1023
+   return voltage;
+}
+
