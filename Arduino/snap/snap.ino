@@ -309,7 +309,8 @@ void setup() {
       display.println("SD error. Restart.");
       displayClock(getTeensy3Time(), BOTTOM);
       display.display();
-      delay(1000);  
+      delay(20000);  
+      resetFunc();
     }
   }
   //SdFile::dateTimeCallback(file_date_time);
@@ -558,13 +559,7 @@ void continueRecording() {
     queue1.freeBuffer();
     memcpy(buffer+256, queue1.readBuffer(), 256);
     queue1.freeBuffer();
-    if (fileType==0){
-      if(frec.write(buffer, 512)==-1) resetFunc(); //audio to .wav file
-    }
-    else{
-      frec.write((uint8_t *)&sidRec[0],sizeof(SID_REC)); //audio to .amx file
-      frec.write(buffer, 512); 
-    }
+    if(frec.write(buffer, 512)==-1) resetFunc(); //audio to .wav file
       
     buf_count += 1;
     audioIntervalCount += 1;
@@ -863,6 +858,7 @@ void FileInit()
    }
    else{
     if(printDiags) Serial.print("Log open fail.");
+    resetFunc();
    }
 
     
@@ -879,6 +875,7 @@ void FileInit()
     frec = SD.open(filename, O_WRITE | O_CREAT | O_EXCL);
     Serial.println(filename);
     delay(10);
+    if(file_count>1000) resetFunc(); // give up after many tries
    }
 
    if(fileType==0){
@@ -1178,7 +1175,6 @@ void read_EE(uint8_t word, uint8_t *buf, uint8_t offset)  {
 void read_myID() {
   read_EE(0xe,myID,0); // should be 04 E9 E5 xx, this being PJRC's registered OUI
   read_EE(0xf,myID,4); // xx xx xx xx
-
 }
 
 float readVoltage(){
