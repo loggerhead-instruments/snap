@@ -31,6 +31,7 @@ void printZero(int val){
 void manualSettings(){
   boolean startRec = 0, startUp, startDown;
   readEEPROM();
+
   
   // make sure settings valid (if EEPROM corrupted or not set yet)
   if (rec_dur < 0 | rec_dur>100000) rec_dur = 60;

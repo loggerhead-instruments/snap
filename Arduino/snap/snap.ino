@@ -314,9 +314,14 @@ void setup() {
   }
   //SdFile::dateTimeCallback(file_date_time);
    
-  //if (!LoadScript())  // if no script file, go to manual settings
-  manualSettings();
+  if(EEPROM.read(20)){
+    EEPROM.write(20, 0); // reset indicator register
+  }
+  else{
+      manualSettings();
+  }
 
+  
   setupDataStructures();
 
   // disable buttons; not using any more
@@ -1192,6 +1197,7 @@ boolean pollImu(){
 
 
 void resetFunc(void){
+  EEPROM.write(20, 1); // reset indicator register
   CPU_RESTART
 }
 
