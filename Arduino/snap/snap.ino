@@ -461,43 +461,6 @@ void loop() {
         displayClock(t, BOTTOM);
         display.display();
       }
-   
-    
-    // write Pressure & Temperature to file
-    if(time2writePT==1)
-    {
-      if(LEDSON | introperiod) digitalWrite(ledRed,HIGH);
-      if(frec.write((uint8_t *)&sidRec[1],sizeof(SID_REC))==-1) resetFunc();
-      if(frec.write((uint8_t *)&PTbuffer[0], halfbufPT * 4)==-1) resetFunc(); 
-      time2writePT = 0;
-      if(LEDSON | introperiod) digitalWrite(ledRed,LOW);
-    }
-    if(time2writePT==2)
-    {
-      if(LEDSON | introperiod) digitalWrite(ledRed,HIGH);
-      if(frec.write((uint8_t *)&sidRec[1],sizeof(SID_REC))==-1) resetFunc();
-      if(frec.write((uint8_t *)&PTbuffer[halfbufPT], halfbufPT * 4)==-1) resetFunc();     
-      time2writePT = 0;
-      if(LEDSON | introperiod) digitalWrite(ledRed,LOW);
-    }   
-  
-    // write RGB values to file
-    if(time2writeRGB==1)
-    {
-      if(LEDSON | introperiod) digitalWrite(ledRed,HIGH);
-      if(frec.write((uint8_t *)&sidRec[2],sizeof(SID_REC))==-1) resetFunc();
-      if(frec.write((uint8_t *)&RGBbuffer[0], halfbufRGB)==-1) resetFunc(); 
-      time2writeRGB = 0;
-      if(LEDSON | introperiod) digitalWrite(ledRed,LOW);
-    }
-    if(time2writeRGB==2)
-    {
-      if(LEDSON | introperiod) digitalWrite(ledRed,HIGH);
-      if(frec.write((uint8_t *)&sidRec[2],sizeof(SID_REC))==-1) resetFunc();
-      if(frec.write((uint8_t *)&RGBbuffer[halfbufRGB], halfbufRGB)==-1) resetFunc();     
-      time2writeRGB = 0;
-      if(LEDSON | introperiod) digitalWrite(ledRed,LOW);
-    } 
       
     if(buf_count >= nbufs_per_file){       // time to stop?
       if(rec_int == 0){
@@ -596,7 +559,7 @@ void continueRecording() {
     memcpy(buffer+256, queue1.readBuffer(), 256);
     queue1.freeBuffer();
     if (fileType==0){
-      frec.write(buffer, 512); //audio to .wav file
+      if(frec.write(buffer, 512)==-1) resetFunc(); //audio to .wav file
     }
     else{
       frec.write((uint8_t *)&sidRec[0],sizeof(SID_REC)); //audio to .amx file
@@ -605,13 +568,6 @@ void continueRecording() {
       
     buf_count += 1;
     audioIntervalCount += 1;
-
-    if (fileType & imuFlag){
-      if (pollImu()){
-        if(frec.write((uint8_t *)&sidRec[3],sizeof(SID_REC))==-1) resetFunc();
-        if(frec.write((uint8_t *)&imuBuffer[0], BUFFERSIZE)==-1) resetFunc();  
-      }
-    }
     
     if(printDiags){
       Serial.print(".");
