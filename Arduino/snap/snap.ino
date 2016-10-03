@@ -269,8 +269,7 @@ void setup() {
   setSyncProvider(getTeensy3Time); //use Teensy RTC to keep time
   t = getTeensy3Time();
   if (t < 1451606400) Teensy3Clock.set(1451606400);
-  startTime = getTeensy3Time();
-  stopTime = startTime + rec_dur;
+
 
   display.begin(SSD1306_SWITCHCAPVCC, 0x3C);  //initialize display
   delay(100);
@@ -337,12 +336,11 @@ void setup() {
   cDisplay();
   
   t = getTeensy3Time();
-  if (startTime < t)
-  {  
-    startTime -= startTime % 300;  //modulo to nearest 5 minutes
-    startTime += 300; //move forward
-    stopTime = startTime + rec_dur;  // this will be set on start of recording
-  }
+  startTime = getTeensy3Time();
+  startTime -= startTime % 300;  //modulo to nearest 5 minutes
+  startTime += 300; //move forward
+  stopTime = startTime + rec_dur;  // this will be set on start of recording
+  
  // if (recMode==MODE_DIEL) checkDielTime();  
   
   nbufs_per_file = (long) (rec_dur * audio_srate / 256.0);
@@ -905,6 +903,7 @@ void FileInit()
    else{
     if(printDiags) Serial.print("Log open fail.");
    }
+
     
    frec = SD.open(filename, O_WRITE | O_CREAT | O_EXCL);
    Serial.println(filename);
