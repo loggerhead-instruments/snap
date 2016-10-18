@@ -1,5 +1,5 @@
 //
-// SNAP -s acoustic recorder
+// SNAP acoustic recorder
 //
 // Loggerhead Instruments
 // 2016
@@ -129,7 +129,7 @@ long nbufs_per_file;
 boolean settingsChanged = 0;
 
 long file_count;
-char filename[20];
+char filename[25];
 char dirname[7];
 int folderMonth;
 //SnoozeBlock snooze_config;
