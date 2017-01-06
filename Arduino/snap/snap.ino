@@ -11,7 +11,8 @@
 
 //#include <SerialFlash.h>
 #include <Audio.h>  //this also includes SD.h from lines 89 & 90
-#include <Wire.h>
+//#include <Wire.h>
+#include <i2c_t3.h>
 #include <SPI.h>
 //#include <SdFat.h>
 #include "amx32.h"
@@ -228,7 +229,8 @@ void setup() {
   
   Serial.begin(baud);
   delay(500);
-  Wire.begin();
+  //Wire.begin();
+  Wire.begin(I2C_MASTER, 0x00, I2C_PINS_18_19, I2C_PULLUP_EXT, I2C_RATE_400);
 
   pinMode(CAM_POW, OUTPUT);
   pinMode(hydroPowPin, OUTPUT);

@@ -1,5 +1,6 @@
 #include "control_sgtl5000.h"
-#include "Wire.h"
+//#include "Wire.h"
+#include <i2c_t3.h>
 
 #define SGTL5000_I2C_ADDR  0x0A  // CTRL_ADR0_CS pin low (normal configuration)
 
