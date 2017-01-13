@@ -32,6 +32,7 @@ void manualSettings(){
   boolean startRec = 0, startUp, startDown;
   readEEPROM();
 
+  time_t autoStartTime = getTeensy3Time();
   
   // make sure settings valid (if EEPROM corrupted or not set yet)
   if (rec_dur < 0 | rec_dur>100000) rec_dur = 60;
@@ -56,11 +57,14 @@ void manualSettings(){
     cDisplay();
 
     t = getTeensy3Time();
+
+    if (t - autoStartTime > 600) startRec = 1; //autostart if no activity for 10 minutes
     switch (curSetting){
       case noSet:
         if (settingsChanged) {
           writeEEPROM();
           settingsChanged = 0;
+          autoStartTime = getTeensy3Time();  //reset autoStartTime
         }
         display.print("UP+DN->Rec"); 
         // Check for start recording
@@ -129,36 +133,6 @@ void manualSettings(){
         display.print("Second:");
         display.print(second(getTeensy3Time()));
         break;
-//      case setMode:
-//        display.print("Mode:");
-//        recMode = updateVal(recMode, 0, 1);
-//        if (recMode==MODE_NORMAL)  display.print("Norm");
-//        if (recMode==MODE_DIEL) display.print("Diel");
-//        break;
-//      case setStartHour:
-//        startHour = updateVal(startHour, 0, 23);
-//        display.print("Strt HH:");
-//        printZero(startHour);
-//        display.print(startHour);
-//        break;
-//      case setStartMinute:
-//        startMinute = updateVal(startMinute, 0, 59);
-//        display.print("Strt MM:");
-//        printZero(startMinute);
-//        display.print(startMinute);
-//        break;
-//      case setEndHour:
-//        endHour = updateVal(endHour, 0, 23);
-//        display.print("End HH:");
-//        printZero(endHour);
-//        display.print(endHour);
-//        break;
-//      case setEndMinute:
-//        endMinute = updateVal(endMinute, 0, 59);
-//        display.print("End MM:");
-//        printZero(endMinute);
-//        display.print(endMinute);
-//        break;
     }
     displaySettings();
     displayClock(getTeensy3Time(), BOTTOM);

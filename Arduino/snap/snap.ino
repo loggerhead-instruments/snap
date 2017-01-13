@@ -298,6 +298,7 @@ void setup() {
   display.display();
   
   digitalWrite(SDSW, LOW); //no USB connected, switch to microcontroller read SD card
+  
   delay(200);
   // Initialize the SD card
   SPI.setMOSI(7);
@@ -321,6 +322,7 @@ void setup() {
     EEPROM.write(20, 0); // reset indicator register
   }
   else{
+      digitalWrite(hydroPowPin, LOW); // make sure hydrophone powered off when in manual settings in case of accidental reset
       manualSettings();
   }
 
