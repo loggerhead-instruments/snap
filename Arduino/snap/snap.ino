@@ -160,7 +160,7 @@ typedef struct {
 
 HdrStruct wav_hdr;
 unsigned int rms;
-float hydroCal = -164;
+float hydroCal = -170;
 
 // Header for amx files
 DF_HEAD dfh;
@@ -965,7 +965,7 @@ void AudioInit(){
  
   sgtl5000_1.inputSelect(myInput);
   sgtl5000_1.volume(0.0);
-  sgtl5000_1.lineInLevel(2);  //default = 8
+  sgtl5000_1.lineInLevel(0);  //default = 8
   // CHIP_ANA_ADC_CTRL
 // Actual measured full-scale peak-to-peak sine wave input for max signal
 //  0: 3.12 Volts p-p

@@ -428,7 +428,7 @@ bool audio_enable(void)
   chipWrite(CHIP_ANA_CTRL, 0x0137);  // enable zero cross detectors
   
  // chipWrite(CHIP_ANA_POWER, 0x40FF); // power up: lineout, hp, adc, dac
-  chipWrite(CHIP_ANA_POWER, 0x00E2); // power up: adc
+  chipWrite(CHIP_ANA_POWER, 0x00A2); // power up:  adc Stereo = E2; Mono (Left): A2
   
   //chipWrite(CHIP_DIG_POWER, 0x0073); // power up all digital stuff
   chipWrite(CHIP_DIG_POWER, 0x0043); // power up only analag ADC and I2S; disable DAC and DAP
@@ -439,8 +439,8 @@ bool audio_enable(void)
   chipWrite(CHIP_I2S_CTRL, 0x0130); // SCLK=32*Fs, 16bit, I2S format
   // default signal routing is ok?
   chipWrite(CHIP_SSS_CTRL, 0x0010); // ADC->I2S, I2S->DAC
-  chipWrite(CHIP_ADCDAC_CTRL, 0x0000); // disable dac mute
-  chipWrite(CHIP_DAC_VOL, 0x3C3C); // digital gain, 0dB
+  chipWrite(CHIP_ADCDAC_CTRL, 0x000C); // DAC mute; ADC high pass and bypass normal operation
+  chipWrite(CHIP_DAC_VOL, 0xFFFF); // dac mute
   chipWrite(CHIP_ANA_HP_CTRL, 0x7F7F); // set headphone volume (lowest level)
   //chipWrite(CHIP_ANA_CTRL, 0x0036);  // enable zero cross detectors; line input
   
@@ -452,12 +452,12 @@ bool audio_enable(void)
 }
 
 void audio_power_down(void){
-  chipWrite(CHIP_ANA_POWER, 0x0000); // power down: everything
-  chipWrite(CHIP_DIG_POWER, 0x0000); // power up: everything
+  chipWrite(CHIP_ANA_POWER, 0x0000); // analog power down: everything
+  chipWrite(CHIP_DIG_POWER, 0x0000); // digital power down: everything
 }
 
 void audio_power_up(void){
-  chipWrite(CHIP_ANA_POWER, 0x00E2); // power up: adc
+  chipWrite(CHIP_ANA_POWER, 0x00A2); // power up: adc Stereo = E2; Mono (Left): A2
   chipWrite(CHIP_DIG_POWER, 0x0043); // power up only analag ADC and I2S; disable DAC and DAP
 }
 
