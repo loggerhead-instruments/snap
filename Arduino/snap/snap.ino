@@ -317,15 +317,9 @@ void setup() {
     }
   }
   //SdFile::dateTimeCallback(file_date_time);
-   
-  if(EEPROM.read(20)){
-    EEPROM.write(20, 0); // reset indicator register
-  }
-  else{
-      digitalWrite(hydroPowPin, LOW); // make sure hydrophone powered off when in manual settings in case of accidental reset
-      manualSettings();
-  }
 
+  digitalWrite(hydroPowPin, LOW); // make sure hydrophone powered off when in manual settings in case of accidental reset
+  manualSettings();
   
   setupDataStructures();
 
