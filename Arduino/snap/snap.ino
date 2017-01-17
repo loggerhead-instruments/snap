@@ -845,7 +845,7 @@ void FileInit()
         logFile.print(myID[n]);
       }
       logFile.print(',');
-      logFile.println(gainSetting); 
+      logFile.print(gainSetting); 
       logFile.print(',');
       logFile.println(voltage); 
       if(voltage < 3.0){
@@ -965,7 +965,7 @@ void AudioInit(){
  
   sgtl5000_1.inputSelect(myInput);
   sgtl5000_1.volume(0.0);
-  sgtl5000_1.lineInLevel(gainSetting);  //default = 8
+  sgtl5000_1.lineInLevel(gainSetting);  //default = 2
   // CHIP_ANA_ADC_CTRL
 // Actual measured full-scale peak-to-peak sine wave input for max signal
 //  0: 3.12 Volts p-p
