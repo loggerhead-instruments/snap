@@ -57,6 +57,7 @@ AudioControlSGTL5000     sgtl5000_1;     //xy=265,212
 // GUItool: end automatically generated code
 
 const int myInput = AUDIO_INPUT_LINEIN;
+int gainSetting = 2; //default gain setting; can be overridden in setup file
 
 // Pin Assignments
 const int CAM_POW = 1;
@@ -317,7 +318,8 @@ void setup() {
     }
   }
   //SdFile::dateTimeCallback(file_date_time);
-
+  LoadScript(); // secret settings accessible from the card
+  
   digitalWrite(hydroPowPin, LOW); // make sure hydrophone powered off when in manual settings in case of accidental reset
   manualSettings();
   
@@ -670,10 +672,10 @@ void setupDataStructures(void){
   strncpy(sensor[0].units[1], "Pa", STR_MAX);
   strncpy(sensor[0].units[2], "Pa", STR_MAX);
   strncpy(sensor[0].units[3], "Pa", STR_MAX);
-  sensor[0].cal[0] = -180.0; // this needs to be set based on hydrophone sensitivity + chip gain
-  sensor[0].cal[1] = -180.0;
-  sensor[0].cal[2] = -180.0;
-  sensor[0].cal[3] = -180.0;
+  sensor[0].cal[0] = -170.0; // this needs to be set based on hydrophone sensitivity + chip gain
+  sensor[0].cal[1] = -170.0;
+  sensor[0].cal[2] = -170.0;
+  sensor[0].cal[3] = -170.0;
 
   // Pressure/Temperature
   if(pressure_sensor == 1) {
@@ -843,6 +845,8 @@ void FileInit()
         logFile.print(myID[n]);
       }
       logFile.print(',');
+      logFile.println(gainSetting); 
+      logFile.print(',');
       logFile.println(voltage); 
       if(voltage < 3.0){
         logFile.println("Stopping because Voltage less than 3.0 V");
@@ -961,7 +965,7 @@ void AudioInit(){
  
   sgtl5000_1.inputSelect(myInput);
   sgtl5000_1.volume(0.0);
-  sgtl5000_1.lineInLevel(0);  //default = 8
+  sgtl5000_1.lineInLevel(gainSetting);  //default = 8
   // CHIP_ANA_ADC_CTRL
 // Actual measured full-scale peak-to-peak sine wave input for max signal
 //  0: 3.12 Volts p-p
