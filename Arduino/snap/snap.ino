@@ -35,7 +35,7 @@ Adafruit_SSD1306 display(OLED_RESET);
 // set this to the hardware serial port you wish to use
 #define HWSERIAL Serial1
 
-static boolean printDiags = 1;  // 1: serial print diagnostics; 0: no diagnostics
+static boolean printDiags = 0;  // 1: serial print diagnostics; 0: no diagnostics
 static uint8_t myID[8];
 
 unsigned long baud = 115200;
@@ -57,7 +57,7 @@ AudioControlSGTL5000     sgtl5000_1;     //xy=265,212
 // GUItool: end automatically generated code
 
 const int myInput = AUDIO_INPUT_LINEIN;
-int gainSetting = 2; //default gain setting; can be overridden in setup file
+int gainSetting = 4; //default gain setting; can be overridden in setup file
 
 // Pin Assignments
 const int hydroPowPin = 2;
@@ -339,7 +339,8 @@ void loop() {
 //        display.display();
 
         mode = 1;
-        digitalWrite(displayPow, LOW);  //display off during recording
+  
+        display.ssd1306_command(SSD1306_DISPLAYOFF); // turn off display during recording
         startRecording();
       }
   }
@@ -348,13 +349,14 @@ void loop() {
   // Record mode
   if (mode == 1) {
     continueRecording();  // download data  
-    
+
+    /*
      // update clock while recording
       recLoopCount++;
       if(recLoopCount>50){
         recLoopCount = 0;
         t = getTeensy3Time();
-       /* cDisplay();
+        cDisplay();
         if(rec_int > 0) {
           display.println("Rec");
           displayClock(stopTime, 20);
@@ -366,8 +368,8 @@ void loop() {
         }
         displayClock(t, BOTTOM);
         display.display();
-        */
       }
+      */
       
     if(buf_count >= nbufs_per_file){       // time to stop?
       if(rec_int == 0){
@@ -376,77 +378,76 @@ void loop() {
         buf_count = 0;
       }
       else{
-      
-                stopRecording();
-          
-                long ss = startTime - getTeensy3Time() - wakeahead;
-                if (ss<0) ss=0;
-                snooze_hour = floor(ss/3600);
-                ss -= snooze_hour * 3600;
-                snooze_minute = floor(ss/60);
-                ss -= snooze_minute * 60;
-                snooze_second = ss;
-          
-                if( snooze_hour + snooze_minute + snooze_second >=10){
-                    digitalWrite(hydroPowPin, LOW); //hydrophone off
-                    audio_power_down();
-                 /*   cDisplay();
-                    display.display();
-                    delay(100);
-                    display.ssd1306_command(SSD1306_DISPLAYOFF); 
-                    */
-                    if(printDiags){
-                      Serial.print("Snooze HH MM SS ");
-                      Serial.print(snooze_hour);
-                      Serial.print(snooze_minute);
-                      Serial.println(snooze_second);
-                    }
-                    
-                    delay(100);
-          
-                   // AudioNoInterrupts();
-          
-                    
-                    //snooze_config.setAlarm(snooze_hour, snooze_minute, snooze_second);
-                    //delay(100);c
-                    //Snooze.sleep( snooze_config );
-                    //Snooze.deepSleep(snooze_config);
-                    //Snooze.hibernate( snooze_config);
-          
-                    alarm.setAlarm(snooze_hour, snooze_minute, snooze_second);
-                    Snooze.sleep(config_teensy32);
-          
-                    
-                    /// ... Sleeping ....
-                    
-                    // Waking up
-                   // if (printDiags==0) usbDisable();
-                    digitalWrite(displayPow, HIGH); //start display up on wake
-                    delay(100);
-                    display.begin(SSD1306_SWITCHCAPVCC, 0x3C);  //initialize display
-                    digitalWrite(hydroPowPin, HIGH); // hydrophone on
-           
-                  //  audio_enable();
-                  //  AudioInterrupts();
-                    
-                    audio_power_up();
-                    
-                    //sdInit();  //reinit SD because voltage can drop in hibernate
-                 }
-          
-                    
-                mode = 0;
+        stopRecording();
+        long ss = startTime - getTeensy3Time() - wakeahead;
+        if (ss<0) ss=0;
+        snooze_hour = floor(ss/3600);
+        ss -= snooze_hour * 3600;
+        snooze_minute = floor(ss/60);
+        ss -= snooze_minute * 60;
+        snooze_second = ss;
+
+        Serial.println(snooze_hour);
+        Serial.println(snooze_minute);
+        Serial.println(snooze_second);
+        
+        if( (snooze_hour * 3600) + (snooze_minute * 60) + snooze_second >=10){
+            if (printDiags==0) Serial.println("Shutting bits down");
+            digitalWrite(hydroPowPin, LOW); //hydrophone off
+            if (printDiags==0) Serial.println("hydrophone off");
+            audio_power_down();
+            if (printDiags==0) Serial.println("audio power down");
+
+            if(printDiags){
+              Serial.print("Snooze HH MM SS ");
+              Serial.print(snooze_hour);
+              Serial.print(snooze_minute);
+              Serial.println(snooze_second);
+            }
+            delay(100);
+            Serial.println("Going to Sleep");
+            delay(100);
+  
+           // AudioNoInterrupts();
+  
+            //snooze_config.setAlarm(snooze_hour, snooze_minute, snooze_second);
+            //delay(100);
+            //Snooze.sleep( snooze_config );
+            //Snooze.deepSleep(snooze_config);
+            //Snooze.hibernate( snooze_config);
+  
+            alarm.setAlarm(snooze_hour, snooze_minute, snooze_second);
+            Snooze.sleep(config_teensy32);
+  
+            
+            /// ... Sleeping ....
+            
+            // Waking up
+           // if (printDiags==0) usbDisable();
+            
+            digitalWrite(hydroPowPin, HIGH); // hydrophone on
+   
+          //  audio_enable();
+          //  AudioInterrupts();
+            audio_power_up();
+            //sdInit();  //reinit SD because voltage can drop in hibernate
+         }
+         
+        //digitalWrite(displayPow, HIGH); //start display up on wake
+        //delay(100);
+        display.begin(SSD1306_SWITCHCAPVCC, 0x3C);  //initialize display
+        mode = 0;  // standby mode
       }
     }
   }
 }
 
 void startRecording() {
-  Serial.println("startRecording");
+  if (printDiags)  Serial.println("startRecording");
   FileInit();
   buf_count = 0;
   queue1.begin();
-  Serial.println("Queue Begin");
+  if (printDiags)  Serial.println("Queue Begin");
 }
 
 void continueRecording() {
@@ -465,18 +466,18 @@ void continueRecording() {
       
     buf_count += 1;
     audioIntervalCount += 1;
-    
-    if(printDiags){
-      Serial.print(".");
-   }
+//    
+//    if(printDiags){
+//      Serial.print(".");
+//   }
   }
 }
 
 void stopRecording() {
-  Serial.println("stopRecording");
+  if (printDiags) Serial.println("stopRecording");
   int maxblocks = AudioMemoryUsageMax();
-  Serial.print("Audio Memory Max");
-  Serial.println(maxblocks);
+  if (printDiags) Serial.print("Audio Memory Max");
+  if (printDiags) Serial.println(maxblocks);
   byte buffer[512];
   queue1.end();
   //queue1.clear();
@@ -484,8 +485,6 @@ void stopRecording() {
   //frec.timestamp(T_WRITE,(uint16_t) year(t),month(t),day(t),hour(t),minute(t),second);
   frec.close();
   delay(100);
-  //calcRMS();
-  //Serial.println(rms);
 }
 
 
@@ -609,7 +608,7 @@ void AudioInit(){
  
   //sgtl5000_1.inputSelect(myInput);
   //sgtl5000_1.volume(0.0);
- // sgtl5000_1.lineInLevel(gainSetting);  //default = 2
+  sgtl5000_1.lineInLevel(gainSetting);  //default = 4
   // CHIP_ANA_ADC_CTRL
 // Actual measured full-scale peak-to-peak sine wave input for max signal
 //  0: 3.12 Volts p-p

@@ -454,7 +454,7 @@ bool audio_enable(void)
   chipWrite(CHIP_ANA_CTRL, 0x0114);  // lineout mute, headphone mute, no zero cross detectors, line input selected
   chipWrite(CHIP_MIC_CTRL, 0x0000); //microphone off
   chipWrite(CHIP_ANA_ADC_CTRL, 0x0000); // 0 dB gain
- 
+  //chipWrite(CHIP_ANA_ADC_CTRL, 0x0100); // -6 dB gain
   return true;
 }
 
