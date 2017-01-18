@@ -249,7 +249,7 @@ void setup() {
   
   cDisplay();
 
-  int roundSeconds = 60;//modulo to nearest x seconds
+  int roundSeconds = 300;//modulo to nearest x seconds
   t = getTeensy3Time();
   startTime = getTeensy3Time();
   startTime -= startTime % roundSeconds;  
