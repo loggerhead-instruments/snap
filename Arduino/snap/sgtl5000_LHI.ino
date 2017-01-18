@@ -208,12 +208,15 @@
 //        (same scale as HP_VOL_RIGHT)
 
 #define CHIP_ANA_CTRL     0x0024
+// 15:9 Reserved
 // 8  MUTE_LO   LINEOUT Mute, 0 = Unmute, 1 = Mute  (default 1)
+// 7  Reserved
 // 6  SELECT_HP Select the headphone input, 0 = DAC, 1 = LINEIN
 // 5  EN_ZCD_HP Enable the headphone zero cross detector (ZCD)
 //        0x0 = HP ZCD disabled
 //        0x1 = HP ZCD enabled
 // 4  MUTE_HP   Mute the headphone outputs, 0 = Unmute, 1 = Mute (default)
+// 3  Reserved
 // 2  SELECT_ADC  Select the ADC input, 0 = Microphone, 1 = LINEIN
 // 1  EN_ZCD_ADC  Enable the ADC analog zero cross detector (ZCD)
 //        0x0 = ADC ZCD disabled
@@ -407,8 +410,8 @@
 #define CHIP_ANA_TEST2      0x003A //  intended only for debug.
 
 #define CHIP_SHORT_CTRL     0x003C
-
-
+#define DAP_AVC_CTRL        0x0124 //audio volume control
+// 0  Disable
 
 bool audio_enable(void)
 {
@@ -420,9 +423,12 @@ bool audio_enable(void)
 
   chipWrite(CHIP_ANA_POWER, 0x4060);  // VDDD is externally driven with 1.8V
   chipWrite(CHIP_LINREG_CTRL, 0x006C);  // VDDA & VDDIO both over 3.1V
+  
   chipWrite(CHIP_REF_CTRL, 0x01F0); // VAG=1.575, normal ramp, no bias current;
-  chipWrite(CHIP_MIC_CTRL, 0x00); // Mic bias off; Mic Amplifier gain 0 dB
   //chipWrite(CHIP_REF_CTRL, 0x01F2); // VAG=1.575, normal ramp, +12.5% bias current
+    
+  chipWrite(CHIP_MIC_CTRL, 0x00); // Mic bias off; Mic Amplifier gain 0 dB
+
   chipWrite(CHIP_LINE_OUT_CTRL, 0x0F22); // LO_VAGCNTRL=1.65V, OUT_CURRENT=0.54mA
   chipWrite(CHIP_SHORT_CTRL, 0x4446);  // allow up to 125mA
   chipWrite(CHIP_ANA_CTRL, 0x0137);  // enable zero cross detectors
@@ -443,11 +449,12 @@ bool audio_enable(void)
   chipWrite(CHIP_DAC_VOL, 0xFFFF); // dac mute
   chipWrite(CHIP_ANA_HP_CTRL, 0x7F7F); // set headphone volume (lowest level)
   //chipWrite(CHIP_ANA_CTRL, 0x0036);  // enable zero cross detectors; line input
-  
-  chipWrite(CHIP_ANA_CTRL, 0x0115);  // lineout mute, headphone mute, no zero cross detectors, line input selected
-  
-  //mute = false;
-  // semi_automated = true;
+
+  chipWrite(DAP_AVC_CTRL, 0x0000); //no automatic volume control
+  chipWrite(CHIP_ANA_CTRL, 0x0114);  // lineout mute, headphone mute, no zero cross detectors, line input selected
+  chipWrite(CHIP_MIC_CTRL, 0x0000); //microphone off
+  chipWrite(CHIP_ANA_ADC_CTRL, 0x0000); // 0 dB gain
+ 
   return true;
 }
 
