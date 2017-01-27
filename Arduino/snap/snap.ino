@@ -615,7 +615,7 @@ void AudioInit(){
 //  1: 2.63 Volts p-p
 //  2: 2.22 Volts p-p
 //  3: 1.87 Volts p-p
-//  4: 1.58 Volts p-p
+//  4: 1.58 Volts p-p (0.79 Vpeak)
 //  5: 1.33 Volts p-p
 //  6: 1.11 Volts p-p
 //  7: 0.94 Volts p-p

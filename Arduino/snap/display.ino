@@ -2,6 +2,9 @@
 /* DISPLAY FUNCTIONS
  *  
  */
+
+time_t autoStartTime;
+ 
 void printDigits(int digits){
   // utility function for digital clock display: prints preceding colon and leading 0
   display.print(":");
@@ -32,7 +35,7 @@ void manualSettings(){
   boolean startRec = 0, startUp, startDown;
   readEEPROM();
 
-  time_t autoStartTime = getTeensy3Time();
+  autoStartTime = getTeensy3Time();
   
   // make sure settings valid (if EEPROM corrupted or not set yet)
   if (rec_dur < 0 | rec_dur>100000) rec_dur = 60;
@@ -152,6 +155,7 @@ void setTeensyTime(int hr, int mn, int sc, int dy, int mh, int yr){
   time_t newtime;
   newtime = makeTime(tm); 
   Teensy3Clock.set(newtime); 
+  autoStartTime = getTeensy3Time();
 }
   
 int updateVal(long curVal, long minVal, long maxVal){
