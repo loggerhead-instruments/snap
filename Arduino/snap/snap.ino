@@ -22,7 +22,7 @@
 #include <TimeLib.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
-#include <EEPROM.h>
+#include <EEPROM.h>T
 //#include <TimerOne.h>
 
 #define CPU_RESTART_ADDR (uint32_t *)0xE000ED0C
@@ -188,10 +188,9 @@ void setup() {
 
   delay(500);    
 
-  setSyncProvider(getTeensy3Time); //use Teensy RTC to keep time
+  //setSyncProvider(getTeensy3Time); //use Teensy RTC to keep time
   t = getTeensy3Time();
   if (t < 1451606400) Teensy3Clock.set(1451606400);
-
 
   display.begin(SSD1306_SWITCHCAPVCC, 0x3C);  //initialize display
   delay(100);
@@ -315,6 +314,8 @@ void loop() {
       displayClock(startTime, 20);
       displayClock(t, BOTTOM);
       display.display();
+
+      Serial.println(rtc_get());
       
       if(t >= burnTime){
         digitalWrite(BURN1, HIGH);

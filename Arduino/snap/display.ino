@@ -202,7 +202,7 @@ void cDisplay(){
 }
 
 void displaySettings(){
-  t = Teensy3Clock.get();
+  t = getTeensy3Time();
   display.setTextSize(1);
   display.setTextColor(WHITE);
   display.setCursor(0, 18);
@@ -239,7 +239,7 @@ void displayClock(time_t t, int loc){
   display.print('-');
   display.print(day(t));
   display.print("  ");
-  printZero(hour());
+  printZero(hour(t));
   display.print(hour(t));
   printDigits(minute(t));
   printDigits(second(t));
