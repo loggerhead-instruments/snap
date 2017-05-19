@@ -35,8 +35,8 @@ void manualSettings(){
   boolean startRec = 0, startUp, startDown;
   readEEPROM();
 
-  //autoStartTime = getTeensy3Time();
-  autoStartTime = now();
+  autoStartTime = getTeensy3Time();
+  
   
   // make sure settings valid (if EEPROM corrupted or not set yet)
   if (rec_dur < 0 | rec_dur>100000) rec_dur = 60;
@@ -60,8 +60,7 @@ void manualSettings(){
 
     cDisplay();
 
-    //t = getTeensy3Time();
-    t = now();
+    t = getTeensy3Time();
 
     if (t - autoStartTime > 600) startRec = 1; //autostart if no activity for 10 minutes
     switch (curSetting){
@@ -69,8 +68,7 @@ void manualSettings(){
         if (settingsChanged) {
           writeEEPROM();
           settingsChanged = 0;
-          //autoStartTime = getTeensy3Time();  //reset autoStartTime
-          autoStartTime = now();  //reset autoStartTime
+          autoStartTime = getTeensy3Time();  //reset autoStartTime
         }
         display.print("UP+DN->Rec"); 
         // Check for start recording
@@ -102,79 +100,63 @@ void manualSettings(){
         newYear = updateVal(oldYear,2000, 2100);
         if(oldYear!=newYear) setTeensyTime(hour(t), minute(t), second(t), day(t), month(t), newYear);
         display.print("Year:");
-        //display.print(year(getTeensy3Time()));
-        t = now();
-        display.print(year(t));
+        display.print(year(getTeensy3Time()));
         break;
       case setMonth:
         oldMonth = month(t);
         newMonth = updateVal(oldMonth, 1, 12);
         if(oldMonth != newMonth) setTeensyTime(hour(t), minute(t), second(t), day(t), newMonth, year(t));
         display.print("Month:");
-        //display.print(month(getTeensy3Time()));
-        t = now();
-        display.print(month(t));
-        
+        display.print(month(getTeensy3Time()));
         break;
       case setDay:
         oldDay = day(t);
         newDay = updateVal(oldDay, 1, 31);
         if(oldDay!=newDay) setTeensyTime(hour(t), minute(t), second(t), newDay, month(t), year(t));
         display.print("Day:");
-        //display.print(day(getTeensy3Time()));
-        t = now();
-        display.print(day(t));
+        display.print(day(getTeensy3Time()));
         break;
       case setHour:
         oldHour = hour(t);
         newHour = updateVal(oldHour, 0, 23);
         if(oldHour!=newHour) setTeensyTime(newHour, minute(t), second(t), day(t), month(t), year(t));
         display.print("Hour:");
-        // display.print(hour(getTeensy3Time()));
-        t = now();
-        display.print(hour(t));
+        display.print(hour(getTeensy3Time()));
         break;
       case setMinute:
         oldMinute = minute(t);
         newMinute = updateVal(oldMinute, 0, 59);
         if(oldMinute!=newMinute) setTeensyTime(hour(t), newMinute, second(t), day(t), month(t), year(t));
         display.print("Minute:");
-        //display.print(minute(getTeensy3Time()));
-        t = now();
-        display.print(minute(t));
+        display.print(minute(getTeensy3Time()));
         break;
       case setSecond:
         oldSecond = second(t);
         newSecond = updateVal(oldSecond, 0, 59);
         if(oldSecond!=newSecond) setTeensyTime(hour(t), minute(t), newSecond, day(t), month(t), year(t));
         display.print("Second:");
-        //display.print(second(getTeensy3Time()));
-        t = now();
-        display.print(second(t));
+        display.print(second(getTeensy3Time()));
         break;
     }
     displaySettings();
-    //displayClock(getTeensy3Time(), BOTTOM);
-    displayClock(now(), BOTTOM);
+    displayClock(getTeensy3Time(), BOTTOM);
     display.display();
     delay(200);
   }
 }
 
 void setTeensyTime(int hr, int mn, int sc, int dy, int mh, int yr){
-  setTime(hr, mn, sc, dy, mh, yr);
-//  tmElements_t tm;
-//  tm.Year = yr - 1970;
-//  tm.Month = mh;
-//  tm.Day = dy;
-//  tm.Hour = hr;
-//  tm.Minute = mn;
-//  tm.Second = sc;
-//  time_t newtime;
-//  newtime = makeTime(tm); 
-//  Teensy3Clock.set(newtime); 
-  //autoStartTime = getTeensy3Time();
-  autoStartTime = now();
+  tmElements_t tm;
+  tm.Year = yr - 1970;
+  tm.Month = mh;
+  tm.Day = dy;
+  tm.Hour = hr;
+  tm.Minute = mn;
+  tm.Second = sc;
+  time_t newtime;
+  newtime = makeTime(tm); 
+  Teensy3Clock.set(newtime); 
+  autoStartTime = getTeensy3Time();
 }
   
 int updateVal(long curVal, long minVal, long maxVal){
@@ -220,9 +202,7 @@ void cDisplay(){
 }
 
 void displaySettings(){
-  //t = Teensy3Clock.get();
-  //t = getTeensy3Time();
-  t = now();
+  t = Teensy3Clock.get();
   display.setTextSize(1);
   display.setTextColor(WHITE);
   display.setCursor(0, 18);
