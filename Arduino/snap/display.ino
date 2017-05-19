@@ -103,7 +103,8 @@ void manualSettings(){
         if(oldYear!=newYear) setTeensyTime(hour(t), minute(t), second(t), day(t), month(t), newYear);
         display.print("Year:");
         //display.print(year(getTeensy3Time()));
-        display.print(year());
+        t = now();
+        display.print(year(t));
         break;
       case setMonth:
         oldMonth = month(t);
@@ -111,7 +112,8 @@ void manualSettings(){
         if(oldMonth != newMonth) setTeensyTime(hour(t), minute(t), second(t), day(t), newMonth, year(t));
         display.print("Month:");
         //display.print(month(getTeensy3Time()));
-        display.print(month());
+        t = now();
+        display.print(month(t));
         
         break;
       case setDay:
@@ -120,7 +122,8 @@ void manualSettings(){
         if(oldDay!=newDay) setTeensyTime(hour(t), minute(t), second(t), newDay, month(t), year(t));
         display.print("Day:");
         //display.print(day(getTeensy3Time()));
-        display.print(day());
+        t = now();
+        display.print(day(t));
         break;
       case setHour:
         oldHour = hour(t);
@@ -128,7 +131,8 @@ void manualSettings(){
         if(oldHour!=newHour) setTeensyTime(newHour, minute(t), second(t), day(t), month(t), year(t));
         display.print("Hour:");
         // display.print(hour(getTeensy3Time()));
-        display.print(hour());
+        t = now();
+        display.print(hour(t));
         break;
       case setMinute:
         oldMinute = minute(t);
@@ -136,7 +140,8 @@ void manualSettings(){
         if(oldMinute!=newMinute) setTeensyTime(hour(t), newMinute, second(t), day(t), month(t), year(t));
         display.print("Minute:");
         //display.print(minute(getTeensy3Time()));
-        display.print(minute());
+        t = now();
+        display.print(minute(t));
         break;
       case setSecond:
         oldSecond = second(t);
@@ -144,7 +149,8 @@ void manualSettings(){
         if(oldSecond!=newSecond) setTeensyTime(hour(t), minute(t), newSecond, day(t), month(t), year(t));
         display.print("Second:");
         //display.print(second(getTeensy3Time()));
-        display.print(second());
+        t = now();
+        display.print(second(t));
         break;
     }
     displaySettings();
@@ -156,16 +162,17 @@ void manualSettings(){
 }
 
 void setTeensyTime(int hr, int mn, int sc, int dy, int mh, int yr){
-  tmElements_t tm;
-  tm.Year = yr - 1970;
-  tm.Month = mh;
-  tm.Day = dy;
-  tm.Hour = hr;
-  tm.Minute = mn;
-  tm.Second = sc;
-  time_t newtime;
-  newtime = makeTime(tm); 
-  Teensy3Clock.set(newtime); 
+  setTime(hr, mn, sc, dy, mh, yr);
+//  tmElements_t tm;
+//  tm.Year = yr - 1970;
+//  tm.Month = mh;
+//  tm.Day = dy;
+//  tm.Hour = hr;
+//  tm.Minute = mn;
+//  tm.Second = sc;
+//  time_t newtime;
+//  newtime = makeTime(tm); 
+//  Teensy3Clock.set(newtime); 
   //autoStartTime = getTeensy3Time();
   autoStartTime = now();
 }
