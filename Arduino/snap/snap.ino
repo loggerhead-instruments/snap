@@ -16,6 +16,7 @@
 #include <Wire.h>
 #include <SPI.h>
 //#include <SdFat.h>
+#include <SD.h>
 #include "amx32.h"
 #include <Snooze.h>  //using https://github.com/duff2013/Snooze; uncomment line 62 #define USE_HIBERNATE
 #include <TimeLib.h>
@@ -188,7 +189,8 @@ void setup() {
   delay(500);    
 
   setSyncProvider(getTeensy3Time); //use Teensy RTC to keep time
-  t = getTeensy3Time();
+  //t = getTeensy3Time();
+  t = now();
   if (t < 1451606400) Teensy3Clock.set(1451606400);
 
 
@@ -227,7 +229,8 @@ void setup() {
     while (1) {
       cDisplay();
       display.println("SD error. Restart.");
-      displayClock(getTeensy3Time(), BOTTOM);
+      //displayClock(getTeensy3Time(), BOTTOM);
+      displayClock(now(), BOTTOM);
       display.display();
       delay(20000);  
       resetFunc();
@@ -250,8 +253,10 @@ void setup() {
   cDisplay();
 
   int roundSeconds = 300;//modulo to nearest x seconds
-  t = getTeensy3Time();
-  startTime = getTeensy3Time();
+  //t = getTeensy3Time();
+  t = now();
+  startTime = t;
+  //startTime = getTeensy3Time();
   startTime -= startTime % roundSeconds;  
   startTime += roundSeconds; //move forward
   stopTime = startTime + rec_dur;  // this will be set on start of recording
@@ -307,7 +312,8 @@ void loop() {
   // Standby mode
   if(mode == 0)
   {
-      t = getTeensy3Time();
+      //t = getTeensy3Time();
+      t = now();
       cDisplay();
       display.println("Next Start");
       displayClock(startTime, 20);
@@ -325,7 +331,8 @@ void loop() {
       //  if (recMode==MODE_DIEL) checkDielTime();
 
         Serial.print("Current Time: ");
-        printTime(getTeensy3Time());
+        //printTime(getTeensy3Time());
+        printTime(now());
         Serial.print("Stop Time: ");
         printTime(stopTime);
         Serial.print("Next Start:");
@@ -379,7 +386,8 @@ void loop() {
       }
       else{
         stopRecording();
-        long ss = startTime - getTeensy3Time() - wakeahead;
+        //long ss = startTime - getTeensy3Time() - wakeahead;
+        long ss = startTime - now() - wakeahead;
         if (ss<0) ss=0;
         snooze_hour = floor(ss/3600);
         ss -= snooze_hour * 3600;
@@ -509,7 +517,8 @@ void sdInit(){
 
 void FileInit()
 {
-   t = getTeensy3Time();
+   //t = getTeensy3Time();
+   t = now();
    
    if (folderMonth != month(t)){
     if(printDiags) Serial.println("New Folder");
@@ -594,7 +603,8 @@ void FileInit()
 //This function returns the date and time for SD card file access and modify time. One needs to call in setup() to register this callback function: SdFile::dateTimeCallback(file_date_time);
 void file_date_time(uint16_t* date, uint16_t* time) 
 {
-  t = getTeensy3Time();
+  //t = getTeensy3Time();
+  t = now();
   *date=FAT_DATE(year(t),month(t),day(t));
   *time=FAT_TIME(hour(t),minute(t),second(t));
 }
