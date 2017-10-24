@@ -129,7 +129,7 @@
 // 8  VOL_EXPO_RAMP Exponential Volume Ramp Enable
 //        0x0 = Linear ramp over top 4 volume octaves
 //        0x1 = Exponential ramp over full volume range
-//        This bit only takes effect if VOL_RAMP_EN is 1.
+//        This bit onlay takes effect if VOL_RAMP_EN is 1.
 // 3  DAC_MUTE_RIGHT  DAC Right Mute (default=1)
 //        0x0 = Unmute
 //        0x1 = Muted
@@ -433,29 +433,43 @@ bool audio_enable(void)
   chipWrite(CHIP_SHORT_CTRL, 0x4446);  // allow up to 125mA
   chipWrite(CHIP_ANA_CTRL, 0x0137);  // enable zero cross detectors
   
- // chipWrite(CHIP_ANA_POWER, 0x40FF); // power up: lineout, hp, adc, dac
-  chipWrite(CHIP_ANA_POWER, 0x00A2); // power up:  adc Stereo = E2; Mono (Left): A2
-  
-  //chipWrite(CHIP_DIG_POWER, 0x0073); // power up all digital stuff
-  chipWrite(CHIP_DIG_POWER, 0x0043); // power up only analag ADC and I2S; disable DAC and DAP
+  audio_power_up();
   
   delay(400);
   //chipWrite(CHIP_LINE_OUT_VOL, 0x1D1D); // default approx 1.3 volts peak-to-peak
+  chipWrite(CHIP_LINE_OUT_VOL, 0x1919); // default approx 1.3 volts peak-to-peak
   chipWrite(CHIP_CLK_CTRL, 0x0004);  // 44.1 kHz, 256*Fs
   chipWrite(CHIP_I2S_CTRL, 0x0130); // SCLK=32*Fs, 16bit, I2S format
   // default signal routing is ok?
-  chipWrite(CHIP_SSS_CTRL, 0x0010); // ADC->I2S, I2S->DAC
-  chipWrite(CHIP_ADCDAC_CTRL, 0x000C); // DAC mute; ADC high pass and bypass normal operation
-  chipWrite(CHIP_DAC_VOL, 0xFFFF); // dac mute
+  
+  //chipWrite(CHIP_SSS_CTRL, 0x0010); // ADC->I2S, I2S->DAC
+  chipWrite(CHIP_SSS_CTRL, 0x0000); // ADC->I2S, ADC->DAC
+
+    chipWrite(CHIP_ADCDAC_CTRL, 0x0008); // DAC mute right; DAC left unmute; ADC HPF normal operation
+  
+  
+  chipWrite(CHIP_DAC_VOL, 0xFF3C); // dac mute right; left 0 dB
   chipWrite(CHIP_ANA_HP_CTRL, 0x7F7F); // set headphone volume (lowest level)
   //chipWrite(CHIP_ANA_CTRL, 0x0036);  // enable zero cross detectors; line input
 
   chipWrite(DAP_AVC_CTRL, 0x0000); //no automatic volume control
-  chipWrite(CHIP_ANA_CTRL, 0x0114);  // lineout mute, headphone mute, no zero cross detectors, line input selected
+  //chipWrite(CHIP_ANA_CTRL, 0x0114);  // lineout mute, headphone mute, no zero cross detectors, line input selected
+  chipWrite(CHIP_ANA_CTRL, 0x0014);  // lineout unmute, headphone mute, no zero cross detectors, line input selected
   chipWrite(CHIP_MIC_CTRL, 0x0000); //microphone off
   chipWrite(CHIP_ANA_ADC_CTRL, 0x0000); // 0 dB gain
   //chipWrite(CHIP_ANA_ADC_CTRL, 0x0100); // -6 dB gain
-  return true;
+  
+  
+   return true;
+}
+
+void audio_freeze_adc_hp(){
+   chipWrite(CHIP_ADCDAC_CTRL, 0x000A); // DAC mute right; DAC left unmute; ADC high pass filter frozen; ADC HPF normal operation
+}
+
+void audio_bypass_adc_hp(){
+  chipWrite(CHIP_ADCDAC_CTRL, 0x000B); // DAC mute right; DAC left unmute; ADC high pass filter frozen; ADC HPF bypassed (so does not matter it is frozen); get offset of about 370 units
+
 }
 
 void audio_power_down(void){
@@ -464,8 +478,11 @@ void audio_power_down(void){
 }
 
 void audio_power_up(void){
-  chipWrite(CHIP_ANA_POWER, 0x00A2); // power up: adc Stereo = E2; Mono (Left): A2
-  chipWrite(CHIP_DIG_POWER, 0x0043); // power up only analag ADC and I2S; disable DAC and DAP
+  //chipWrite(CHIP_ANA_POWER, 0x00A2); // power up: adc Stereo = E2; Mono (Left): A2
+ chipWrite(CHIP_ANA_POWER, 0x00AB); // power up: DAC; ADC; Mono (Left): Lineout amplifier; AB
+ 
+//  chipWrite(CHIP_DIG_POWER, 0x0043); // power up only analag ADC and I2S; disable DAC and DAP
+  chipWrite(CHIP_DIG_POWER, 0x0063); // power up analag ADC, DAC, I2SIN, I2SOUT; disable DAP and IS2OUT
 }
 
 bool chipWrite(unsigned int reg, unsigned int val)

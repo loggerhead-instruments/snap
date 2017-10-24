@@ -2,7 +2,7 @@
 // SNAP acoustic recorder
 //
 // Loggerhead Instruments
-// 2016
+// 2016-2017
 // David Mann
 // 
 // Modified from PJRC audio code
@@ -15,8 +15,7 @@
 #include <Audio.h>  //this also includes SD.h from lines 89 & 90
 #include <Wire.h>
 #include <SPI.h>
-//#include <SdFat.h>
-#include <SD.h>
+#include <SdFat.h>
 #include "amx32.h"
 #include <Snooze.h>  //using https://github.com/duff2013/Snooze; uncomment line 62 #define USE_HIBERNATE
 #include <TimeLib.h>
@@ -59,6 +58,7 @@ AudioControlSGTL5000     sgtl5000_1;     //xy=265,212
 
 const int myInput = AUDIO_INPUT_LINEIN;
 int gainSetting = 4; //default gain setting; can be overridden in setup file
+int noDC = 0; // 0 = freezeDC offset; 1 = remove DC offset
 
 // Pin Assignments
 const int hydroPowPin = 2;
@@ -134,6 +134,8 @@ SnoozeBlock config_teensy32(snooze_audio, alarm);
 
 // The file where data is recorded
 File frec;
+SdFat SD;
+SdFile file;
 
 typedef struct {
     char    rId[4];
@@ -163,6 +165,32 @@ void setup() {
   
   Serial.begin(baud);
   delay(500);
+
+  Serial.println(RTC_TSR);
+  delay(1000);
+  Serial.println(RTC_TSR);
+  delay(1000);
+  Serial.println(RTC_TSR);
+
+  RTC_CR = 0; // disable RTC
+  delay(100);
+  Serial.println(RTC_CR,HEX);
+  // change capacitance to 26 pF (12.5 pF load capacitance)
+  RTC_CR = RTC_CR_SC16P | RTC_CR_SC8P | RTC_CR_SC2P; 
+  delay(100);
+  RTC_CR = RTC_CR_SC16P | RTC_CR_SC8P | RTC_CR_SC2P | RTC_CR_OSCE;
+  delay(100);
+
+  Serial.println(RTC_SR,HEX);
+  Serial.println(RTC_CR,HEX);
+  Serial.println(RTC_LR,HEX);
+
+  Serial.println(RTC_TSR);
+  delay(1000);
+  Serial.println(RTC_TSR);
+  delay(1000);
+  Serial.println(RTC_TSR);
+  
   Wire.begin();
 
   pinMode(hydroPowPin, OUTPUT);
@@ -171,7 +199,7 @@ void setup() {
   pinMode(vSense, INPUT);
   analogReference(DEFAULT);
 
-  digitalWrite(hydroPowPin, LOW);
+  digitalWrite(hydroPowPin, HIGH);
   digitalWrite(displayPow, HIGH);
 
   pinMode(usbSense, OUTPUT);
@@ -236,7 +264,13 @@ void setup() {
   //SdFile::dateTimeCallback(file_date_time);
   LoadScript(); // secret settings accessible from the card
   
-  digitalWrite(hydroPowPin, LOW); // make sure hydrophone powered off when in manual settings in case of accidental reset
+  // Audio connections require memory, and the record queue
+  // uses this memory to buffer incoming audio.
+  // initialize now to estimate DC offset during setup
+  AudioMemory(100);
+  AudioInit(); // this calls Wire.begin() in control_sgtl5000.cpp
+  
+
   manualSettings();
   
   // disable buttons; not using any more
@@ -286,12 +320,8 @@ void setup() {
   Serial.print("Time to first record ");
   Serial.println(time_to_first_rec);
 
-  // Audio connections require memory, and the record queue
-  // uses this memory to buffer incoming audio.
-  AudioMemory(100);
-  AudioInit(); // this calls Wire.begin() in control_sgtl5000.cpp
-  
-  digitalWrite(hydroPowPin, HIGH);
+
+  if(noDC==0) audio_freeze_adc_hp(); // this will lower the DC offset voltage, and reduce noise
   mode = 0;
 
   // create first folder to hold data
