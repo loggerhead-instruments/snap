@@ -111,6 +111,7 @@ float audio_srate = 44100.0;
 
 float audioIntervalSec = 256.0 / audio_srate; //buffer interval in seconds
 unsigned int audioIntervalCount = 0;
+float gainDb;
 
 int recMode = MODE_NORMAL;
 long rec_dur = 10;
@@ -569,7 +570,7 @@ void FileInit()
         logFile.print(myID[n]);
       }
       logFile.print(',');
-      logFile.print(gainSetting); 
+      logFile.print(gainDb); 
       logFile.print(',');
       logFile.println(voltage); 
       if(voltage < 3.0){
@@ -633,35 +634,28 @@ void file_date_time(uint16_t* date, uint16_t* time)
 }
 
 void AudioInit(){
-    // Enable the audio shield, select input, and enable output
- // sgtl5000_1.enable();
-
  // Instead of using audio library enable; do custom so only power up what is needed in sgtl5000_LHI
   audio_enable();
- 
-  //sgtl5000_1.inputSelect(myInput);
-  //sgtl5000_1.volume(0.0);
   sgtl5000_1.lineInLevel(gainSetting);  //default = 4
-  // CHIP_ANA_ADC_CTRL
-// Actual measured full-scale peak-to-peak sine wave input for max signal
-//  0: 3.12 Volts p-p
-//  1: 2.63 Volts p-p
-//  2: 2.22 Volts p-p
-//  3: 1.87 Volts p-p
-//  4: 1.58 Volts p-p (0.79 Vpeak)
-//  5: 1.33 Volts p-p
-//  6: 1.11 Volts p-p
-//  7: 0.94 Volts p-p
-//  8: 0.79 Volts p-p (+8.06 dB)
-//  9: 0.67 Volts p-p
-// 10: 0.56 Volts p-p
-// 11: 0.48 Volts p-p
-// 12: 0.40 Volts p-p
-// 13: 0.34 Volts p-p
-// 14: 0.29 Volts p-p
-// 15: 0.24 Volts p-p
-  //sgtl5000_1.autoVolumeDisable();
- // sgtl5000_1.audioProcessorDisable();
+
+  switch(gainSetting){
+    case 0: gainDb = -20 * log10(3.12 / 2.0);
+    case 1: gainDb = -20 * log10(2.63 / 2.0);
+    case 2: gainDb = -20 * log10(2.22 / 2.0);
+    case 3: gainDb = -20 * log10(1.87 / 2.0);
+    case 4: gainDb = -20 * log10(1.58 / 2.0);
+    case 5: gainDb = -20 * log10(1.33 / 2.0);
+    case 6: gainDb = -20 * log10(1.11 / 2.0);
+    case 7: gainDb = -20 * log10(0.94 / 2.0);
+    case 8: gainDb = -20 * log10(0.79 / 2.0);
+    case 9: gainDb = -20 * log10(0.67 / 2.0);
+    case 10: gainDb = -20 * log10(0.56 / 2.0);
+    case 11: gainDb = -20 * log10(0.48 / 2.0);
+    case 12: gainDb = -20 * log10(0.40 / 2.0);
+    case 13: gainDb = -20 * log10(0.34 / 2.0);
+    case 14: gainDb = -20 * log10(0.29 / 2.0);
+    case 15: gainDb = -20 * log10(0.24 / 2.0);
+  }
 }
 
 time_t getTeensy3Time()
