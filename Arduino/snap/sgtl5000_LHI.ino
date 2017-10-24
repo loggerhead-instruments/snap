@@ -478,11 +478,11 @@ void audio_power_down(void){
 }
 
 void audio_power_up(void){
-  //chipWrite(CHIP_ANA_POWER, 0x00A2); // power up: adc Stereo = E2; Mono (Left): A2
- chipWrite(CHIP_ANA_POWER, 0x00AB); // power up: DAC; ADC; Mono (Left): Lineout amplifier; AB
+  chipWrite(CHIP_ANA_POWER, 0x00A2); // power up: adc Stereo = E2; Mono (Left): A2
+// chipWrite(CHIP_ANA_POWER, 0x00AB); // power up: DAC; ADC; Mono (Left): Lineout amplifier; AB
  
-//  chipWrite(CHIP_DIG_POWER, 0x0043); // power up only analag ADC and I2S; disable DAC and DAP
-  chipWrite(CHIP_DIG_POWER, 0x0063); // power up analag ADC, DAC, I2SIN, I2SOUT; disable DAP and IS2OUT
+  chipWrite(CHIP_DIG_POWER, 0x0043); // power up only analag ADC and I2S; disable DAC and DAP
+//  chipWrite(CHIP_DIG_POWER, 0x0063); // power up analag ADC, DAC, I2SIN, I2SOUT; disable DAP and IS2OUT
 }
 
 bool chipWrite(unsigned int reg, unsigned int val)
@@ -496,4 +496,5 @@ bool chipWrite(unsigned int reg, unsigned int val)
   if (Wire.endTransmission() == 0) return true;
   return false;
 }
+
 

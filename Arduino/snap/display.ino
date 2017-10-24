@@ -299,3 +299,4 @@ void writeEEPROM(){
   EEPROM.write(11, endMinute); //byte
   EEPROM.write(12, recMode); //byte
 }
+

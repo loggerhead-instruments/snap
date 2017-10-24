@@ -270,9 +270,9 @@ void setup() {
   // initialize now to estimate DC offset during setup
   AudioMemory(100);
   AudioInit(); // this calls Wire.begin() in control_sgtl5000.cpp
-  
-
+ 
   manualSettings();
+  logFileHeader();
   
   // disable buttons; not using any more
   digitalWrite(UP, LOW);
@@ -625,6 +625,13 @@ void FileInit()
   Serial.println(nbufs_per_file);
 }
 
+void logFileHeader(){
+  if(File logFile = SD.open("LOG.CSV",  O_CREAT | O_APPEND | O_WRITE)){
+      logFile.println("filename, ID, gain (dB), Voltage");
+      logFile.close();
+  }
+}
+
 //This function returns the date and time for SD card file access and modify time. One needs to call in setup() to register this callback function: SdFile::dateTimeCallback(file_date_time);
 void file_date_time(uint16_t* date, uint16_t* time) 
 {
@@ -639,22 +646,22 @@ void AudioInit(){
   sgtl5000_1.lineInLevel(gainSetting);  //default = 4
 
   switch(gainSetting){
-    case 0: gainDb = -20 * log10(3.12 / 2.0);
-    case 1: gainDb = -20 * log10(2.63 / 2.0);
-    case 2: gainDb = -20 * log10(2.22 / 2.0);
-    case 3: gainDb = -20 * log10(1.87 / 2.0);
-    case 4: gainDb = -20 * log10(1.58 / 2.0);
-    case 5: gainDb = -20 * log10(1.33 / 2.0);
-    case 6: gainDb = -20 * log10(1.11 / 2.0);
-    case 7: gainDb = -20 * log10(0.94 / 2.0);
-    case 8: gainDb = -20 * log10(0.79 / 2.0);
-    case 9: gainDb = -20 * log10(0.67 / 2.0);
-    case 10: gainDb = -20 * log10(0.56 / 2.0);
-    case 11: gainDb = -20 * log10(0.48 / 2.0);
-    case 12: gainDb = -20 * log10(0.40 / 2.0);
-    case 13: gainDb = -20 * log10(0.34 / 2.0);
-    case 14: gainDb = -20 * log10(0.29 / 2.0);
-    case 15: gainDb = -20 * log10(0.24 / 2.0);
+    case 0: gainDb = -20 * log10(3.12 / 2.0); break;
+    case 1: gainDb = -20 * log10(2.63 / 2.0); break;
+    case 2: gainDb = -20 * log10(2.22 / 2.0); break;
+    case 3: gainDb = -20 * log10(1.87 / 2.0); break;
+    case 4: gainDb = -20 * log10(1.58 / 2.0); break;
+    case 5: gainDb = -20 * log10(1.33 / 2.0); break;
+    case 6: gainDb = -20 * log10(1.11 / 2.0); break;
+    case 7: gainDb = -20 * log10(0.94 / 2.0); break;
+    case 8: gainDb = -20 * log10(0.79 / 2.0); break;
+    case 9: gainDb = -20 * log10(0.67 / 2.0); break;
+    case 10: gainDb = -20 * log10(0.56 / 2.0); break;
+    case 11: gainDb = -20 * log10(0.48 / 2.0); break;
+    case 12: gainDb = -20 * log10(0.40 / 2.0); break;
+    case 13: gainDb = -20 * log10(0.34 / 2.0); break;
+    case 14: gainDb = -20 * log10(0.29 / 2.0); break;
+    case 15: gainDb = -20 * log10(0.24 / 2.0); break;
   }
 }
 
