@@ -55,6 +55,9 @@ void manualSettings(){
     boolean selectVal = digitalRead(SELECT);
     if(selectVal==0){
       curSetting += 1;
+      while(digitalRead(SELECT)==0){ // wait until let go of button
+        delay(10);
+      }
       if((recMode==MODE_NORMAL & curSetting>8)) curSetting = 0;
     }
 
@@ -141,7 +144,7 @@ void manualSettings(){
     displaySettings();
     displayClock(getTeensy3Time(), BOTTOM);
     display.display();
-    delay(200);
+    delay(10);
   }
 }
 
@@ -164,28 +167,23 @@ int updateVal(long curVal, long minVal, long maxVal){
   boolean downVal = digitalRead(DOWN);
   static int heldDown = 0;
   static int heldUp = 0;
+
   if(upVal==0){
     settingsChanged = 1;
-      if (heldUp > 10) {
-        curVal = (int) (curVal / 10) * 10;
-        curVal += 10;
-        if (heldUp > 20) curVal += 100;
-      }
-      else curVal += 1;
+    if (heldUp < 20) delay(200);
+      curVal += 1;
       heldUp += 1;
     }
     else heldUp = 0;
     
     if(downVal==0){
       settingsChanged = 1;
-      if (heldDown > 10) {
-        curVal = (int) (curVal / 10) * 10;
-        curVal -= 10;
-        if (heldDown > 20) curVal -= 100;
+      if(heldDown < 20) delay(200);
+      if(curVal < 10) { // going down to 0, go back to slow mode
+        heldDown = 0;
       }
-      else
         curVal -= 1;
-      heldDown += 1;
+        heldDown += 1;
     }
     else heldDown = 0;
 
