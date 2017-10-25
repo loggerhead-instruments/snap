@@ -321,8 +321,6 @@ void setup() {
   Serial.print("Time to first record ");
   Serial.println(time_to_first_rec);
 
-
-  if(noDC==0) audio_freeze_adc_hp(); // this will lower the DC offset voltage, and reduce noise
   mode = 0;
 
   // create first folder to hold data
@@ -352,6 +350,10 @@ void loop() {
         digitalWrite(BURN1, HIGH);
       }
       if(t >= startTime){      // time to start?
+        if(noDC==0) {
+          audio_freeze_adc_hp(); // this will lower the DC offset voltage, and reduce noise
+          noDC = -1;
+        }
         Serial.println("Record Start.");
         
         stopTime = startTime + rec_dur;
