@@ -2,7 +2,7 @@
 // SNAP acoustic recorder
 //
 // Loggerhead Instruments
-// 2016-2017
+// 2016-2018
 // David Mann
 // 
 // Modified from PJRC audio code
@@ -21,7 +21,7 @@
 #include <TimeLib.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
-#include <EEPROM.h>T
+#include <EEPROM.h>
 //#include <TimerOne.h>
 
 #define CPU_RESTART_ADDR (uint32_t *)0xE000ED0C
@@ -35,6 +35,7 @@ Adafruit_SSD1306 display(OLED_RESET);
 // set this to the hardware serial port you wish to use
 #define HWSERIAL Serial1
 
+char codeVersion[12] = "2018-02-28";
 static boolean printDiags = 0;  // 1: serial print diagnostics; 0: no diagnostics
 static uint8_t myID[8];
 
@@ -173,24 +174,24 @@ void setup() {
   delay(1000);
   Serial.println(RTC_TSR);
 
-  RTC_CR = 0; // disable RTC
-  delay(100);
-  Serial.println(RTC_CR,HEX);
-  // change capacitance to 26 pF (12.5 pF load capacitance)
-  RTC_CR = RTC_CR_SC16P | RTC_CR_SC8P | RTC_CR_SC2P; 
-  delay(100);
-  RTC_CR = RTC_CR_SC16P | RTC_CR_SC8P | RTC_CR_SC2P | RTC_CR_OSCE;
-  delay(100);
-
-  Serial.println(RTC_SR,HEX);
-  Serial.println(RTC_CR,HEX);
-  Serial.println(RTC_LR,HEX);
-
-  Serial.println(RTC_TSR);
-  delay(1000);
-  Serial.println(RTC_TSR);
-  delay(1000);
-  Serial.println(RTC_TSR);
+//  RTC_CR = 0; // disable RTC
+//  delay(100);
+//  Serial.println(RTC_CR,HEX);
+//  // change capacitance to 26 pF (12.5 pF load capacitance)
+//  RTC_CR = RTC_CR_SC16P | RTC_CR_SC8P | RTC_CR_SC2P; 
+//  delay(100);
+//  RTC_CR = RTC_CR_SC16P | RTC_CR_SC8P | RTC_CR_SC2P | RTC_CR_OSCE;
+//  delay(100);
+//
+//  Serial.println(RTC_SR,HEX);
+//  Serial.println(RTC_CR,HEX);
+//  Serial.println(RTC_LR,HEX);
+//
+//  Serial.println(RTC_TSR);
+//  delay(1000);
+//  Serial.println(RTC_TSR);
+//  delay(1000);
+//  Serial.println(RTC_TSR);
   
   Wire.begin();
 
@@ -575,6 +576,8 @@ void FileInit()
       logFile.print(gainDb); 
       logFile.print(',');
       logFile.println(voltage); 
+      logFile.print(',');
+      logFile.println(codeVersion);
       if(voltage < 3.0){
         logFile.println("Stopping because Voltage less than 3.0 V");
         logFile.close();  
@@ -629,7 +632,7 @@ void FileInit()
 
 void logFileHeader(){
   if(File logFile = SD.open("LOG.CSV",  O_CREAT | O_APPEND | O_WRITE)){
-      logFile.println("filename, ID, gain (dB), Voltage");
+      logFile.println("filename, ID, gain (dB), Voltage, Version");
       logFile.close();
   }
 }
