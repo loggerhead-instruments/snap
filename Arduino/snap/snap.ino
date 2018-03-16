@@ -35,7 +35,7 @@ Adafruit_SSD1306 display(OLED_RESET);
 // set this to the hardware serial port you wish to use
 #define HWSERIAL Serial1
 
-char codeVersion[12] = "2018-02-28";
+char codeVersion[12] = "2018-03-16";
 static boolean printDiags = 0;  // 1: serial print diagnostics; 0: no diagnostics
 static uint8_t myID[8];
 
@@ -575,7 +575,7 @@ void FileInit()
       logFile.print(',');
       logFile.print(gainDb); 
       logFile.print(',');
-      logFile.println(voltage); 
+      logFile.print(voltage); 
       logFile.print(',');
       logFile.println(codeVersion);
       if(voltage < 3.0){
