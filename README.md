@@ -15,7 +15,7 @@ Software supports:
 - button input for recording setup
 - writing to microSD
 
-##Updating Firmware
+## Updating Firmware
 
 1.	Install Teensyduino from https://www.pjrc.com/teensy/td_download.html
 2.	Get latest hex file from appropriate repository
