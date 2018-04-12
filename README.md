@@ -17,9 +17,10 @@ Software supports:
 
 ## Updating Firmware
 
-1.	Install Teensyduino from https://www.pjrc.com/teensy/td_download.html
+1.	Install Teensyduino from https://www.pjrc.com/teensy/loader.html
 2.	Get latest hex file from appropriate repository
 	https://github.com/loggerhead-instruments/snap/tree/master/hex
+	To download the file, right click on it and select Save link as
 3.	Connect microUSB cable to small board on device. You may have to unscrew board.
 4.	Run the Teensy Loader program.
 5.	From File Menu, select Open HEX File
