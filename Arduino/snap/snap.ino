@@ -156,8 +156,6 @@ typedef struct {
 } HdrStruct;
 
 HdrStruct wav_hdr;
-unsigned int rms;
-float hydroCal = -170;
 
 unsigned char prev_dtr = 0;
 
