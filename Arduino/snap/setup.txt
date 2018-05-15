@@ -17,3 +17,6 @@ RD 30
 
 // Rec interval
 RI 30
+
+// Sampling Index
+SF 3

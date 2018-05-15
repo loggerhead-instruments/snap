@@ -5,15 +5,15 @@
 
 time_t autoStartTime;
  
+void printZero(int val){
+  if(val<10) display.print('0');
+}
+
 void printDigits(int digits){
   // utility function for digital clock display: prints preceding colon and leading 0
   display.print(":");
   printZero(digits);
   display.print(digits);
-}
-
-void printZero(int val){
-  if(val<10) display.print('0');
 }
 
 #define noSet 0
@@ -30,13 +30,171 @@ void printZero(int val){
 #define setStartMinute 11
 #define setEndHour 12
 #define setEndMinute 13
+#define setFsamp 14
+
+time_t getTeensy3Time();
+
+void setTeensyTime(int hr, int mn, int sc, int dy, int mh, int yr){
+  tmElements_t tm;
+  tm.Year = yr - 1970;
+  tm.Month = mh;
+  tm.Day = dy;
+  tm.Hour = hr;
+  tm.Minute = mn;
+  tm.Second = sc;
+  time_t newtime;
+  newtime = makeTime(tm); 
+  Teensy3Clock.set(newtime); 
+  autoStartTime = getTeensy3Time();
+}
+  
+int updateVal(long curVal, long minVal, long maxVal){
+  boolean upVal = digitalRead(UP);
+  boolean downVal = digitalRead(DOWN);
+  static int heldDown = 0;
+  static int heldUp = 0;
+
+  if(upVal==0){
+    settingsChanged = 1;
+    if (heldUp < 20) delay(200);
+      curVal += 1;
+      heldUp += 1;
+    }
+    else heldUp = 0;
+    
+    if(downVal==0){
+      settingsChanged = 1;
+      if(heldDown < 20) delay(200);
+      if(curVal < 10) { // going down to 0, go back to slow mode
+        heldDown = 0;
+      }
+        curVal -= 1;
+        heldDown += 1;
+    }
+    else heldDown = 0;
+
+    if (curVal < minVal) curVal = maxVal;
+    if (curVal > maxVal) curVal = minVal;
+    return curVal;
+}
+
+void cDisplay(){
+    display.clearDisplay();
+    display.setTextColor(WHITE);
+    display.setTextSize(2);
+    display.setCursor(0,0);
+}
+
+void displaySettings(){
+  t = getTeensy3Time();
+  display.setTextSize(1);
+  display.setTextColor(WHITE);
+  display.setCursor(0, 18);
+//  display.print("Mode:");
+//  if (recMode==MODE_NORMAL) display.println("Normal");
+//  if (recMode==MODE_DIEL) {
+//    display.println("Diel");
+//  }
+  display.print("Rec:");
+  display.print(rec_dur);
+  display.println("s");
+  display.print("Sleep:");
+  display.print(rec_int);
+  display.println("s");
+  if (recMode==MODE_DIEL) {
+    display.print("Active: ");
+    printZero(startHour);
+    display.print(startHour);
+    printDigits(startMinute);
+    display.print("-");
+    printZero(endHour);
+    display.print(endHour);
+    printDigits(endMinute);
+    display.println();
+  }
+  display.printf("Fsamp: %.1f kHz\n",lhi_fsamps[isf]/1000.0f);
+  //
+
+}
+
+void displayClock(time_t t, int loc){
+  display.setTextSize(1);
+  display.setCursor(0,loc);
+  display.print(year(t));
+  display.print('-');
+  display.print(month(t));
+  display.print('-');
+  display.print(day(t));
+  display.print("  ");
+  printZero(hour(t));
+  display.print(hour(t));
+  printDigits(minute(t));
+  printDigits(second(t));
+}
+
+void printTime(time_t t){
+  Serial.print(year(t));
+  Serial.print('-');
+  Serial.print(month(t));
+  Serial.print('-');
+  Serial.print(day(t));
+  Serial.print(" ");
+  Serial.print(hour(t));
+  Serial.print(':');
+  Serial.print(minute(t));
+  Serial.print(':');
+  Serial.println(second(t));
+}
+
+
+union {
+  byte b[4];
+  long lval;
+}u;
+
+long readEEPROMlong(int address){
+  u.b[0] = EEPROM.read(address);
+  u.b[1] = EEPROM.read(address + 1);
+  u.b[2] = EEPROM.read(address + 2);
+  u.b[3] = EEPROM.read(address + 3);
+  return u.lval;
+}
+
+void readEEPROM(){
+  rec_dur = readEEPROMlong(0);
+  rec_int = readEEPROMlong(4);
+  startHour = EEPROM.read(8);
+  startMinute = EEPROM.read(9);
+  endHour = EEPROM.read(10);
+  endMinute = EEPROM.read(11);
+  recMode = EEPROM.read(12);
+  isf = EEPROM.read(13);
+}
+
+void writeEEPROMlong(int address, long val){
+  u.lval = val;
+  EEPROM.write(address, u.b[0]);
+  EEPROM.write(address + 1, u.b[1]);
+  EEPROM.write(address + 2, u.b[2]);
+  EEPROM.write(address + 3, u.b[3]);
+}
+
+void writeEEPROM(){
+  writeEEPROMlong(0, rec_dur);  //long
+  writeEEPROMlong(4, rec_int);  //long
+  EEPROM.write(8, startHour); //byte
+  EEPROM.write(9, startMinute); //byte
+  EEPROM.write(10, endHour); //byte
+  EEPROM.write(11, endMinute); //byte
+  EEPROM.write(12, recMode); //byte
+  EEPROM.write(13, isf); //byte
+}
 
 void manualSettings(){
   boolean startRec = 0, startUp, startDown;
   readEEPROM();
 
   autoStartTime = getTeensy3Time();
-  
   
   // make sure settings valid (if EEPROM corrupted or not set yet)
   if (rec_dur < 0 | rec_dur>100000) rec_dur = 60;
@@ -46,6 +204,7 @@ void manualSettings(){
   if (endHour<0 | endHour>23) endHour = 0;
   if (endMinute<0 | endMinute>59) endMinute = 0;
   if (recMode<0 | recMode>1) recMode = 0;
+  if (isf<0 | isf>3) isf = F_SAMP;
   
   while(startRec==0){
     static int curSetting = noSet;
@@ -58,7 +217,9 @@ void manualSettings(){
       while(digitalRead(SELECT)==0){ // wait until let go of button
         delay(10);
       }
-      if((recMode==MODE_NORMAL & curSetting>8)) curSetting = 0;
+      if(recMode==MODE_NORMAL & (curSetting>8) & (curSetting<14)) curSetting = 14;
+      if(recMode==MODE_NORMAL & (curSetting>14)) curSetting = 0;
+      Serial.println(curSetting);
     }
 
     cDisplay();
@@ -140,161 +301,15 @@ void manualSettings(){
         display.print("Second:");
         display.print(second(getTeensy3Time()));
         break;
+      case setFsamp:
+        isf = updateVal(isf, 0, 3);
+        display.printf("SF: %.1f",lhi_fsamps[isf]/1000.0f);
+        break;
     }
     displaySettings();
     displayClock(getTeensy3Time(), BOTTOM);
     display.display();
     delay(10);
   }
-}
-
-void setTeensyTime(int hr, int mn, int sc, int dy, int mh, int yr){
-  tmElements_t tm;
-  tm.Year = yr - 1970;
-  tm.Month = mh;
-  tm.Day = dy;
-  tm.Hour = hr;
-  tm.Minute = mn;
-  tm.Second = sc;
-  time_t newtime;
-  newtime = makeTime(tm); 
-  Teensy3Clock.set(newtime); 
-  autoStartTime = getTeensy3Time();
-}
-  
-int updateVal(long curVal, long minVal, long maxVal){
-  boolean upVal = digitalRead(UP);
-  boolean downVal = digitalRead(DOWN);
-  static int heldDown = 0;
-  static int heldUp = 0;
-
-  if(upVal==0){
-    settingsChanged = 1;
-    if (heldUp < 20) delay(200);
-      curVal += 1;
-      heldUp += 1;
-    }
-    else heldUp = 0;
-    
-    if(downVal==0){
-      settingsChanged = 1;
-      if(heldDown < 20) delay(200);
-      if(curVal < 10) { // going down to 0, go back to slow mode
-        heldDown = 0;
-      }
-        curVal -= 1;
-        heldDown += 1;
-    }
-    else heldDown = 0;
-
-    if (curVal < minVal) curVal = maxVal;
-    if (curVal > maxVal) curVal = minVal;
-    return curVal;
-}
-
-void cDisplay(){
-    display.clearDisplay();
-    display.setTextColor(WHITE);
-    display.setTextSize(2);
-    display.setCursor(0,0);
-}
-
-void displaySettings(){
-  t = getTeensy3Time();
-  display.setTextSize(1);
-  display.setTextColor(WHITE);
-  display.setCursor(0, 18);
-//  display.print("Mode:");
-//  if (recMode==MODE_NORMAL) display.println("Normal");
-//  if (recMode==MODE_DIEL) {
-//    display.println("Diel");
-//  }
-  display.print("Rec:");
-  display.print(rec_dur);
-  display.println("s");
-  display.print("Sleep:");
-  display.print(rec_int);
-  display.println("s");
-  if (recMode==MODE_DIEL) {
-    display.print("Active: ");
-    printZero(startHour);
-    display.print(startHour);
-    printDigits(startMinute);
-    display.print("-");
-    printZero(endHour);
-    display.print(endHour);
-    printDigits(endMinute);
-    display.println();
-  }
-}
-
-void displayClock(time_t t, int loc){
-  display.setTextSize(1);
-  display.setCursor(0,loc);
-  display.print(year(t));
-  display.print('-');
-  display.print(month(t));
-  display.print('-');
-  display.print(day(t));
-  display.print("  ");
-  printZero(hour(t));
-  display.print(hour(t));
-  printDigits(minute(t));
-  printDigits(second(t));
-}
-
-void printTime(time_t t){
-  Serial.print(year(t));
-  Serial.print('-');
-  Serial.print(month(t));
-  Serial.print('-');
-  Serial.print(day(t));
-  Serial.print(" ");
-  Serial.print(hour(t));
-  Serial.print(':');
-  Serial.print(minute(t));
-  Serial.print(':');
-  Serial.println(second(t));
-}
-
-void readEEPROM(){
-  rec_dur = readEEPROMlong(0);
-  rec_int = readEEPROMlong(4);
-  startHour = EEPROM.read(8);
-  startMinute = EEPROM.read(9);
-  endHour = EEPROM.read(10);
-  endMinute = EEPROM.read(11);
-  recMode = EEPROM.read(12);
-}
-
-union {
-  byte b[4];
-  long lval;
-}u;
-
-long readEEPROMlong(int address){
-  u.b[0] = EEPROM.read(address);
-  u.b[1] = EEPROM.read(address + 1);
-  u.b[2] = EEPROM.read(address + 2);
-  u.b[3] = EEPROM.read(address + 3);
-  return u.lval;
-}
-
-void writeEEPROMlong(int address, long val){
-  u.lval = val;
-  EEPROM.write(address, u.b[0]);
-  EEPROM.write(address + 1, u.b[1]);
-  EEPROM.write(address + 2, u.b[2]);
-  EEPROM.write(address + 3, u.b[3]);
-}
-
-void writeEEPROM(){
-  writeEEPROMlong(0, rec_dur);  //long
-  writeEEPROMlong(4, rec_int);  //long
-  EEPROM.write(8, startHour); //byte
-  EEPROM.write(9, startMinute); //byte
-  EEPROM.write(10, endHour); //byte
-  EEPROM.write(11, endMinute); //byte
-  EEPROM.write(12, recMode); //byte
 }
 
