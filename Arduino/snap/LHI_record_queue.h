@@ -24,8 +24,8 @@
  * THE SOFTWARE.
  */
 
-#ifndef LHI_record_queue_h_
-#define LHI_record_queue_h_
+#ifndef record_queue_h_
+#define record_queue_h_
 
 #include "AudioStream.h"
 #ifndef MQ

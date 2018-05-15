@@ -2,8 +2,6 @@
 #define TRUE 1
 #define FALSE 0
 
-unsigned long RTCToUNIXTime(TIME_HEAD *tm);
-
 int ProcCmd(char *pCmd)
 {
 	short *pCV;
@@ -88,13 +86,6 @@ int ProcCmd(char *pCmd)
          Serial.println(startTime);
          break;
       } 
-      
-      case ('S' + ('F'<<8)):
-      {
-        sscanf(&pCmd[3],"%d",&isf);
-        break;
-      }
-      
 	}	
 	return TRUE;
 }
@@ -105,16 +96,19 @@ boolean LoadScript()
   char c;
   short i;
 
-//  File file;
+#if USE_SDFS==1
   FsFile file;
+#else
+  File file;
+#endif
   unsigned long TM_byte;
   int comment_TM = 0;
 
   // Read card setup.txt file to set date and time, recording interval
   file=sd.open("setup.txt");
- if(file)
- {
-   do{
+  if(file)
+  {
+    do{
       	i = 0;
       	s[i] = 0;
         do{
