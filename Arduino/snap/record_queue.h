@@ -28,30 +28,105 @@
 #define record_queue_h_
 
 #include "AudioStream.h"
+#ifndef MQ
+#define MQ 53
+#endif
 
-class AudioRecordQueue : public AudioStream
+class LHIRecordQueue : public AudioStream
 {
 public:
-	AudioRecordQueue(void) : AudioStream(1, inputQueueArray),
-		userblock(NULL), head(0), tail(0), enabled(0) { }
-	void begin(void) {
-		clear();
-		enabled = 1;
-	}
-	int available(void);
-	void clear(void);
-	int16_t * readBuffer(void);
-	void freeBuffer(void);
-	void end(void) {
-		enabled = 0;
-	}
-	virtual void update(void);
+  LHIRecordQueue(void) : AudioStream(1, inputQueueArray),
+    userblock(NULL), head(0), tail(0), enabled(0), queue_dropped(0){ }
+  void begin(void) {
+    clear();
+    enabled = 1;
+  }
+  int available(void);
+  void clear(void);
+  int16_t * readBuffer(void);
+  void freeBuffer(void);
+  void end(void) {
+    enabled = 0;
+  }
+  virtual void update(void);
 private:
-	audio_block_t *inputQueueArray[1];
-	audio_block_t * volatile queue[53];
-	audio_block_t *userblock;
-	volatile uint8_t head, tail, enabled;
+  audio_block_t *inputQueueArray[1];
+  audio_block_t * volatile queue[MQ];
+  audio_block_t *userblock;
+  volatile uint8_t head, tail, enabled;
+  uint32_t queue_dropped;
+public:
+  uint32_t getQueue_dropped(void) {return queue_dropped;}
+  void clearQueue_dropped(void) {queue_dropped=0;}
 };
+
+int LHIRecordQueue::available(void)
+{
+  uint32_t h, t;
+
+  h = head;
+  t = tail;
+  if (h >= t) return h - t;
+  return MQ + h - t;
+}
+
+void LHIRecordQueue::clear(void)
+{
+  uint32_t t;
+
+  if (userblock) {
+    release(userblock);
+    userblock = NULL;
+  }
+  t = tail;
+  while (t != head) {
+    if (++t >= MQ) t = 0;
+    release(queue[t]);
+  }
+  tail = t;
+}
+
+int16_t * LHIRecordQueue::readBuffer(void)
+{
+  uint32_t t;
+
+  if (userblock) return NULL;
+  t = tail;
+  if (t == head) return NULL;
+  if (++t >= MQ) t = 0;
+  userblock = queue[t];
+  tail = t;
+  return userblock->data;
+}
+
+void LHIRecordQueue::freeBuffer(void)
+{
+  if (userblock == NULL) return;
+  release(userblock);
+  userblock = NULL;
+}
+
+void LHIRecordQueue::update(void)
+{
+  audio_block_t *block;
+  uint32_t h;
+  
+  block = receiveReadOnly();
+  if (!block) return;
+  if (!enabled) {
+    release(block);
+    return;
+  }
+  h = head + 1;
+  if (h >= MQ) h = 0;
+  if (h == tail) {
+    queue_dropped++;
+    release(block);
+  } else {
+    queue[h] = block;
+    head = h;
+  }
+}
 
 #endif
 

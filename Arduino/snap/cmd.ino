@@ -96,15 +96,19 @@ boolean LoadScript()
   char c;
   short i;
 
+#if USE_SDFS==1
+  FsFile file;
+#else
   File file;
+#endif
   unsigned long TM_byte;
   int comment_TM = 0;
 
   // Read card setup.txt file to set date and time, recording interval
-  file=SD.open("setup.txt");
- if(file)
- {
-   do{
+  file=sd.open("setup.txt");
+  if(file)
+  {
+    do{
       	i = 0;
       	s[i] = 0;
         do{
@@ -130,7 +134,7 @@ boolean LoadScript()
       {
         Serial.print("Comment TM ");
         Serial.println(TM_byte);
-        file = SD.open("setup.txt", FILE_WRITE);
+        file = sd.open("setup.txt", FILE_WRITE);
         file.seek(TM_byte);
         file.print("//");
         file.close();

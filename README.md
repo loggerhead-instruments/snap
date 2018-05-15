@@ -4,20 +4,20 @@ SNAP is an arduino-compatible audio datalogger board (designed for Teensy 3.x)
 More information is at http://loggerhead.com
 
 Files:
-- snap: Main control and sensor recording
-- cmd.pde: Reads recording settings from a script file
+- snap.ino: Main control and sensor recording
+- cmd.ino: Reads recording settings from a script file
 - wav.h: wav header
-- rms: rms calculation
 
 Software supports:
 - duty cycle recording
 - display
 - button input for recording setup
 - writing to microSD
+- different sampling frequencies (32, 44.1 48, 96 kHz)
 
 ## Updating Firmware
 
-1.	Install Teensyduino from https://www.pjrc.com/teensy/loader.html
+1.	Get Teensy loader (Teensy.exe) from https://github.com/loggerhead-instruments/snap/tree/master/
 2.	Get latest hex file from appropriate repository
 	https://github.com/loggerhead-instruments/snap/tree/master/hex
 	To download the file, right click on it and select Save link as

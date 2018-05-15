@@ -30,6 +30,7 @@ void printZero(int val){
 #define setStartMinute 11
 #define setEndHour 12
 #define setEndMinute 13
+#define setFsamp 14
 
 void manualSettings(){
   boolean startRec = 0, startUp, startDown;
@@ -46,7 +47,8 @@ void manualSettings(){
   if (endHour<0 | endHour>23) endHour = 0;
   if (endMinute<0 | endMinute>59) endMinute = 0;
   if (recMode<0 | recMode>1) recMode = 0;
-  
+  if (isf<0 | isf>3) isf = F_SAMP;
+    
   while(startRec==0){
     static int curSetting = noSet;
     static int newYear, newMonth, newDay, newHour, newMinute, newSecond, oldYear, oldMonth, oldDay, oldHour, oldMinute, oldSecond;
@@ -58,8 +60,9 @@ void manualSettings(){
       while(digitalRead(SELECT)==0){ // wait until let go of button
         delay(10);
       }
-      if((recMode==MODE_NORMAL & curSetting>8)) curSetting = 0;
-    }
+      if(recMode==MODE_NORMAL & (curSetting>8) & (curSetting<14)) curSetting = 14;
+      if(recMode==MODE_NORMAL & (curSetting>14)) curSetting = 0;
+   }
 
     cDisplay();
 
@@ -139,6 +142,10 @@ void manualSettings(){
         if(oldSecond!=newSecond) setTeensyTime(hour(t), minute(t), newSecond, day(t), month(t), year(t));
         display.print("Second:");
         display.print(second(getTeensy3Time()));
+        break;
+      case setFsamp:
+        isf = updateVal(isf, 0, 3);
+        display.printf("SF: %.1f",lhi_fsamps[isf]/1000.0f);
         break;
     }
     displaySettings();
@@ -226,6 +233,7 @@ void displaySettings(){
     printDigits(endMinute);
     display.println();
   }
+  display.printf("Fsamp: %.1f kHz\n",lhi_fsamps[isf]/1000.0f);
 }
 
 void displayClock(time_t t, int loc){
@@ -265,6 +273,7 @@ void readEEPROM(){
   endHour = EEPROM.read(10);
   endMinute = EEPROM.read(11);
   recMode = EEPROM.read(12);
+  isf = EEPROM.read(13);
 }
 
 union {
@@ -296,5 +305,6 @@ void writeEEPROM(){
   EEPROM.write(10, endHour); //byte
   EEPROM.write(11, endMinute); //byte
   EEPROM.write(12, recMode); //byte
+  EEPROM.write(13, isf); //byte
 }
 

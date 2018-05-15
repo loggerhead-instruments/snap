@@ -8,14 +8,28 @@
 // Modified from PJRC audio code
 // http://www.pjrc.com/store/teensy3_audio.html
 //
-
 // Compile with 48 MHz Optimize Speed
 
+// Modified by WMXZ 15-05-2018 for SdFS anf multiple sampling frequencies
+
+#define USE_SDFS 1  // to be used for exFAT
+#define MQ 90 // to be used with record queue (modified local version)
+
 //#include <SerialFlash.h>
-#include <Audio.h>  //this also includes SD.h from lines 89 & 90
+#if USE_SDFS==1
+  #include "input_i2s.h"
+  #include "record_queue.h"
+  #include "control_sgtl5000.h"
+#else
+  #include <Audio.h>  //this also includes SD.h from lines 89 & 90
+#endif
 #include <Wire.h>
 #include <SPI.h>
-#include <SdFat.h>
+#if USE_SDFS==1
+  #include "SdFs.h"
+#else
+  #include "SdFat.h"
+#endif
 #include "amx32.h"
 #include <Snooze.h>  //using https://github.com/duff2013/Snooze; uncomment line 62 #define USE_HIBERNATE
 #include <TimeLib.h>
@@ -35,7 +49,7 @@ Adafruit_SSD1306 display(OLED_RESET);
 // set this to the hardware serial port you wish to use
 #define HWSERIAL Serial1
 
-char codeVersion[12] = "2018-05-10";
+char codeVersion[12] = "2018-05-15";
 static boolean printDiags = 0;  // 1: serial print diagnostics; 0: no diagnostics
 static uint8_t myID[8];
 
@@ -52,7 +66,7 @@ unsigned long baud = 115200;
 
 // GUItool: begin automatically generated code
 AudioInputI2S            i2s2;           //xy=105,63
-AudioRecordQueue         queue1;         //xy=281,63
+LHIRecordQueue         queue1;         //xy=281,63
 AudioConnection          patchCord1(i2s2, 0, queue1, 0);
 AudioControlSGTL5000     sgtl5000_1;     //xy=265,212
 // GUItool: end automatically generated code
@@ -108,7 +122,11 @@ boolean audioFlag = 1;
 boolean LEDSON=1;
 boolean introperiod=1;  //flag for introductory period; used for keeping LED on for a little while
 
-float audio_srate = 44100.0;
+int32_t lhi_fsamps[4] = {32000, 44100, 48000, 96000};
+#define F_SAMP 3   // 0 is 32 kHz; 1 is 44.1 kHz; 2 is 48 kHz; 3 is 96 kHz
+
+float audio_srate = lhi_fsamps[F_SAMP];//44100.0;
+int isf = F_SAMP;
 
 float audioIntervalSec = 256.0 / audio_srate; //buffer interval in seconds
 unsigned int audioIntervalCount = 0;
@@ -135,9 +153,14 @@ SnoozeAudio snooze_audio;
 SnoozeBlock config_teensy32(snooze_audio, alarm);
 
 // The file where data is recorded
-File frec;
-SdFat SD;
-SdFile file;
+#if USE_SDFS==1
+  FsFile frec;
+  SdFs sd;
+#else
+  File frec;
+  SdFat sd;
+  //SdFile file; // not used(WMXZ)
+#endif
 
 typedef struct {
     char    rId[4];
@@ -248,7 +271,7 @@ void setup() {
   // Initialize the SD card
   SPI.setMOSI(7);
   SPI.setSCK(14);
-  if (!(SD.begin(10))) {
+  if (!(sd.begin(10))) {
     // stop here if no SD card, but print a message
     Serial.println("Unable to access the SD card");
     
@@ -268,9 +291,14 @@ void setup() {
   // uses this memory to buffer incoming audio.
   // initialize now to estimate DC offset during setup
   AudioMemory(100);
-  AudioInit(); // this calls Wire.begin() in control_sgtl5000.cpp
- 
+  
   manualSettings();
+  
+  audio_srate = lhi_fsamps[isf];
+  audioIntervalSec = 256.0 / audio_srate; //buffer interval in seconds
+
+  AudioInit(isf); // this calls Wire.begin() in control_sgtl5000.cpp
+
   logFileHeader();
   
   // disable buttons; not using any more
@@ -526,7 +554,7 @@ void stopRecording() {
 
 /*
 void sdInit(){
-     if (!(SD.begin(10))) {
+     if (!(sd.begin(10))) {
     // stop here if no SD card, but print a message
     Serial.println("Unable to access the SD card");
     
@@ -550,8 +578,12 @@ void FileInit()
     if(printDiags) Serial.println("New Folder");
     folderMonth = month(t);
     sprintf(dirname, "%04d-%02d", year(t), folderMonth);
-    SdFile::dateTimeCallback(file_date_time);
-    SD.mkdir(dirname);
+    #if USE_SDFS==1
+      FsDateTime::callback = file_date_time;
+    #else
+      SdFile::dateTimeCallback(file_date_time);
+    #endif
+    sd.mkdir(dirname);
    }
    pinMode(vSense, INPUT);  // get ready to read voltage
 
@@ -560,11 +592,19 @@ void FileInit()
 
 
    // log file
-   SdFile::dateTimeCallback(file_date_time);
+  #if USE_SDFS==1
+    FsDateTime::callback = file_date_time;
+  #else
+    SdFile::dateTimeCallback(file_date_time);
+  #endif
 
    float voltage = readVoltage();
    
-   if(File logFile = SD.open("LOG.CSV",  O_CREAT | O_APPEND | O_WRITE)){
+  #if USE_SDFS==1
+    if(FsFile logFile = sd.open("LOG.CSV",  O_CREAT | O_APPEND | O_WRITE)){
+  #else
+    if(File logFile = sd.open("LOG.CSV",  O_CREAT | O_APPEND | O_WRITE)){
+  #endif
       logFile.print(filename);
       logFile.print(',');
       for(int n=0; n<8; n++){
@@ -592,14 +632,14 @@ void FileInit()
    }
 
     
-   frec = SD.open(filename, O_WRITE | O_CREAT | O_EXCL);
+   frec = sd.open(filename, O_WRITE | O_CREAT | O_EXCL);
    Serial.println(filename);
    delay(100);
    
    while (!frec){
     file_count += 1;
     sprintf(filename,"F%06d.wav",file_count); //if can't open just use count
-    frec = SD.open(filename, O_WRITE | O_CREAT | O_EXCL);
+    frec = sd.open(filename, O_WRITE | O_CREAT | O_EXCL);
     Serial.println(filename);
     delay(10);
     if(file_count>1000) resetFunc(); // give up after many tries
@@ -629,7 +669,11 @@ void FileInit()
 }
 
 void logFileHeader(){
-  if(File logFile = SD.open("LOG.CSV",  O_CREAT | O_APPEND | O_WRITE)){
+#ifdef USE_SDFS
+  if(FsFile logFile = sd.open("LOG.CSV",  O_CREAT | O_APPEND | O_WRITE)){
+#else
+  if(File logFile = sd.open("LOG.CSV",  O_CREAT | O_APPEND | O_WRITE)){
+#endif
       logFile.println("filename, ID, gain (dB), Voltage, Version");
       logFile.close();
   }
@@ -639,13 +683,21 @@ void logFileHeader(){
 void file_date_time(uint16_t* date, uint16_t* time) 
 {
   t = getTeensy3Time();
-  *date=FAT_DATE(year(t),month(t),day(t));
-  *time=FAT_TIME(hour(t),minute(t),second(t));
+  #if USE_SDFS==1
+    *date=FS_DATE(year(t),month(t),day(t));
+    *time=FS_TIME(hour(t),minute(t),second(t));
+  #else
+    *date=FAT_DATE(year(t),month(t),day(t));
+    *time=FAT_TIME(hour(t),minute(t),second(t));
+  #endif
 }
 
-void AudioInit(){
+void AudioInit(int ifs){
  // Instead of using audio library enable; do custom so only power up what is needed in sgtl5000_LHI
-  audio_enable();
+  I2S_modification(lhi_fsamps[ifs], 16);
+  Wire.begin();
+  audio_enable(ifs);
+  
   sgtl5000_1.lineInLevel(gainSetting);  //default = 4
 
   switch(gainSetting){
