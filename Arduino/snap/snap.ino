@@ -8,27 +8,21 @@
 // Modified from PJRC audio code
 // http://www.pjrc.com/store/teensy3_audio.html
 //
-
 // Compile with 48 MHz Optimize Speed
-// 15-may-2018 WMXZ modified for SdFS ang 96 kHz
 
-//#include "core_pins.h"
-//#include "usb_serial.h"
+// Modified by WMXZ 15-05-2018 for SdFS anf multiple sampling frequencies
 
 #define USE_SDFS 1  // to be used for exFAT
 #define MQ 90 // to be used with record queue (modified local version)
 
 //#include <SerialFlash.h>
 #if USE_SDFS==1
-  #define __SD_H__
-  #define __SD_t3_H__
   #include "input_i2s.h"
-  #include "LHI_record_queue.h"
+  #include "record_queue.h"
   #include "control_sgtl5000.h"
 #else
   #include <Audio.h>  //this also includes SD.h from lines 89 & 90
 #endif
-
 #include <Wire.h>
 #include <SPI.h>
 #if USE_SDFS==1
@@ -128,7 +122,6 @@ boolean audioFlag = 1;
 boolean LEDSON=1;
 boolean introperiod=1;  //flag for introductory period; used for keeping LED on for a little while
 
-
 int32_t lhi_fsamps[4] = {32000, 44100, 48000, 96000};
 #define F_SAMP 3   // 0 is 32 kHz; 1 is 44.1 kHz; 2 is 48 kHz; 3 is 96 kHz
 
@@ -189,22 +182,6 @@ HdrStruct wav_hdr;
 
 unsigned char prev_dtr = 0;
 
-// some forward declarations
-void startRecording();
-void continueRecording();
-void stopRecording();
-void FileInit();
-void logFileHeader();
-void file_date_time(uint16_t* date, uint16_t* time);
-void AudioInit(int FS_MODE);
-time_t getTeensy3Time();
-unsigned long processSyncMessage();
-unsigned long RTCToUNIXTime(TIME_HEAD *tm);
-void resetFunc(void);
-void read_EE(uint8_t word, uint8_t *buf, uint8_t offset);
-void read_myID() ;
-float readVoltage();
-void audio_power_up(void);
 
 void setup() {
   read_myID();
@@ -314,14 +291,14 @@ void setup() {
   // uses this memory to buffer incoming audio.
   // initialize now to estimate DC offset during setup
   AudioMemory(100);
-
+  
   manualSettings();
   
   audio_srate = lhi_fsamps[isf];
   audioIntervalSec = 256.0 / audio_srate; //buffer interval in seconds
 
   AudioInit(isf); // this calls Wire.begin() in control_sgtl5000.cpp
- 
+
   logFileHeader();
   
   // disable buttons; not using any more
@@ -601,8 +578,11 @@ void FileInit()
     if(printDiags) Serial.println("New Folder");
     folderMonth = month(t);
     sprintf(dirname, "%04d-%02d", year(t), folderMonth);
-//    SdFile::dateTimeCallback(file_date_time);
-    FsDateTime::callback = file_date_time;
+    #if USE_SDFS==1
+      FsDateTime::callback = file_date_time;
+    #else
+      SdFile::dateTimeCallback(file_date_time);
+    #endif
     sd.mkdir(dirname);
    }
    pinMode(vSense, INPUT);  // get ready to read voltage
@@ -612,13 +592,19 @@ void FileInit()
 
 
    // log file
-//   SdFile::dateTimeCallback(file_date_time);
-   FsDateTime::callback = file_date_time;
+  #if USE_SDFS==1
+    FsDateTime::callback = file_date_time;
+  #else
+    SdFile::dateTimeCallback(file_date_time);
+  #endif
 
    float voltage = readVoltage();
    
-//   if(File logFile = sd.open("LOG.CSV",  O_CREAT | O_APPEND | O_WRITE)){
-   if(FsFile logFile = sd.open("LOG.CSV",  O_CREAT | O_APPEND | O_WRITE)){
+  #if USE_SDFS==1
+    if(FsFile logFile = sd.open("LOG.CSV",  O_CREAT | O_APPEND | O_WRITE)){
+  #else
+    if(File logFile = sd.open("LOG.CSV",  O_CREAT | O_APPEND | O_WRITE)){
+  #endif
       logFile.print(filename);
       logFile.print(',');
       for(int n=0; n<8; n++){
@@ -683,8 +669,11 @@ void FileInit()
 }
 
 void logFileHeader(){
-//  if(File logFile = sd.open("LOG.CSV",  O_CREAT | O_APPEND | O_WRITE)){
+#ifdef USE_SDFS
   if(FsFile logFile = sd.open("LOG.CSV",  O_CREAT | O_APPEND | O_WRITE)){
+#else
+  if(File logFile = sd.open("LOG.CSV",  O_CREAT | O_APPEND | O_WRITE)){
+#endif
       logFile.println("filename, ID, gain (dB), Voltage, Version");
       logFile.close();
   }
@@ -703,13 +692,12 @@ void file_date_time(uint16_t* date, uint16_t* time)
   #endif
 }
 
-void AudioInit(int FS_MODE){
+void AudioInit(int ifs){
  // Instead of using audio library enable; do custom so only power up what is needed in sgtl5000_LHI
-//  audio_enable();
-  I2S_modification(lhi_fsamps[FS_MODE], 16);
-
+  I2S_modification(lhi_fsamps[ifs], 16);
   Wire.begin();
-  audio_enable(FS_MODE);
+  audio_enable(ifs);
+  
   sgtl5000_1.lineInLevel(gainSetting);  //default = 4
 
   switch(gainSetting){
