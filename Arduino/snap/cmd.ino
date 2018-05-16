@@ -105,6 +105,7 @@ boolean LoadScript()
   int comment_TM = 0;
 
   // Read card setup.txt file to set date and time, recording interval
+  sd.chdir(); // only to be sure to star from root
   file=sd.open("setup.txt");
   if(file)
   {
@@ -128,16 +129,20 @@ boolean LoadScript()
       	  }
       }while(file.available());
       file.close();  
+
       
       // comment out TM line if it exists
       if (comment_TM)
       {
         Serial.print("Comment TM ");
         Serial.println(TM_byte);
-        file = sd.open("setup.txt", FILE_WRITE);
+        
+        sd.chdir(); // only to be sure to star from root
+        file = sd.open("setup.txt", FILE_WRITE); // WMXZ check mod
         file.seek(TM_byte);
         file.print("//");
         file.close();
+
       }
       
   }

@@ -12,13 +12,13 @@
 
 // Modified by WMXZ 15-05-2018 for SdFS anf multiple sampling frequencies
 
-#define USE_SDFS 1  // to be used for exFAT
-#define MQ 90 // to be used with record queue (modified local version)
+#define USE_SDFS 1  // to be used for exFAT but works also for FAT16/32
+#define MQ 90 // to be used with LHI record queue (modified local version)
 
 //#include <SerialFlash.h>
 #if USE_SDFS==1
   #include "input_i2s.h"
-  #include "record_queue.h"
+  #include "LHI_record_queue.h"
   #include "control_sgtl5000.h"
 #else
   #include <Audio.h>  //this also includes SD.h from lines 89 & 90
@@ -128,8 +128,8 @@ int32_t lhi_fsamps[4] = {32000, 44100, 48000, 96000};
 float audio_srate = lhi_fsamps[F_SAMP];//44100.0;
 int isf = F_SAMP;
 
-float audioIntervalSec = 256.0 / audio_srate; //buffer interval in seconds
-unsigned int audioIntervalCount = 0;
+//WMXZ float audioIntervalSec = 256.0 / audio_srate; //buffer interval in seconds
+//WMXZ unsigned int audioIntervalCount = 0;
 float gainDb;
 
 int recMode = MODE_NORMAL;
@@ -295,7 +295,7 @@ void setup() {
   manualSettings();
   
   audio_srate = lhi_fsamps[isf];
-  audioIntervalSec = 256.0 / audio_srate; //buffer interval in seconds
+//WMXZ  audioIntervalSec = 256.0 / audio_srate; //buffer interval in seconds
 
   AudioInit(isf); // this calls Wire.begin() in control_sgtl5000.cpp
 
@@ -370,9 +370,10 @@ void loop() {
       displayClock(startTime, 20);
       displayClock(t, BOTTOM);
       display.display();
-
-      Serial.println(rtc_get());
-      
+      //
+      static uint32_t to;
+      if(t >to) Serial.println(t); t=to;
+      //
       if(t >= burnTime){
         digitalWrite(BURN1, HIGH);
       }
@@ -503,6 +504,7 @@ void loop() {
       }
     }
   }
+  asm("wfi"); // reduce power between interrupts
 }
 
 void startRecording() {
@@ -513,22 +515,26 @@ void startRecording() {
   if (printDiags)  Serial.println("Queue Begin");
 }
 
+#define NREC 8 // increase disk buffer to speed up disk access
+byte buffer[NREC*512];
 void continueRecording() {
-  if (queue1.available() >= 2) {
-    byte buffer[512];
-    // Fetch 2 blocks from the audio library and copy
-    // into a 512 byte buffer.  The Arduino SD library
-    // is most efficient when full 512 byte sector size
+  if (queue1.available() >= NREC*2) {
+    // Fetch 2 blocks (or multiples) from the audio library and copy
+    // into a 512 byte buffer.  micro SD disk access
+    // is most efficient when full (or multiple of) 512 byte sector size
     // writes are used.
     //digitalWrite(ledGreen, HIGH);
-    memcpy(buffer, queue1.readBuffer(), 256);
-    queue1.freeBuffer();
-    memcpy(buffer+256, queue1.readBuffer(), 256);
-    queue1.freeBuffer();
-    if(frec.write(buffer, 512)==-1) resetFunc(); //audio to .wav file
+    for(int ii=0;ii<NREC;ii++)
+    { byte *ptr = buffer+ii*512;
+      memcpy(ptr, queue1.readBuffer(), 256);
+      queue1.freeBuffer();
+      memcpy(ptr, queue1.readBuffer(), 256);
+      queue1.freeBuffer();
+    }
+    if(frec.write(buffer, NREC*512)==-1) resetFunc(); //audio to .wav file
       
-    buf_count += 1;
-    audioIntervalCount += 1;
+    buf_count += NREC;
+//WMXZ    audioIntervalCount += NREC;
 //    
 //    if(printDiags){
 //      Serial.print(".");
@@ -577,7 +583,7 @@ void FileInit()
    if (folderMonth != month(t)){
     if(printDiags) Serial.println("New Folder");
     folderMonth = month(t);
-    sprintf(dirname, "%04d-%02d", year(t), folderMonth);
+    sprintf(dirname, "/%04d-%02d", year(t), folderMonth);
     #if USE_SDFS==1
       FsDateTime::callback = file_date_time;
     #else
@@ -588,7 +594,8 @@ void FileInit()
    pinMode(vSense, INPUT);  // get ready to read voltage
 
    // open file 
-   sprintf(filename,"%s/%02d%02d%02d%02d.wav", dirname, day(t), hour(t), minute(t), second(t));  //filename is DDHHMM
+   sd.chdir(dirname);
+   sprintf(filename,"%02d%02d%02d%02d.wav", day(t), hour(t), minute(t), second(t));  //filename is DDHHMMSS
 
 
    // log file
@@ -600,6 +607,7 @@ void FileInit()
 
    float voltage = readVoltage();
    
+  sd.chdir(); // only to be sure to star from root
   #if USE_SDFS==1
     if(FsFile logFile = sd.open("LOG.CSV",  O_CREAT | O_APPEND | O_WRITE)){
   #else
@@ -632,6 +640,7 @@ void FileInit()
    }
 
     
+   sd.chdir(dirname);
    frec = sd.open(filename, O_WRITE | O_CREAT | O_EXCL);
    Serial.println(filename);
    delay(100);
@@ -639,6 +648,7 @@ void FileInit()
    while (!frec){
     file_count += 1;
     sprintf(filename,"F%06d.wav",file_count); //if can't open just use count
+    sd.chdir(dirname);
     frec = sd.open(filename, O_WRITE | O_CREAT | O_EXCL);
     Serial.println(filename);
     delay(10);
@@ -669,6 +679,8 @@ void FileInit()
 }
 
 void logFileHeader(){
+
+   sd.chdir(); // only to be sure to star from root
 #ifdef USE_SDFS
   if(FsFile logFile = sd.open("LOG.CSV",  O_CREAT | O_APPEND | O_WRITE)){
 #else
