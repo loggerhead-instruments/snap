@@ -146,8 +146,8 @@ long nbufs_per_file;
 boolean settingsChanged = 0;
 
 long file_count;
-char filename[25];
-char dirname[7];
+char filename[40];
+char dirname[20];
 int folderMonth;
 //SnoozeBlock snooze_config;
 SnoozeAlarm alarm;
@@ -682,7 +682,7 @@ void FileInit()
 void logFileHeader(){
 
    sd.chdir(); // only to be sure to star from root
-#ifdef USE_SDFS
+#if USE_SDFS==1
   if(FsFile logFile = sd.open("LOG.CSV",  O_CREAT | O_APPEND | O_WRITE)){
 #else
   if(File logFile = sd.open("LOG.CSV",  O_CREAT | O_APPEND | O_WRITE)){
