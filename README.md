@@ -5,7 +5,7 @@ More information is at http://loggerhead.com
 
 Files:
 - snap: Main control and sensor recording
-- cmd.pde: Reads recording settings from a script file
+- cmd.ino: Reads recording settings from a script file
 - wav.h: wav header
 
 Software supports:
