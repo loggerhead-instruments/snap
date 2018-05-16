@@ -371,8 +371,7 @@ void loop() {
       displayClock(t, BOTTOM);
       display.display();
       //
-      static uint32_t to;
-      if(t >to) Serial.println(t); t=to;
+      //static uint32_t to; if(t >to) Serial.println(t); to=t;
       //
       if(t >= burnTime){
         digitalWrite(BURN1, HIGH);
