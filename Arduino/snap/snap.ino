@@ -11,6 +11,8 @@
 // Compile with 48 MHz Optimize Speed
 
 // Modified by WMXZ 15-05-2018 for SdFS anf multiple sampling frequencies
+// uses SdFS from Bill Greiman https://github.com/greiman/SdFs
+// 
 
 #define USE_SDFS 1  // to be used for exFAT but works also for FAT16/32
 #define MQ 90 // to be used with LHI record queue (modified local version)
@@ -527,7 +529,7 @@ void continueRecording() {
     { byte *ptr = buffer+ii*512;
       memcpy(ptr, queue1.readBuffer(), 256);
       queue1.freeBuffer();
-      memcpy(ptr, queue1.readBuffer(), 256);
+      memcpy(ptr+256, queue1.readBuffer(), 256);
       queue1.freeBuffer();
     }
     if(frec.write(buffer, NREC*512)==-1) resetFunc(); //audio to .wav file
