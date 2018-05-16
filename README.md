@@ -7,13 +7,14 @@ Files:
 - snap: Main control and sensor recording
 - cmd.pde: Reads recording settings from a script file
 - wav.h: wav header
-- rms: rms calculation
 
 Software supports:
 - duty cycle recording
 - display
 - button input for recording setup
+- selection of sampling frequencies
 - writing to microSD
+- support of Fat16/32 and exFAT
 
 ## Updating Firmware
 
