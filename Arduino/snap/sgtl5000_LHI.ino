@@ -504,12 +504,12 @@ void I2S_dividers(uint32_t *iscl, uint32_t fsamp, uint32_t nbits)
 {
     int64_t i1 = 1;
     int64_t i2 = 1;
-    int64_t i3 = 2;
+    int64_t i3 = 4;
     int fcpu=F_CPU;
     if(F_CPU<=96000000) fcpu=96000000;
     float A=fcpu/2.0f/i3/(2.0f*nbits*fsamp);
     float mn=1.0; 
-    for(int ii=1;ii<32;ii++) 
+    for(int ii=1;ii<64;ii++) 
     { float xx;
       xx=A*ii-(int32_t)(A*ii); 
       if(xx<mn && A*ii<256.0) { mn=xx; i1=ii; i2=A*ii;} //select first candidate
