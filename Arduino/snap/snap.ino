@@ -313,7 +313,7 @@ void setup() {
   
   cDisplay();
 
-  int roundSeconds = 300;//modulo to nearest x seconds
+  int roundSeconds = 30;//modulo to nearest x seconds
   t = getTeensy3Time();
   startTime = t;
   //startTime = getTeensy3Time();
@@ -608,7 +608,7 @@ void FileInit()
 
    float voltage = readVoltage();
    
-  sd.chdir(); // only to be sure to star from root
+  sd.chdir(); // only to be sure to start from root
   #if USE_SDFS==1
     if(FsFile logFile = sd.open("LOG.CSV",  O_CREAT | O_APPEND | O_WRITE)){
   #else
