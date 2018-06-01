@@ -20,7 +20,7 @@ Software supports:
 
 1.	Install Teensyduino from https://www.pjrc.com/teensy/loader.html or get teensy.exe from 
 	https://github.com/loggerhead-instruments/snap/tree/96kHz/hex
-	To download the file, right click on it and select Save link as
+	To download the file, click on the file, and then right click on the Raw button and select Save link as
 2.	Get latest hex file from appropriate repository
 	https://github.com/loggerhead-instruments/snap/tree/96kHz/hex
 	To download the file, right click on it and select Save link as
