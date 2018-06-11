@@ -16,6 +16,7 @@
 
 #define USE_SDFS 1  // to be used for exFAT but works also for FAT16/32
 #define MQ 90 // to be used with LHI record queue (modified local version)
+#define USE_LONG_FILE_NAMES
 
 //#include <SerialFlash.h>
 #if USE_SDFS==1
@@ -192,9 +193,7 @@ void setup() {
   delay(500);
 
   Serial.println(RTC_TSR);
-  delay(1000);
   Serial.println(RTC_TSR);
-  delay(1000);
   Serial.println(RTC_TSR);
 
 //  RTC_CR = 0; // disable RTC
@@ -237,9 +236,7 @@ void setup() {
   pinMode(SELECT, INPUT);
   digitalWrite(UP, HIGH);
   digitalWrite(DOWN, HIGH);
-  digitalWrite(SELECT, HIGH);
-
-  delay(500);    
+  digitalWrite(SELECT, HIGH);  
 
   //setSyncProvider(getTeensy3Time); //use Teensy RTC to keep time
   t = getTeensy3Time();
@@ -269,7 +266,6 @@ void setup() {
   display.println("Loggerhead");
   display.display();
   
-  delay(200);
   // Initialize the SD card
   SPI.setMOSI(7);
   SPI.setSCK(14);
@@ -313,7 +309,10 @@ void setup() {
   
   cDisplay();
 
-  int roundSeconds = 30;//modulo to nearest x seconds
+  int roundSeconds = 10;//modulo to nearest x seconds
+  if(rec_int > 60) roundSeconds = 60;
+  if(rec_int > 300) roundSeconds = 300;
+  
   t = getTeensy3Time();
   startTime = t;
   //startTime = getTeensy3Time();
@@ -596,7 +595,7 @@ void FileInit()
 
    // open file 
    sd.chdir(dirname);
-   sprintf(filename,"%02d%02d%02d%02d.wav", day(t), hour(t), minute(t), second(t));  //filename is DDHHMMSS
+   sprintf(filename,"%04d%02d%02dT%02d%02d%02d.wav", year(t), month(t), day(t), hour(t), minute(t), second(t));  //filename is DDHHMMSS
 
 
    // log file
