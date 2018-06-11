@@ -290,7 +290,7 @@ void setup() {
   // Audio connections require memory, and the record queue
   // uses this memory to buffer incoming audio.
   // initialize now to estimate DC offset during setup
-  AudioMemory(100);
+  AudioMemory(150);
   
   manualSettings();
   
@@ -660,7 +660,6 @@ void FileInit()
    sd.chdir(dirname);
    frec = sd.open(filename, O_WRITE | O_CREAT | O_EXCL);
    Serial.println(filename);
-   delay(100);
    
    while (!frec){
     file_count += 1;
