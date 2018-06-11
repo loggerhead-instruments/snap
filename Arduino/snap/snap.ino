@@ -14,6 +14,8 @@
 // uses SdFS from Bill Greiman https://github.com/greiman/SdFs
 // 
 
+char codeVersion[12] = "2018-06-11";
+
 #define USE_SDFS 1  // to be used for exFAT but works also for FAT16/32
 #define MQ 90 // to be used with LHI record queue (modified local version)
 #define USE_LONG_FILE_NAMES
@@ -52,7 +54,7 @@ Adafruit_SSD1306 display(OLED_RESET);
 // set this to the hardware serial port you wish to use
 #define HWSERIAL Serial1
 
-char codeVersion[12] = "2018-05-25";
+
 static boolean printDiags = 0;  // 1: serial print diagnostics; 0: no diagnostics
 static uint8_t myID[8];
 
@@ -300,11 +302,7 @@ void setup() {
   logFileHeader();
   
   // disable buttons; not using any more
-  digitalWrite(UP, LOW);
-  digitalWrite(DOWN, LOW);
   digitalWrite(SELECT, LOW);
-  pinMode(UP, OUTPUT);
-  pinMode(DOWN, OUTPUT);
   pinMode(SELECT, OUTPUT);
   
   cDisplay();
@@ -434,7 +432,26 @@ void loop() {
         display.display();
       }
       */
-      
+    if(digitalRead(UP)==0 & digitalRead(DOWN)==0){
+      // stop recording
+      queue1.end();
+      // update wav file header
+      wav_hdr.rLen = 36 + buf_count * 256 * 2;
+      wav_hdr.dLen = buf_count * 256 * 2;
+      frec.seek(0);
+      frec.write((uint8_t *)&wav_hdr, 44);
+      frec.close();
+      display.begin(SSD1306_SWITCHCAPVCC, 0x3C);  //initialize display
+      delay(100);
+      cDisplay();
+      display.println("Stopped");
+      display.setTextSize(1);
+      display.println("Safe to turn off");
+      display.display();
+      while(1);
+    }
+    
+    
     if(buf_count >= nbufs_per_file){       // time to stop?
       if(rec_int == 0){
         frec.close();
