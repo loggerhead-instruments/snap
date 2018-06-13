@@ -16,15 +16,18 @@
 
 char codeVersion[12] = "2018-06-11";
 
-#define USE_SDFS 1  // to be used for exFAT but works also for FAT16/32
-#define MQ 90 // to be used with LHI record queue (modified local version)
-#define USE_LONG_FILE_NAMES
+#define USE_SDFS 0  // to be used for exFAT but works also for FAT16/32
+#define MQ 150 // to be used with LHI record queue (modified local version)
+//#define USE_LONG_FILE_NAMES
+
+  #include "LHI_record_queue.h"
+  #include "control_sgtl5000.h"
 
 //#include <SerialFlash.h>
 #if USE_SDFS==1
   #include "input_i2s.h"
-  #include "LHI_record_queue.h"
-  #include "control_sgtl5000.h"
+//  #include "LHI_record_queue.h"
+//  #include "control_sgtl5000.h"
 #else
   #include <Audio.h>  //this also includes SD.h from lines 89 & 90
 #endif
@@ -411,6 +414,10 @@ void loop() {
   // Record mode
   if (mode == 1) {
     continueRecording();  // download data  
+
+    if (queue1.getQueue_dropped() > 0){
+      Serial.println(queue1.getQueue_dropped());
+    }
 
     /*
      // update clock while recording
@@ -822,7 +829,6 @@ float readVoltage(){
    float  voltage = 0;
    for(int n = 0; n<8; n++){
     voltage += (float) analogRead(vSense) / 1024.0;
-    delay(2);
    }
    voltage = 5.9 * voltage / 8.0;   //fudging scaling based on actual measurements; shoud be max of 3.3V at 1023
    return voltage;
