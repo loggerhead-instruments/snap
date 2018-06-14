@@ -58,7 +58,7 @@ Adafruit_SSD1306 display(OLED_RESET);
 // set this to the hardware serial port you wish to use
 #define HWSERIAL Serial1
 
-
+#define NREC 32 // increase disk buffer to speed up disk access
 
 static uint8_t myID[8];
 
@@ -324,7 +324,7 @@ void setup() {
   
  // if (recMode==MODE_DIEL) checkDielTime();  
   
-  nbufs_per_file = (long) (rec_dur * audio_srate / 256.0);
+  nbufs_per_file = (long) (ceil(((rec_dur * audio_srate / 256.0) / (float) NREC)) * (float) NREC);
   long ss = rec_int - wakeahead;
   if (ss<0) ss=0;
   snooze_hour = floor(ss/3600);
@@ -546,7 +546,7 @@ void startRecording() {
   if (printDiags)  Serial.println("Queue Begin");
 }
 
-#define NREC 32 // increase disk buffer to speed up disk access
+
 byte buffer[NREC*512];
 void continueRecording() {
   if (queue1.available() >= NREC*2) {
