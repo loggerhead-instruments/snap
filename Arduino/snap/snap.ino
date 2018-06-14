@@ -15,9 +15,10 @@
 // 
 
 char codeVersion[12] = "2018-06-11";
+static boolean printDiags = 0;  // 1: serial print diagnostics; 0: no diagnostics
 
-#define USE_SDFS 0  // to be used for exFAT but works also for FAT16/32
-#define MQ 150 // to be used with LHI record queue (modified local version)
+#define USE_SDFS 1  // to be used for exFAT but works also for FAT16/32
+#define MQ 140 // to be used with LHI record queue (modified local version)
 //#define USE_LONG_FILE_NAMES
 
   #include "LHI_record_queue.h"
@@ -58,7 +59,7 @@ Adafruit_SSD1306 display(OLED_RESET);
 #define HWSERIAL Serial1
 
 
-static boolean printDiags = 0;  // 1: serial print diagnostics; 0: no diagnostics
+
 static uint8_t myID[8];
 
 unsigned long baud = 115200;
@@ -248,7 +249,7 @@ void setup() {
   if (t < 1451606400) Teensy3Clock.set(1451606400);
 
   display.begin(SSD1306_SWITCHCAPVCC, 0x3C);  //initialize display
-  delay(100);
+  delay(140);
   cDisplay();
   display.println("Loggerhead");
 //  Serial.println("Loggerhead");
@@ -293,7 +294,7 @@ void setup() {
   // Audio connections require memory, and the record queue
   // uses this memory to buffer incoming audio.
   // initialize now to estimate DC offset during setup
-  AudioMemory(150);
+  AudioMemory(100);
   
   manualSettings();
   
@@ -415,9 +416,11 @@ void loop() {
   if (mode == 1) {
     continueRecording();  // download data  
 
-    if (queue1.getQueue_dropped() > 0){
+  if(printDiags){
+        if (queue1.getQueue_dropped() > 0){
       Serial.println(queue1.getQueue_dropped());
     }
+  }
 
     /*
      // update clock while recording
@@ -464,6 +467,10 @@ void loop() {
         frec.close();
         FileInit();  // make a new file
         buf_count = 0;
+        if(printDiags) {
+          Serial.print("Audio Mem: ");
+          Serial.println(AudioMemoryUsageMax());
+        }
       }
       else{
         stopRecording();
@@ -539,7 +546,7 @@ void startRecording() {
   if (printDiags)  Serial.println("Queue Begin");
 }
 
-#define NREC 8 // increase disk buffer to speed up disk access
+#define NREC 32 // increase disk buffer to speed up disk access
 byte buffer[NREC*512];
 void continueRecording() {
   if (queue1.available() >= NREC*2) {
