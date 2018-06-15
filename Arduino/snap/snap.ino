@@ -8,8 +8,9 @@
 // Modified from PJRC audio code
 // http://www.pjrc.com/store/teensy3_audio.html
 //
-
 // Compile with 48 MHz Optimize Speed
+
+// 2018-06-15: leave buttons as inputs, may cause issue with short if pressed after start
 
 //#include <SerialFlash.h>
 #include <Audio.h>  //this also includes SD.h from lines 89 & 90
@@ -35,7 +36,7 @@ Adafruit_SSD1306 display(OLED_RESET);
 // set this to the hardware serial port you wish to use
 #define HWSERIAL Serial1
 
-char codeVersion[12] = "2018-05-10";
+char codeVersion[12] = "2018-06-15";
 static boolean printDiags = 0;  // 1: serial print diagnostics; 0: no diagnostics
 static uint8_t myID[8];
 
@@ -75,7 +76,6 @@ const int ledRed = 17;
 const int BURN1 = 5;
 const int SDSW = 0;
 const int ledWhite = 21;
-const int usbSense = 6;
 const int vSense = 21; 
 //const int vSense = A14;  // moved to Pin 21 for X1
 
@@ -201,10 +201,6 @@ void setup() {
 
   digitalWrite(hydroPowPin, HIGH);
   digitalWrite(displayPow, HIGH);
-
-  pinMode(usbSense, OUTPUT);
-  digitalWrite(usbSense, LOW); // make sure no pull-up
-  pinMode(usbSense, INPUT);
   
   //setup display and controls
   pinMode(UP, INPUT);
@@ -227,18 +223,6 @@ void setup() {
 //  Serial.println("Loggerhead");
 //  display.println("USB <->");
   display.display();
-  // Check for external USB connection to microSD
-// while(digitalRead(usbSense)){
-//    delay(500);
-//  }
-
-  // Power down USB if not using Serial monitor
-//  if (printDiags==0){
-//      usbDisable();
-//  }
-  
-  pinMode(usbSense, OUTPUT);  //not using any more, set to OUTPUT
-  digitalWrite(usbSense, LOW); 
 
   cDisplay();
   display.println("Loggerhead");
@@ -277,9 +261,9 @@ void setup() {
   digitalWrite(UP, LOW);
   digitalWrite(DOWN, LOW);
   digitalWrite(SELECT, LOW);
-  pinMode(UP, OUTPUT);
-  pinMode(DOWN, OUTPUT);
-  pinMode(SELECT, OUTPUT);
+//  pinMode(UP, OUTPUT);
+//  pinMode(DOWN, OUTPUT);
+//  pinMode(SELECT, OUTPUT);
   
   cDisplay();
 
