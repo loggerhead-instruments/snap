@@ -21,8 +21,8 @@ static boolean printDiags = 0;  // 1: serial print diagnostics; 0: no diagnostic
 #define MQ 100 // to be used with LHI record queue (modified local version)
 //#define USE_LONG_FILE_NAMES
 
-  #include "LHI_record_queue.h"
-  #include "control_sgtl5000.h"
+#include "LHI_record_queue.h"
+#include "control_sgtl5000.h"
 
 //#include <SerialFlash.h>
 #if USE_SDFS==1
