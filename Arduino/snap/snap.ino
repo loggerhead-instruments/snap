@@ -511,7 +511,8 @@ void loop() {
             //Snooze.deepSleep(snooze_config);
             //Snooze.hibernate( snooze_config);
   
-            alarm.setAlarm(snooze_hour, snooze_minute, snooze_second);
+//            alarm.setAlarm(snooze_hour, snooze_minute, snooze_second);
+            alarm.setRtcTimer(snooze_hour, snooze_minute, snooze_second);
             Snooze.sleep(config_teensy32);
   
             
