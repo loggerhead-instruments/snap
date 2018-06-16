@@ -18,7 +18,7 @@ char codeVersion[12] = "2018-06-16";
 static boolean printDiags = 0;  // 1: serial print diagnostics; 0: no diagnostics
 
 #define USE_SDFS 1  // to be used for exFAT but works also for FAT16/32
-#define MQ 140 // to be used with LHI record queue (modified local version)
+#define MQ 100 // to be used with LHI record queue (modified local version)
 //#define USE_LONG_FILE_NAMES
 
   #include "LHI_record_queue.h"
@@ -294,7 +294,7 @@ void setup() {
   // Audio connections require memory, and the record queue
   // uses this memory to buffer incoming audio.
   // initialize now to estimate DC offset during setup
-  AudioMemory(200);
+  AudioMemory(MQ+10);
   
   manualSettings();
   
