@@ -415,6 +415,7 @@
 
   bool audio_enable(int fs_mode)
 {
+  if(fs_mode>3) fs_mode=3;
 //  muted = true;
 //  Serial.print("audio ID = ");
 //  delay(5);
@@ -504,7 +505,7 @@ void I2S_dividers(uint32_t *iscl, uint32_t fsamp, uint32_t nbits)
 {
     int64_t i1 = 1;
     int64_t i2 = 1;
-    int64_t i3 = 4;
+    int64_t i3 = iscl[2]+1;
     int fcpu=F_CPU;
     if(F_CPU<=96000000) fcpu=96000000;
     float A=fcpu/2.0f/i3/(2.0f*nbits*fsamp);
@@ -521,7 +522,10 @@ void I2S_dividers(uint32_t *iscl, uint32_t fsamp, uint32_t nbits)
 
 void I2S_modification(uint32_t fsamp, uint16_t nbits)
 { uint32_t iscl[3];
-
+  if(nbits==16)
+    iscl[2]=3;  // 16 bit I2S (256/2*(2*16)-1)
+  else if(nbits==32)
+    iscl[2]=1;  // 32 bit modified I2S (256/(2*(2*32)-1)
   I2S_dividers(iscl, fsamp ,nbits);
   int fcpu=F_CPU;
   if(F_CPU<=96000000) fcpu=96000000;

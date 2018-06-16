@@ -102,7 +102,7 @@ void manualSettings(){
   if (endHour<0 | endHour>23) endHour = 0;
   if (endMinute<0 | endMinute>59) endMinute = 0;
   if (recMode<0 | recMode>1) recMode = 0;
-  if (isf<0 | isf>3) isf = F_SAMP;
+  if (isf<0 | isf>3) isf = I_SAMP; // change 3 to 4 to allow 192 kHz
     
   while(startRec==0){
     static int curSetting = noSet;

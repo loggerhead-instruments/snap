@@ -53,7 +53,7 @@ private:
   audio_block_t *inputQueueArray[1];
   audio_block_t * volatile queue[MQ];
   audio_block_t *userblock;
-  volatile uint8_t head, tail, enabled;
+  volatile uint16_t head, tail, enabled;
   uint32_t queue_dropped;
 public:
   uint32_t getQueue_dropped(void) {return queue_dropped;}
