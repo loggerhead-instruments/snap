@@ -131,11 +131,11 @@ boolean audioFlag = 1;
 boolean LEDSON=1;
 boolean introperiod=1;  //flag for introductory period; used for keeping LED on for a little while
 
-int32_t lhi_fsamps[4] = {32000, 44100, 48000, 96000};
-#define F_SAMP 3   // 0 is 32 kHz; 1 is 44.1 kHz; 2 is 48 kHz; 3 is 96 kHz
+int32_t lhi_fsamps[5] = {32000, 44100, 48000, 96000, 192000};
+#define I_SAMP 3   // 0 is 32 kHz; 1 is 44.1 kHz; 2 is 48 kHz; 3 is 96 kHz; 4 is 192 kHz
 
-float audio_srate = lhi_fsamps[F_SAMP];//44100.0;
-int isf = F_SAMP;
+float audio_srate = lhi_fsamps[I_SAMP];//44100.0;
+int isf = I_SAMP;
 
 //WMXZ float audioIntervalSec = 256.0 / audio_srate; //buffer interval in seconds
 //WMXZ unsigned int audioIntervalCount = 0;
@@ -294,7 +294,7 @@ void setup() {
   // Audio connections require memory, and the record queue
   // uses this memory to buffer incoming audio.
   // initialize now to estimate DC offset during setup
-  AudioMemory(100);
+  AudioMemory(200);
   
   manualSettings();
   
