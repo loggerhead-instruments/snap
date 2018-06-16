@@ -5,21 +5,24 @@ More information is at http://loggerhead.com
 
 Files:
 - snap: Main control and sensor recording
-- cmd.pde: Reads recording settings from a script file
+- cmd.ino: Reads recording settings from a script file
 - wav.h: wav header
-- rms: rms calculation
 
 Software supports:
 - duty cycle recording
 - display
 - button input for recording setup
+- selection of sampling frequencies
 - writing to microSD
+- support of Fat16/32 and exFAT
 
 ## Updating Firmware
 
-1.	Install Teensyduino from https://www.pjrc.com/teensy/loader.html
+1.	Install Teensyduino from https://www.pjrc.com/teensy/loader.html or get teensy.exe from 
+	https://github.com/loggerhead-instruments/snap/tree/96kHz/hex
+	To download the file, left-click on the file name, and then right click on the Raw button and select Save As link.
 2.	Get latest hex file from appropriate repository
-	https://github.com/loggerhead-instruments/snap/tree/master/hex
+	https://github.com/loggerhead-instruments/snap/tree/96kHz/hex
 	To download the file, right click on it and select Save link as
 3.	Connect microUSB cable to small board on device. You may have to unscrew board.
 4.	Run the Teensy Loader program.

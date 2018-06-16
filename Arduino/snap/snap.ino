@@ -14,14 +14,21 @@
 // uses SdFS from Bill Greiman https://github.com/greiman/SdFs
 // 
 
+char codeVersion[12] = "2018-06-11";
+static boolean printDiags = 0;  // 1: serial print diagnostics; 0: no diagnostics
+
 #define USE_SDFS 1  // to be used for exFAT but works also for FAT16/32
-#define MQ 90 // to be used with LHI record queue (modified local version)
+#define MQ 140 // to be used with LHI record queue (modified local version)
+//#define USE_LONG_FILE_NAMES
+
+  #include "LHI_record_queue.h"
+  #include "control_sgtl5000.h"
 
 //#include <SerialFlash.h>
 #if USE_SDFS==1
   #include "input_i2s.h"
-  #include "LHI_record_queue.h"
-  #include "control_sgtl5000.h"
+//  #include "LHI_record_queue.h"
+//  #include "control_sgtl5000.h"
 #else
   #include <Audio.h>  //this also includes SD.h from lines 89 & 90
 #endif
@@ -51,8 +58,8 @@ Adafruit_SSD1306 display(OLED_RESET);
 // set this to the hardware serial port you wish to use
 #define HWSERIAL Serial1
 
-char codeVersion[12] = "2018-05-15";
-static boolean printDiags = 0;  // 1: serial print diagnostics; 0: no diagnostics
+#define NREC 32 // increase disk buffer to speed up disk access
+
 static uint8_t myID[8];
 
 unsigned long baud = 115200;
@@ -192,9 +199,7 @@ void setup() {
   delay(500);
 
   Serial.println(RTC_TSR);
-  delay(1000);
   Serial.println(RTC_TSR);
-  delay(1000);
   Serial.println(RTC_TSR);
 
 //  RTC_CR = 0; // disable RTC
@@ -237,16 +242,14 @@ void setup() {
   pinMode(SELECT, INPUT);
   digitalWrite(UP, HIGH);
   digitalWrite(DOWN, HIGH);
-  digitalWrite(SELECT, HIGH);
-
-  delay(500);    
+  digitalWrite(SELECT, HIGH);  
 
   //setSyncProvider(getTeensy3Time); //use Teensy RTC to keep time
   t = getTeensy3Time();
   if (t < 1451606400) Teensy3Clock.set(1451606400);
 
   display.begin(SSD1306_SWITCHCAPVCC, 0x3C);  //initialize display
-  delay(100);
+  delay(140);
   cDisplay();
   display.println("Loggerhead");
 //  Serial.println("Loggerhead");
@@ -269,7 +272,6 @@ void setup() {
   display.println("Loggerhead");
   display.display();
   
-  delay(200);
   // Initialize the SD card
   SPI.setMOSI(7);
   SPI.setSCK(14);
@@ -304,16 +306,15 @@ void setup() {
   logFileHeader();
   
   // disable buttons; not using any more
-  digitalWrite(UP, LOW);
-  digitalWrite(DOWN, LOW);
   digitalWrite(SELECT, LOW);
-  pinMode(UP, OUTPUT);
-  pinMode(DOWN, OUTPUT);
   pinMode(SELECT, OUTPUT);
   
   cDisplay();
 
-  int roundSeconds = 300;//modulo to nearest x seconds
+  int roundSeconds = 10;//modulo to nearest x seconds
+  if(rec_int > 60) roundSeconds = 60;
+  if(rec_int > 300) roundSeconds = 300;
+  
   t = getTeensy3Time();
   startTime = t;
   //startTime = getTeensy3Time();
@@ -323,7 +324,7 @@ void setup() {
   
  // if (recMode==MODE_DIEL) checkDielTime();  
   
-  nbufs_per_file = (long) (rec_dur * audio_srate / 256.0);
+  nbufs_per_file = (long) (ceil(((rec_dur * audio_srate / 256.0) / (float) NREC)) * (float) NREC);
   long ss = rec_int - wakeahead;
   if (ss<0) ss=0;
   snooze_hour = floor(ss/3600);
@@ -415,6 +416,12 @@ void loop() {
   if (mode == 1) {
     continueRecording();  // download data  
 
+  if(printDiags){
+        if (queue1.getQueue_dropped() > 0){
+      Serial.println(queue1.getQueue_dropped());
+    }
+  }
+
     /*
      // update clock while recording
       recLoopCount++;
@@ -435,12 +442,35 @@ void loop() {
         display.display();
       }
       */
-      
+    if(digitalRead(UP)==0 & digitalRead(DOWN)==0){
+      // stop recording
+      queue1.end();
+      // update wav file header
+      wav_hdr.rLen = 36 + buf_count * 256 * 2;
+      wav_hdr.dLen = buf_count * 256 * 2;
+      frec.seek(0);
+      frec.write((uint8_t *)&wav_hdr, 44);
+      frec.close();
+      display.begin(SSD1306_SWITCHCAPVCC, 0x3C);  //initialize display
+      delay(100);
+      cDisplay();
+      display.println("Stopped");
+      display.setTextSize(1);
+      display.println("Safe to turn off");
+      display.display();
+      while(1);
+    }
+    
+    
     if(buf_count >= nbufs_per_file){       // time to stop?
       if(rec_int == 0){
         frec.close();
         FileInit();  // make a new file
         buf_count = 0;
+        if(printDiags) {
+          Serial.print("Audio Mem: ");
+          Serial.println(AudioMemoryUsageMax());
+        }
       }
       else{
         stopRecording();
@@ -516,7 +546,7 @@ void startRecording() {
   if (printDiags)  Serial.println("Queue Begin");
 }
 
-#define NREC 8 // increase disk buffer to speed up disk access
+
 byte buffer[NREC*512];
 void continueRecording() {
   if (queue1.available() >= NREC*2) {
@@ -596,7 +626,7 @@ void FileInit()
 
    // open file 
    sd.chdir(dirname);
-   sprintf(filename,"%02d%02d%02d%02d.wav", day(t), hour(t), minute(t), second(t));  //filename is DDHHMMSS
+   sprintf(filename,"%04d%02d%02dT%02d%02d%02d.wav", year(t), month(t), day(t), hour(t), minute(t), second(t));  //filename is DDHHMMSS
 
 
    // log file
@@ -608,7 +638,7 @@ void FileInit()
 
    float voltage = readVoltage();
    
-  sd.chdir(); // only to be sure to star from root
+  sd.chdir(); // only to be sure to start from root
   #if USE_SDFS==1
     if(FsFile logFile = sd.open("LOG.CSV",  O_CREAT | O_APPEND | O_WRITE)){
   #else
@@ -644,7 +674,6 @@ void FileInit()
    sd.chdir(dirname);
    frec = sd.open(filename, O_WRITE | O_CREAT | O_EXCL);
    Serial.println(filename);
-   delay(100);
    
    while (!frec){
     file_count += 1;
@@ -807,7 +836,6 @@ float readVoltage(){
    float  voltage = 0;
    for(int n = 0; n<8; n++){
     voltage += (float) analogRead(vSense) / 1024.0;
-    delay(2);
    }
    voltage = 5.9 * voltage / 8.0;   //fudging scaling based on actual measurements; shoud be max of 3.3V at 1023
    return voltage;
