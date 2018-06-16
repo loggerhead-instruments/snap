@@ -14,7 +14,7 @@
 // uses SdFS from Bill Greiman https://github.com/greiman/SdFs
 // 
 
-char codeVersion[12] = "2018-06-11";
+char codeVersion[12] = "2018-06-16";
 static boolean printDiags = 0;  // 1: serial print diagnostics; 0: no diagnostics
 
 #define USE_SDFS 1  // to be used for exFAT but works also for FAT16/32
@@ -512,7 +512,7 @@ void loop() {
             //Snooze.hibernate( snooze_config);
   
 //            alarm.setAlarm(snooze_hour, snooze_minute, snooze_second);
-            alarm.setRtcTimer(snooze_hour, snooze_minute, snooze_second);
+            alarm.setRtcTimer(snooze_hour, snooze_minute, snooze_second); // to be compatible with new snooze library
             Snooze.sleep(config_teensy32);
   
             
