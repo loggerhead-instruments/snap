@@ -168,6 +168,7 @@ int folderMonth;
 SnoozeAlarm alarm;
 //SnoozeAudio snooze_audio;
 SnoozeBlock config_teensy32(alarm);
+<<<<<<< HEAD
 >>>>>>> 5eb1a251e0b63aeab52c58138e621c35fd3a191b
 
 #ifdef USE_SNOOZE
@@ -176,6 +177,9 @@ SnoozeBlock config_teensy32(alarm);
   SnoozeAudio snooze_audio;
   SnoozeBlock config_teensy32(snooze_audio, alarm);
 #endif
+=======
+
+>>>>>>> 5eb1a251e0b63aeab52c58138e621c35fd3a191b
 // The file where data is recorded
 #if USE_SDFS==1
   FsFile frec;
@@ -516,6 +520,7 @@ void loop() {
             //Snooze.hibernate( snooze_config);
   
 <<<<<<< HEAD
+<<<<<<< HEAD
 //            alarm.setAlarm(snooze_hour, snooze_minute, snooze_second);
 //            Snooze.sleep(config_teensy32);
             #ifdef USE_SNOOZE
@@ -525,6 +530,8 @@ void loop() {
               setWakeupCallandSleep2(snooze_hour, snooze_minute, snooze_second);
             #endif  
 =======
+=======
+>>>>>>> 5eb1a251e0b63aeab52c58138e621c35fd3a191b
         //    alarm.setAlarm(snooze_hour, snooze_minute, snooze_second);
             alarm.setRtcTimer(snooze_hour, snooze_minute, snooze_second); // to be compatible with new snooze library
             //Snooze.sleep(config_teensy32);
