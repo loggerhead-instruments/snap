@@ -378,7 +378,6 @@ void loop() {
       if(t >= startTime){      // time to start?
         if(noDC==0) {
           audio_freeze_adc_hp(); // this will lower the DC offset voltage, and reduce noise
-          noDC = -1;
         }
         Serial.println("Record Start.");
         
