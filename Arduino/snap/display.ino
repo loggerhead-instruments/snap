@@ -1,7 +1,7 @@
-float mAmpRec = 50;
-float mAmpSleep = 3;
+float mAmpRec = 50;  // actual about 43 mA
+float mAmpSleep = 3; // actual about 2.5 mA
 byte nBatPacks = 1;
-float mAhPerBat = 12000.0; // assume 12Ah per battery pack
+float mAhPerBat = 12000.0; // assume 12Ah per battery pack; good batteries should be 14000
 
 uint32_t freeMB;
 uint32_t filesPerCard;

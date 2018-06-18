@@ -17,7 +17,7 @@
 char codeVersion[12] = "2018-06-18";
 static boolean printDiags = 0;  // 1: serial print diagnostics; 0: no diagnostics
 
-#define USE_SDFS 1  // to be used for exFAT but works also for FAT16/32
+#define USE_SDFS 0  // to be used for exFAT but works also for FAT16/32
 #define MQ 100 // to be used with LHI record queue (modified local version)
 //#define USE_LONG_FILE_NAMES
 
@@ -412,12 +412,6 @@ void loop() {
   if (mode == 1) {
     continueRecording();  // download data  
 
-  if(printDiags){
-        if (queue1.getQueue_dropped() > 0){
-      Serial.println(queue1.getQueue_dropped());
-    }
-  }
-
     /*
      // update clock while recording
       recLoopCount++;
@@ -507,7 +501,7 @@ void loop() {
             //Snooze.deepSleep(snooze_config);
             //Snooze.hibernate( snooze_config);
   
-//            alarm.setAlarm(snooze_hour, snooze_minute, snooze_second);
+        //    alarm.setAlarm(snooze_hour, snooze_minute, snooze_second);
             alarm.setRtcTimer(snooze_hour, snooze_minute, snooze_second); // to be compatible with new snooze library
             Snooze.sleep(config_teensy32);
   
