@@ -13,6 +13,7 @@
 // Modified by WMXZ 15-05-2018 for SdFS anf multiple sampling frequencies
 // uses SdFS from Bill Greiman https://github.com/greiman/SdFs
 // 
+// 18/06/2018 test own hibernate 
 
 char codeVersion[12] = "2018-06-18";
 static boolean printDiags = 0;  // 1: serial print diagnostics; 0: no diagnostics
@@ -40,7 +41,12 @@ static boolean printDiags = 0;  // 1: serial print diagnostics; 0: no diagnostic
   #include "SdFat.h"
 #endif
 #include "amx32.h"
-#include <Snooze.h>  //using https://github.com/duff2013/Snooze; uncomment line 62 #define USE_HIBERNATE
+#undef USE_SNOOZE
+#ifdef USE_SNOOZE
+  #include <Snooze.h>  //using https://github.com/duff2013/Snooze; uncomment line 62 #define USE_HIBERNATE
+#else
+  #include "hibernate.h"
+#endif
 #include <TimeLib.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
@@ -131,8 +137,8 @@ boolean audioFlag = 1;
 boolean LEDSON=1;
 boolean introperiod=1;  //flag for introductory period; used for keeping LED on for a little while
 
-int32_t lhi_fsamps[5] = {32000, 44100, 48000, 96000, 192000};
-#define I_SAMP 3   // 0 is 32 kHz; 1 is 44.1 kHz; 2 is 48 kHz; 3 is 96 kHz; 4 is 192 kHz
+int32_t lhi_fsamps[7] = {8000, 16000, 32000, 44100, 48000, 96000, 192000};
+#define I_SAMP 5   // 0 is 32 kHz; 1 is 44.1 kHz; 2 is 48 kHz; 3 is 96 kHz; 4 is 192 kHz
 
 float audio_srate = lhi_fsamps[I_SAMP];//44100.0;
 int isf = I_SAMP;
@@ -156,10 +162,13 @@ long file_count;
 char filename[40];
 char dirname[20];
 int folderMonth;
-//SnoozeBlock snooze_config;
-SnoozeAlarm alarm;
-//SnoozeAudio snooze_audio;
-SnoozeBlock config_teensy32(alarm);
+
+#ifdef USE_SNOOZE
+  //SnoozeBlock snooze_config;
+  SnoozeAlarm alarm;
+  SnoozeAudio snooze_audio;
+  SnoozeBlock config_teensy32(snooze_audio, alarm);
+#endif
 
 // The file where data is recorded
 #if USE_SDFS==1
@@ -500,12 +509,14 @@ void loop() {
             //Snooze.deepSleep(snooze_config);
             //Snooze.hibernate( snooze_config);
   
-        //    alarm.setAlarm(snooze_hour, snooze_minute, snooze_second);
-            alarm.setRtcTimer(snooze_hour, snooze_minute, snooze_second); // to be compatible with new snooze library
-            //Snooze.sleep(config_teensy32);
-            Snooze.hibernate(config_teensy32);
-  
-            
+//            alarm.setAlarm(snooze_hour, snooze_minute, snooze_second);
+//            Snooze.sleep(config_teensy32);
+            #ifdef USE_SNOOZE
+              alarm.setRtcTimer(snooze_hour, snooze_minute, snooze_second); // to be compatible with new snooze library
+              Snooze.deepSleep(config_teensy32,VLLS0); // will not return from this, but restart the program
+            #else
+              setWakeupCallandSleep2(snooze_hour, snooze_minute, snooze_second);
+            #endif  
             /// ... Sleeping ....
             
             // Waking up

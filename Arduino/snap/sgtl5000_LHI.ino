@@ -552,5 +552,3 @@ void I2S_modification(uint32_t fsamp, uint16_t nbits)
   //restart I2S
   I2S0_RCSR |= I2S_RCSR_RE | I2S_RCSR_BCE;
 }
-
-
