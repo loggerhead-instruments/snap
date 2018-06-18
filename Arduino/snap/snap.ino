@@ -14,10 +14,10 @@
 // uses SdFS from Bill Greiman https://github.com/greiman/SdFs
 // 
 
-char codeVersion[12] = "2018-06-16";
+char codeVersion[12] = "2018-06-18";
 static boolean printDiags = 0;  // 1: serial print diagnostics; 0: no diagnostics
 
-#define USE_SDFS 1  // to be used for exFAT but works also for FAT16/32
+#define USE_SDFS 0  // to be used for exFAT but works also for FAT16/32
 #define MQ 100 // to be used with LHI record queue (modified local version)
 //#define USE_LONG_FILE_NAMES
 
@@ -158,8 +158,8 @@ char dirname[20];
 int folderMonth;
 //SnoozeBlock snooze_config;
 SnoozeAlarm alarm;
-SnoozeAudio snooze_audio;
-SnoozeBlock config_teensy32(snooze_audio, alarm);
+//SnoozeAudio snooze_audio;
+SnoozeBlock config_teensy32(alarm);
 
 // The file where data is recorded
 #if USE_SDFS==1
@@ -305,10 +305,6 @@ void setup() {
 
   logFileHeader();
   
-  // disable buttons; not using any more
-  digitalWrite(SELECT, LOW);
-  pinMode(SELECT, OUTPUT);
-  
   cDisplay();
 
   int roundSeconds = 10;//modulo to nearest x seconds
@@ -382,7 +378,6 @@ void loop() {
       if(t >= startTime){      // time to start?
         if(noDC==0) {
           audio_freeze_adc_hp(); // this will lower the DC offset voltage, and reduce noise
-          noDC = -1;
         }
         Serial.println("Record Start.");
         
@@ -415,12 +410,6 @@ void loop() {
   // Record mode
   if (mode == 1) {
     continueRecording();  // download data  
-
-  if(printDiags){
-        if (queue1.getQueue_dropped() > 0){
-      Serial.println(queue1.getQueue_dropped());
-    }
-  }
 
     /*
      // update clock while recording
@@ -511,9 +500,10 @@ void loop() {
             //Snooze.deepSleep(snooze_config);
             //Snooze.hibernate( snooze_config);
   
-//            alarm.setAlarm(snooze_hour, snooze_minute, snooze_second);
+        //    alarm.setAlarm(snooze_hour, snooze_minute, snooze_second);
             alarm.setRtcTimer(snooze_hour, snooze_minute, snooze_second); // to be compatible with new snooze library
-            Snooze.sleep(config_teensy32);
+            //Snooze.sleep(config_teensy32);
+            Snooze.hibernate(config_teensy32);
   
             
             /// ... Sleeping ....
@@ -523,9 +513,10 @@ void loop() {
             
             digitalWrite(hydroPowPin, HIGH); // hydrophone on
    
-          //  audio_enable();
+          //  
           //  AudioInterrupts();
             audio_power_up();
+            AudioInit(isf);
             //sdInit();  //reinit SD because voltage can drop in hibernate
          }
          
