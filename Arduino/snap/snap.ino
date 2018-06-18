@@ -305,10 +305,6 @@ void setup() {
 
   logFileHeader();
   
-  // disable buttons; not using any more
-  digitalWrite(SELECT, LOW);
-  pinMode(SELECT, OUTPUT);
-  
   cDisplay();
 
   int roundSeconds = 10;//modulo to nearest x seconds
