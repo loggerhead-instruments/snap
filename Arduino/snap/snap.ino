@@ -158,8 +158,8 @@ char dirname[20];
 int folderMonth;
 //SnoozeBlock snooze_config;
 SnoozeAlarm alarm;
-SnoozeAudio snooze_audio;
-SnoozeBlock config_teensy32(snooze_audio, alarm);
+//SnoozeAudio snooze_audio;
+SnoozeBlock config_teensy32(alarm);
 
 // The file where data is recorded
 #if USE_SDFS==1
@@ -503,7 +503,8 @@ void loop() {
   
         //    alarm.setAlarm(snooze_hour, snooze_minute, snooze_second);
             alarm.setRtcTimer(snooze_hour, snooze_minute, snooze_second); // to be compatible with new snooze library
-            Snooze.sleep(config_teensy32);
+            //Snooze.sleep(config_teensy32);
+            Snooze.hibernate(config_teensy32);
   
             
             /// ... Sleeping ....
@@ -513,9 +514,10 @@ void loop() {
             
             digitalWrite(hydroPowPin, HIGH); // hydrophone on
    
-          //  audio_enable();
+          //  
           //  AudioInterrupts();
             audio_power_up();
+            AudioInit(isf);
             //sdInit();  //reinit SD because voltage can drop in hibernate
          }
          
