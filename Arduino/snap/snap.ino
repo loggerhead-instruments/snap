@@ -14,7 +14,7 @@
 // uses SdFS from Bill Greiman https://github.com/greiman/SdFs
 // 
 
-char codeVersion[12] = "2018-06-16";
+char codeVersion[12] = "2018-06-18";
 static boolean printDiags = 0;  // 1: serial print diagnostics; 0: no diagnostics
 
 #define USE_SDFS 1  // to be used for exFAT but works also for FAT16/32
