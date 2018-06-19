@@ -18,7 +18,7 @@
 char codeVersion[12] = "2018-06-18";
 static boolean printDiags = 0;  // 1: serial print diagnostics; 0: no diagnostics
 
-#define USE_SDFS 0  // to be used for exFAT but works also for FAT16/32
+#define USE_SDFS 1  // to be used for exFAT but works also for FAT16/32
 #define MQ 100 // to be used with LHI record queue (modified local version)
 //#define USE_LONG_FILE_NAMES
 
@@ -138,7 +138,7 @@ boolean LEDSON=1;
 boolean introperiod=1;  //flag for introductory period; used for keeping LED on for a little while
 
 int32_t lhi_fsamps[7] = {8000, 16000, 32000, 44100, 48000, 96000, 192000};
-#define I_SAMP 5   // 0 is 32 kHz; 1 is 44.1 kHz; 2 is 48 kHz; 3 is 96 kHz; 4 is 192 kHz
+#define I_SAMP 5   // 0 is 8 kHz; 1 is 16 kHz; 2 is 32 kHz; 3 is 44.1 kHz; 4 is 48 kHz; 5 is 96 kHz; 6 is 192 kHz
 
 float audio_srate = lhi_fsamps[I_SAMP];//44100.0;
 int isf = I_SAMP;
@@ -314,6 +314,10 @@ void setup() {
 
   logFileHeader();
   
+  // disable buttons; not using any more
+  digitalWrite(SELECT, LOW);
+  pinMode(SELECT, OUTPUT);
+  
   cDisplay();
 
   int roundSeconds = 10;//modulo to nearest x seconds
@@ -355,7 +359,7 @@ void setup() {
   long time_to_first_rec = startTime - t;
   Serial.print("Time to first record ");
   Serial.println(time_to_first_rec);
-
+  
   mode = 0;
 
   // create first folder to hold data
@@ -387,6 +391,7 @@ void loop() {
       if(t >= startTime){      // time to start?
         if(noDC==0) {
           audio_freeze_adc_hp(); // this will lower the DC offset voltage, and reduce noise
+          noDC = -1;
         }
         Serial.println("Record Start.");
         
@@ -419,6 +424,12 @@ void loop() {
   // Record mode
   if (mode == 1) {
     continueRecording();  // download data  
+
+  if(printDiags){
+        if (queue1.getQueue_dropped() > 0){
+      Serial.println(queue1.getQueue_dropped());
+    }
+  }
 
     /*
      // update clock while recording
@@ -517,6 +528,7 @@ void loop() {
             #else
               setWakeupCallandSleep2(snooze_hour, snooze_minute, snooze_second);
             #endif  
+            
             /// ... Sleeping ....
             
             // Waking up
@@ -524,10 +536,9 @@ void loop() {
             
             digitalWrite(hydroPowPin, HIGH); // hydrophone on
    
-          //  
+          //  audio_enable();
           //  AudioInterrupts();
             audio_power_up();
-            AudioInit(isf);
             //sdInit();  //reinit SD because voltage can drop in hibernate
          }
          
