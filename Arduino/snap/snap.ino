@@ -41,12 +41,14 @@ static boolean printDiags = 0;  // 1: serial print diagnostics; 0: no diagnostic
   #include "SdFat.h"
 #endif
 #include "amx32.h"
+
 #undef USE_SNOOZE
 #ifdef USE_SNOOZE
   #include <Snooze.h>  //using https://github.com/duff2013/Snooze; uncomment line 62 #define USE_HIBERNATE
 #else
   #include "hibernate.h"
 #endif
+
 #include <TimeLib.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
@@ -81,7 +83,7 @@ unsigned long baud = 115200;
 
 // GUItool: begin automatically generated code
 AudioInputI2S            i2s2;           //xy=105,63
-LHIRecordQueue         queue1;         //xy=281,63
+LHIRecordQueue           queue1;         //xy=281,63
 AudioConnection          patchCord1(i2s2, 0, queue1, 0);
 AudioControlSGTL5000     sgtl5000_1;     //xy=265,212
 // GUItool: end automatically generated code
