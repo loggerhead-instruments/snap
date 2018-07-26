@@ -199,7 +199,7 @@ void manualSettings(){
         display.print(second(getTeensy3Time()));
         break;
       case setFsamp:
-        isf = updateVal(isf, 0, 3);
+        isf = updateVal(isf, 0, 5);
         display.printf("SF: %.1f",lhi_fsamps[isf]/1000.0f);
         break;
     }
