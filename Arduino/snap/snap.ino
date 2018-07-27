@@ -15,10 +15,10 @@
 // 
 // 18/06/2018 test own hibernate 
 
-char codeVersion[12] = "2018-06-18";
-static boolean printDiags = 0;  // 1: serial print diagnostics; 0: no diagnostics
+char codeVersion[12] = "2018-07-26";
+static boolean printDiags = 1;  // 1: serial print diagnostics; 0: no diagnostics
 
-#define USE_SDFS 1  // to be used for exFAT but works also for FAT16/32
+#define USE_SDFS 0  // to be used for exFAT but works also for FAT16/32
 #define MQ 100 // to be used with LHI record queue (modified local version)
 //#define USE_LONG_FILE_NAMES
 
@@ -43,6 +43,7 @@ static boolean printDiags = 0;  // 1: serial print diagnostics; 0: no diagnostic
 #include "amx32.h"
 
 #undef USE_SNOOZE
+//#define USE_SNOOZE
 #ifdef USE_SNOOZE
   #include <Snooze.h>  //using https://github.com/duff2013/Snooze; uncomment line 62 #define USE_HIBERNATE
 #else
@@ -316,10 +317,6 @@ void setup() {
 
   logFileHeader();
   
-  // disable buttons; not using any more
-  digitalWrite(SELECT, LOW);
-  pinMode(SELECT, OUTPUT);
-  
   cDisplay();
 
   int roundSeconds = 10;//modulo to nearest x seconds
@@ -492,17 +489,10 @@ void loop() {
         snooze_minute = floor(ss/60);
         ss -= snooze_minute * 60;
         snooze_second = ss;
-
-        Serial.println(snooze_hour);
-        Serial.println(snooze_minute);
-        Serial.println(snooze_second);
         
         if( (snooze_hour * 3600) + (snooze_minute * 60) + snooze_second >=10){
-            if (printDiags==0) Serial.println("Shutting bits down");
             digitalWrite(hydroPowPin, LOW); //hydrophone off
-            if (printDiags==0) Serial.println("hydrophone off");
             audio_power_down();
-            if (printDiags==0) Serial.println("audio power down");
 
             if(printDiags){
               Serial.print("Snooze HH MM SS ");
@@ -514,19 +504,9 @@ void loop() {
             Serial.println("Going to Sleep");
             delay(100);
   
-           // AudioNoInterrupts();
-  
-            //snooze_config.setAlarm(snooze_hour, snooze_minute, snooze_second);
-            //delay(100);
-            //Snooze.sleep( snooze_config );
-            //Snooze.deepSleep(snooze_config);
-            //Snooze.hibernate( snooze_config);
-  
-//            alarm.setAlarm(snooze_hour, snooze_minute, snooze_second);
-//            Snooze.sleep(config_teensy32);
             #ifdef USE_SNOOZE
               alarm.setRtcTimer(snooze_hour, snooze_minute, snooze_second); // to be compatible with new snooze library
-              Snooze.deepSleep(config_teensy32,VLLS0); // will not return from this, but restart the program
+              Snooze.hibernate(config_teensy32); 
             #else
               setWakeupCallandSleep2(snooze_hour, snooze_minute, snooze_second);
             #endif  
@@ -535,17 +515,24 @@ void loop() {
             
             // Waking up
            // if (printDiags==0) usbDisable();
-            
+
+            delay(500);  // give time for Serial to reconnect to USB
+            if(printDiags) Serial.println("Waking");
             digitalWrite(hydroPowPin, HIGH); // hydrophone on
-   
+    
           //  audio_enable();
           //  AudioInterrupts();
+            if(printDiags) Serial.println("audio init");
+          //  AudioInit(isf);
             audio_power_up();
-            //sdInit();  //reinit SD because voltage can drop in hibernate
+
+            if(printDiags) Serial.println("Sd init");
+            sdInit();  //reinit SD because voltage can drop in hibernate
          }
          
         //digitalWrite(displayPow, HIGH); //start display up on wake
         //delay(100);
+        Serial.println("Display");
         display.begin(SSD1306_SWITCHCAPVCC, 0x3C);  //initialize display
         mode = 0;  // standby mode
       }
@@ -582,10 +569,10 @@ void continueRecording() {
       
     buf_count += NREC;
 //WMXZ    audioIntervalCount += NREC;
-//    
-//    if(printDiags){
-//      Serial.print(".");
-//   }
+    
+    if(printDiags){
+      Serial.print(".");
+   }
   }
 }
 
@@ -604,24 +591,19 @@ void stopRecording() {
 }
 
 
-
-/*
 void sdInit(){
      if (!(sd.begin(10))) {
     // stop here if no SD card, but print a message
     Serial.println("Unable to access the SD card");
     
-    while (1) {
-      cDisplay();
-      display.println("SD error. Restart.");
-      displayClock(getTeensy3Time(), BOTTOM);
-      display.display();
-      delay(1000);
-      
-    }
+    cDisplay();
+    display.println("SD error. Restart.");
+    displayClock(getTeensy3Time(), BOTTOM);
+    display.display();
+    delay(1000);
   }
 }
-*/
+
 
 void FileInit()
 {
