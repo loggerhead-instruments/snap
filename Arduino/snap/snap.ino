@@ -15,7 +15,7 @@
 // 
 // 18/06/2018 test own hibernate 
 
-char codeVersion[12] = "2018-07-26";
+char codeVersion[12] = "2018-07-31";
 static boolean printDiags = 1;  // 1: serial print diagnostics; 0: no diagnostics
 
 #define USE_SDFS 0  // to be used for exFAT but works also for FAT16/32
@@ -26,7 +26,7 @@ static boolean printDiags = 1;  // 1: serial print diagnostics; 0: no diagnostic
 #include "control_sgtl5000.h"
 
 //#include <SerialFlash.h>
-#if USE_SDFS==1
+#if USE_SDFS==0
   #include "input_i2s.h"
 //  #include "LHI_record_queue.h"
 //  #include "control_sgtl5000.h"
@@ -42,8 +42,8 @@ static boolean printDiags = 1;  // 1: serial print diagnostics; 0: no diagnostic
 #endif
 #include "amx32.h"
 
-#undef USE_SNOOZE
-//#define USE_SNOOZE
+//#undef USE_SNOOZE
+#define USE_SNOOZE
 #ifdef USE_SNOOZE
   #include <Snooze.h>  //using https://github.com/duff2013/Snooze; uncomment line 62 #define USE_HIBERNATE
 #else
@@ -405,15 +405,7 @@ void loop() {
         Serial.print("Next Start:");
         printTime(startTime);
 
-//        cDisplay();
-//        display.println("Rec");
-//        display.setTextSize(1);
-//        display.print("Stop Time: ");
-//        displayClock(stopTime, 30);
-//        display.display();
-
         mode = 1;
-  
         display.ssd1306_command(SSD1306_DISPLAYOFF); // turn off display during recording
         startRecording();
       }
@@ -424,32 +416,11 @@ void loop() {
   if (mode == 1) {
     continueRecording();  // download data  
 
-  if(printDiags){
-        if (queue1.getQueue_dropped() > 0){
-      Serial.println(queue1.getQueue_dropped());
-    }
-  }
-
-    /*
-     // update clock while recording
-      recLoopCount++;
-      if(recLoopCount>50){
-        recLoopCount = 0;
-        t = getTeensy3Time();
-        cDisplay();
-        if(rec_int > 0) {
-          display.println("Rec");
-          displayClock(stopTime, 20);
-        }
-        else{
-          display.println("Rec Contin");
-          display.setTextSize(1);
-          display.println(filename);
-        }
-        displayClock(t, BOTTOM);
-        display.display();
-      }
-      */
+//  if(printDiags){
+//        if (queue1.getQueue_dropped() > 0){
+//      Serial.println(queue1.getQueue_dropped());
+//    }
+//  }
     if(digitalRead(UP)==0 & digitalRead(DOWN)==0){
       // stop recording
       queue1.end();
@@ -500,6 +471,9 @@ void loop() {
               Serial.print(snooze_minute);
               Serial.println(snooze_second);
             }
+            // stop I2S
+            I2S0_RCSR &= ~(I2S_RCSR_RE | I2S_RCSR_BCE);
+            
             delay(100);
             Serial.println("Going to Sleep");
             delay(100);
@@ -516,18 +490,18 @@ void loop() {
             // Waking up
            // if (printDiags==0) usbDisable();
 
-            delay(500);  // give time for Serial to reconnect to USB
+            delay(300);  // give time for Serial to reconnect to USB
+
+          //  CORE_PIN23_CONFIG = PORT_PCR_MUX(6); // added because LRCLK did not always restart
+            
+            if(printDiags) Serial.println("audio init");
+            AudioInit(isf);  // restart I2S
+            delay(200);
+            
             if(printDiags) Serial.println("Waking");
             digitalWrite(hydroPowPin, HIGH); // hydrophone on
-    
-          //  audio_enable();
-          //  AudioInterrupts();
-            if(printDiags) Serial.println("audio init");
-          //  AudioInit(isf);
-            audio_power_up();
-
+            
             if(printDiags) Serial.println("Sd init");
-            sdInit();  //reinit SD because voltage can drop in hibernate
          }
          
         //digitalWrite(displayPow, HIGH); //start display up on wake

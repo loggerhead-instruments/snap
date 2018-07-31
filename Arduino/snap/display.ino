@@ -104,16 +104,16 @@ void manualSettings(){
   if (recMode<0 | recMode>1) recMode = 0;
   if (isf<0 | isf>3) isf = I_SAMP; // change 3 to 4 to allow 192 kHz
 
-  // if LOG.CSV present, skip manual settings
-  #if USE_SDFS==1
-    FsFile logFile = sd.open("LOG.CSV");
-  #else
-    File logFile = sd.open("LOG.CSV");
-  #endif
-  if(logFile){
-    startRec = 1;
-    logFile.close();
-  }
+//  // if LOG.CSV present, skip manual settings
+//  #if USE_SDFS==1
+//    FsFile logFile = sd.open("LOG.CSV");
+//  #else
+//    File logFile = sd.open("LOG.CSV");
+//  #endif
+//  if(logFile){
+//    startRec = 1;
+//    logFile.close();
+//  }
   
   while(startRec==0){
     static int curSetting = noSet;
