@@ -463,23 +463,23 @@ void loop() {
         
         if( (snooze_hour * 3600) + (snooze_minute * 60) + snooze_second >=10){
             digitalWrite(hydroPowPin, LOW); //hydrophone off
-            audio_power_down();
+            // audio_power_down();  // when this is activated, seems to occassionally have trouble restarting; no LRCLK signal or RX on Teensy
 
             if(printDiags){
               Serial.print("Snooze HH MM SS ");
               Serial.print(snooze_hour);
               Serial.print(snooze_minute);
               Serial.println(snooze_second);
+              Serial.flush(); // make sure empty so doesn't prematurely wake
             }
             // stop I2S
-            I2S0_RCSR &= ~(I2S_RCSR_RE | I2S_RCSR_BCE);
+            //I2S0_RCSR &= ~(I2S_RCSR_RE | I2S_RCSR_BCE);  // added because LRCLK did not always restart. This doesn't fix issue. Left commented so I know I tried it.
             
-            delay(100);
-            Serial.println("Going to Sleep");
             delay(100);
   
             #ifdef USE_SNOOZE
               alarm.setRtcTimer(snooze_hour, snooze_minute, snooze_second); // to be compatible with new snooze library
+              delay(100); // sometimes does not hibernate; trying delay
               Snooze.hibernate(config_teensy32); 
             #else
               setWakeupCallandSleep2(snooze_hour, snooze_minute, snooze_second);
@@ -489,19 +489,15 @@ void loop() {
             
             // Waking up
            // if (printDiags==0) usbDisable();
-
+            
             delay(300);  // give time for Serial to reconnect to USB
 
-          //  CORE_PIN23_CONFIG = PORT_PCR_MUX(6); // added because LRCLK did not always restart
-            
-            if(printDiags) Serial.println("audio init");
+          //  CORE_PIN23_CONFIG = PORT_PCR_MUX(6); // added because LRCLK did not always restart. This doesn't fix issue. Left commented so I know I tried it.
+          // audio_power_up();  // when use audio_power_down() before sleeping, does not always get LRCLK. This did not fix.  
+          //  if(printDiags) Serial.println("audio init");
             AudioInit(isf);  // restart I2S
-            delay(200);
             
-            if(printDiags) Serial.println("Waking");
             digitalWrite(hydroPowPin, HIGH); // hydrophone on
-            
-            if(printDiags) Serial.println("Sd init");
          }
          
         //digitalWrite(displayPow, HIGH); //start display up on wake
