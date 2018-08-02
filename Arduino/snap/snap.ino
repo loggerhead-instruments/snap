@@ -463,7 +463,7 @@ void loop() {
         
         if( (snooze_hour * 3600) + (snooze_minute * 60) + snooze_second >=10){
             digitalWrite(hydroPowPin, LOW); //hydrophone off
-            // audio_power_down();  // when this is activated, seems to occassionally have trouble restarting; no LRCLK signal or RX on Teensy
+            audio_power_down();  // when this is activated, seems to occassionally have trouble restarting; no LRCLK signal or RX on Teensy
 
             if(printDiags){
               Serial.print("Snooze HH MM SS ");
@@ -480,7 +480,7 @@ void loop() {
             #ifdef USE_SNOOZE
               alarm.setRtcTimer(snooze_hour, snooze_minute, snooze_second); // to be compatible with new snooze library
               delay(100); // sometimes does not hibernate; trying delay
-              Snooze.hibernate(config_teensy32); 
+              Snooze.sleep(config_teensy32); 
             #else
               setWakeupCallandSleep2(snooze_hour, snooze_minute, snooze_second);
             #endif  
@@ -489,15 +489,16 @@ void loop() {
             
             // Waking up
            // if (printDiags==0) usbDisable();
-            
+
+            digitalWrite(hydroPowPin, HIGH); // hydrophone on
             delay(300);  // give time for Serial to reconnect to USB
 
           //  CORE_PIN23_CONFIG = PORT_PCR_MUX(6); // added because LRCLK did not always restart. This doesn't fix issue. Left commented so I know I tried it.
-          // audio_power_up();  // when use audio_power_down() before sleeping, does not always get LRCLK. This did not fix.  
+           audio_power_up();  // when use audio_power_down() before sleeping, does not always get LRCLK. This did not fix.  
           //  if(printDiags) Serial.println("audio init");
-            AudioInit(isf);  // restart I2S
+          //  AudioInit(isf);  // restart I2S
             
-            digitalWrite(hydroPowPin, HIGH); // hydrophone on
+            
          }
          
         //digitalWrite(displayPow, HIGH); //start display up on wake
