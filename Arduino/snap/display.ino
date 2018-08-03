@@ -1,3 +1,12 @@
+float mAmpRec = 50;  // actual about 43 mA
+float mAmpSleep = 3; // actual about 2.6 mA
+byte nBatPacks = 1;
+float mAhPerBat = 12000.0; // assume 12Ah per battery pack; good batteries should be 14000
+
+uint32_t freeMB;
+uint32_t filesPerCard;
+csd_t m_csd;
+
 
 /* DISPLAY FUNCTIONS
  *  
@@ -30,12 +39,59 @@ void printZero(int val){
 #define setStartMinute 11
 #define setEndHour 12
 #define setEndMinute 13
+#define setFsamp 14
 
 void manualSettings(){
   boolean startRec = 0, startUp, startDown;
   readEEPROM();
 
   autoStartTime = getTeensy3Time();
+
+// get free space on cards
+
+    cDisplay();
+    display.print("LS1 Init");
+    display.setTextSize(1);
+    display.setCursor(0, 16);
+    display.println("Card Free/Total MB");
+    
+    freeMB = 0; //reset
+    Serial.println(); Serial.println();
+    Serial.print("Card:"); 
+    display.display();
+    
+    // Initialize the SD card
+
+    SPI.setMOSI(7);
+    SPI.setSCK(14);
+    SPI.setMISO(12);
+  
+    if(sd.begin(10, SD_SCK_MHZ(50))){
+      sd.card()->readCSD(&m_csd);
+      
+      //uint32_t volFree = sd.FsVolume.freeClusterCount();
+      uint32_t volMB = uint32_t ( 0.000512 * sdCardCapacity(&m_csd));    
+      
+      Serial.print("Volume (MB): ");
+      Serial.println((uint32_t) volMB);
+
+      if (volMB < 200) freeMB = 0;
+      else
+        freeMB = volMB - 200; // take off 200 MB to be safe
+      
+      display.print(freeMB);
+      display.print("/");
+      display.println(volMB);
+      display.display();
+    }
+    else{
+      Serial.println("Unable to access the SD card");
+      //Serial.println(card.errorCode());
+     // Serial.println(card.errorData());
+      display.println("  None");
+      display.display();
+  }
+ 
   
   
   // make sure settings valid (if EEPROM corrupted or not set yet)
@@ -46,6 +102,18 @@ void manualSettings(){
   if (endHour<0 | endHour>23) endHour = 0;
   if (endMinute<0 | endMinute>59) endMinute = 0;
   if (recMode<0 | recMode>1) recMode = 0;
+  if (isf<0 | isf>4) isf = I_SAMP; // change 3 to 4 to allow 192 kHz
+
+//  // if LOG.CSV present, skip manual settings
+//  #if USE_SDFS==1
+//    FsFile logFile = sd.open("LOG.CSV");
+//  #else
+//    File logFile = sd.open("LOG.CSV");
+//  #endif
+//  if(logFile){
+//    startRec = 1;
+//    logFile.close();
+//  }
   
   while(startRec==0){
     static int curSetting = noSet;
@@ -58,8 +126,9 @@ void manualSettings(){
       while(digitalRead(SELECT)==0){ // wait until let go of button
         delay(10);
       }
-      if((recMode==MODE_NORMAL & curSetting>8)) curSetting = 0;
-    }
+      if(recMode==MODE_NORMAL & (curSetting>8) & (curSetting<14)) curSetting = 14;
+      if(recMode==MODE_NORMAL & (curSetting>14)) curSetting = 0;
+   }
 
     cDisplay();
 
@@ -140,6 +209,10 @@ void manualSettings(){
         display.print("Second:");
         display.print(second(getTeensy3Time()));
         break;
+      case setFsamp:
+        isf = updateVal(isf, 0, 5);
+        display.printf("SF: %.1f",lhi_fsamps[isf]/1000.0f);
+        break;
     }
     displaySettings();
     displayClock(getTeensy3Time(), BOTTOM);
@@ -204,29 +277,57 @@ void displaySettings(){
   display.setTextSize(1);
   display.setTextColor(WHITE);
   display.setCursor(0, 18);
-//  display.print("Mode:");
-//  if (recMode==MODE_NORMAL) display.println("Normal");
-//  if (recMode==MODE_DIEL) {
-//    display.println("Diel");
-//  }
+
   display.print("Rec:");
   display.print(rec_dur);
-  display.println("s");
+  display.println("s ");
+  
   display.print("Sleep:");
   display.print(rec_int);
-  display.println("s");
-  if (recMode==MODE_DIEL) {
-    display.print("Active: ");
-    printZero(startHour);
-    display.print(startHour);
-    printDigits(startMinute);
-    display.print("-");
-    printZero(endHour);
-    display.print(endHour);
-    printDigits(endMinute);
-    display.println();
+  display.println("s  ");
+
+  display.printf("%.1f kHz\n",lhi_fsamps[isf]/1000.0f);
+
+  display.setTextSize(1);
+  uint32_t totalRecSeconds = 0;
+
+  float fileBytes = (2 * rec_dur * lhi_fsamps[isf]) + 44;
+  float fileMB = (fileBytes + 32768) / 1000 / 1000; // add cluster size so don't underestimate fileMB
+  float dielFraction = 1.0; //diel mode decreases time spent recording, increases time in sleep
+  
+  float recDraw = mAmpRec;
+  float recFraction = (rec_dur * dielFraction) / (rec_dur + rec_int);
+  float sleepFraction = 1 - recFraction;
+  float avgCurrentDraw = (recDraw * recFraction) + (mAmpSleep * sleepFraction);
+
+  uint32_t powerSeconds = uint32_t (3600.0 * (mAhPerBat / avgCurrentDraw));
+
+  filesPerCard = 0;
+  if(freeMB==0) filesPerCard = 0;
+  else{
+    filesPerCard = (uint32_t) floor(freeMB / fileMB);
+  }
+  totalRecSeconds += (filesPerCard * rec_dur);
+  //display.setCursor(60, 18 + (n*8));  // display file count for debugging
+  //display.print(n+1); display.print(":");display.print(filesPerCard[n]); 
+
+  float totalSecondsMemory = totalRecSeconds / recFraction;
+  if(powerSeconds < totalSecondsMemory){
+   // displayClock(getTeensy3Time() + powerSeconds, 45, 0);
+    display.setCursor(0, 46);
+    display.print("Battery Limit:");
+    display.print(powerSeconds / 86400);
+    display.print("d");
+  }
+  else{
+  //  displayClock(getTeensy3Time() + totalRecSeconds + totalSleepSeconds, 45, 0);
+    display.setCursor(0, 46);
+    display.print("Memory Limit:");
+    display.print(totalSecondsMemory / 86400);
+    display.print("d");
   }
 }
+
 
 void displayClock(time_t t, int loc){
   display.setTextSize(1);
@@ -265,6 +366,7 @@ void readEEPROM(){
   endHour = EEPROM.read(10);
   endMinute = EEPROM.read(11);
   recMode = EEPROM.read(12);
+  isf = EEPROM.read(13);
 }
 
 union {
@@ -296,5 +398,6 @@ void writeEEPROM(){
   EEPROM.write(10, endHour); //byte
   EEPROM.write(11, endMinute); //byte
   EEPROM.write(12, recMode); //byte
+  EEPROM.write(13, isf); //byte
 }
 

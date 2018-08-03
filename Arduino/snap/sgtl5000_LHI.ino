@@ -1,3 +1,4 @@
+
 #include "control_sgtl5000.h"
 #include "Wire.h"
 
@@ -413,8 +414,11 @@
 #define DAP_AVC_CTRL        0x0124 //audio volume control
 // 0  Disable
 
-bool audio_enable(void)
-{
+bool audio_enable(int fs_mode)
+{ int sgtl_mode=fs_mode-2;
+  if(sgtl_mode>3) sgtl_mode=3;
+  if(sgtl_mode<0) sgtl_mode=0;
+  
 //  muted = true;
 //  Serial.print("audio ID = ");
 //  delay(5);
@@ -438,14 +442,15 @@ bool audio_enable(void)
   delay(400);
   //chipWrite(CHIP_LINE_OUT_VOL, 0x1D1D); // default approx 1.3 volts peak-to-peak
   chipWrite(CHIP_LINE_OUT_VOL, 0x1919); // default approx 1.3 volts peak-to-peak
-  chipWrite(CHIP_CLK_CTRL, 0x0004);  // 44.1 kHz, 256*Fs
+  //
+  chipWrite(CHIP_CLK_CTRL, (sgtl_mode<<2));  // 256*Fs| sgtl_mode = 0:32 kHz; 1:44.1 kHz; 2:48 kHz; 3:96 kHz
   chipWrite(CHIP_I2S_CTRL, 0x0130); // SCLK=32*Fs, 16bit, I2S format
-  // default signal routing is ok?
   
+  // default signal routing is ok?
   //chipWrite(CHIP_SSS_CTRL, 0x0010); // ADC->I2S, I2S->DAC
   chipWrite(CHIP_SSS_CTRL, 0x0000); // ADC->I2S, ADC->DAC
 
-    chipWrite(CHIP_ADCDAC_CTRL, 0x0008); // DAC mute right; DAC left unmute; ADC HPF normal operation
+  chipWrite(CHIP_ADCDAC_CTRL, 0x0008); // DAC mute right; DAC left unmute; ADC HPF normal operation
   
   
   chipWrite(CHIP_DAC_VOL, 0xFF3C); // dac mute right; left 0 dB
@@ -497,4 +502,58 @@ bool chipWrite(unsigned int reg, unsigned int val)
   return false;
 }
 
+  //------------------------------modify I2S-------------------------------------------
+// attempt to generate dividers programmatically
+// always better to check
+void I2S_dividers(uint32_t *iscl, uint32_t fsamp, uint32_t nbits)
+{
+    int64_t i1 = 1;
+    int64_t i2 = 1;
+    int64_t i3 = iscl[2]+1;
+    int fcpu=F_CPU;
+    if(F_CPU<=96000000) fcpu=96000000;
+    float A=fcpu/2.0f/i3/(2.0f*nbits*fsamp);
+    float mn=1.0; 
+    for(int ii=1;ii<64;ii++) 
+    { float xx;
+      xx=A*ii-(int32_t)(A*ii); 
+      if(xx<mn && A*ii<256.0) { mn=xx; i1=ii; i2=A*ii;} //select first candidate
+    }
+    iscl[0] = (int) (i1-1);
+    iscl[1] = (int) (i2-1);
+    iscl[2] = (int) (i3-1);
+}
+
+void I2S_modification(uint32_t fsamp, uint16_t nbits)
+{ uint32_t iscl[3];
+  if(nbits==16)
+    iscl[2]=3;  // 16 bit I2S (256/2*(2*16)-1)
+  else if(nbits==32)
+    iscl[2]=1;  // 32 bit modified I2S (256/(2*(2*32)-1)
+  I2S_dividers(iscl, fsamp ,nbits);
+  int fcpu=F_CPU;
+  if(F_CPU<=96000000) fcpu=96000000;
+  float fs = (fcpu * (iscl[0]+1.0f)) / (iscl[1]+1l) / 2 / (iscl[2]+1l) / (2l*nbits);
+  #if DEBUG >0
+    Serial.printf("%d %d: %d %d %d %d %d %d\n\r",
+        F_CPU, fcpu, fsamp, (int)fs, nbits,iscl[0]+1,iscl[1]+1,iscl[2]+1);
+  #endif
+
+  // stop I2S
+  I2S0_RCSR &= ~(I2S_RCSR_RE | I2S_RCSR_BCE);
+
+  // modify sampling frequency
+  I2S0_MDR = I2S_MDR_FRACT(iscl[0]) | I2S_MDR_DIVIDE(iscl[1]);
+
+  // configure transmitter
+  I2S0_TCR2 = I2S_TCR2_SYNC(0) | I2S_TCR2_BCP | I2S_TCR2_MSEL(1)
+    | I2S_TCR2_BCD | I2S_TCR2_DIV(iscl[2]);
+
+  // configure receiver (sync'd to transmitter clocks)
+  I2S0_RCR2 = I2S_RCR2_SYNC(1) | I2S_TCR2_BCP | I2S_RCR2_MSEL(1)
+    | I2S_RCR2_BCD | I2S_RCR2_DIV(iscl[2]);
+
+  //restart I2S
+  I2S0_RCSR |= I2S_RCSR_RE | I2S_RCSR_BCE;
+}
 
