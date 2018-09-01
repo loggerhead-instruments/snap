@@ -547,6 +547,17 @@ void continueRecording() {
   }
 }
 
+void forceIdlingSDCard(void)
+{
+  // idling sd card after closing file
+  #define SD_CS 10
+  digitalWriteFast(SD_CS,LOW);
+    int ii;
+    for(ii=0; SPI.transfer(0xff)!=0xFF && ii<30000; ii++) ;
+    if (printDiags) {Serial.println(ii); Serial.flush();}
+  digitalWriteFast(SD_CS,HIGH);
+}
+
 void stopRecording() {
   if (printDiags) Serial.println("stopRecording");
   int maxblocks = AudioMemoryUsageMax();
@@ -559,6 +570,9 @@ void stopRecording() {
   //frec.timestamp(T_WRITE,(uint16_t) year(t),month(t),day(t),hour(t),minute(t),second);
   frec.close();
   delay(100);
+  //
+  forceIdlingSDCard();
+
 }
 
 
@@ -633,6 +647,8 @@ void FileInit()
         }
       }
       logFile.close();
+      //
+      forceIdlingSDCard();
    }
    else{
     if(printDiags) Serial.print("Log open fail.");
@@ -687,6 +703,8 @@ void logFileHeader(){
 #endif
       logFile.println("filename, ID, gain (dB), Voltage, Version");
       logFile.close();
+      //
+      forceIdlingSDCard();
   }
 }
 
