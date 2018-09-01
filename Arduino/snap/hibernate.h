@@ -142,8 +142,8 @@ void setWakeupCallandSleep(uint32_t nsec)
    
    rtcSetAlarm(nsec);
    yield();
-//   pinMode(13,OUTPUT);
-//   digitalWriteFast(13,HIGH); delay(1000); digitalWriteFast(13,LOW);
+   pinMode(13,OUTPUT);
+   digitalWriteFast(13,LOW);
    gotoSleep();
 }
 

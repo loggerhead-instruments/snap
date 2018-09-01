@@ -15,8 +15,8 @@
 // 
 // 18/06/2018 test own hibernate 
 
-char codeVersion[12] = "2018-06-18";
-static boolean printDiags = 0;  // 1: serial print diagnostics; 0: no diagnostics
+char codeVersion[12] = "2018-07-31";
+static boolean printDiags = 1;  // 1: serial print diagnostics; 0: no diagnostics
 
 #define USE_SDFS 0  // to be used for exFAT but works also for FAT16/32
 #define MQ 100 // to be used with LHI record queue (modified local version)
@@ -26,7 +26,7 @@ static boolean printDiags = 0;  // 1: serial print diagnostics; 0: no diagnostic
 #include "control_sgtl5000.h"
 
 //#include <SerialFlash.h>
-#if USE_SDFS==1
+#if USE_SDFS==0
   #include "input_i2s.h"
 //  #include "LHI_record_queue.h"
 //  #include "control_sgtl5000.h"
@@ -41,12 +41,15 @@ static boolean printDiags = 0;  // 1: serial print diagnostics; 0: no diagnostic
   #include "SdFat.h"
 #endif
 #include "amx32.h"
-#undef USE_SNOOZE
+
+//#undef USE_SNOOZE
+#define USE_SNOOZE
 #ifdef USE_SNOOZE
   #include <Snooze.h>  //using https://github.com/duff2013/Snooze; uncomment line 62 #define USE_HIBERNATE
 #else
   #include "hibernate.h"
 #endif
+
 #include <TimeLib.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
@@ -81,7 +84,7 @@ unsigned long baud = 115200;
 
 // GUItool: begin automatically generated code
 AudioInputI2S            i2s2;           //xy=105,63
-LHIRecordQueue         queue1;         //xy=281,63
+LHIRecordQueue           queue1;         //xy=281,63
 AudioConnection          patchCord1(i2s2, 0, queue1, 0);
 AudioControlSGTL5000     sgtl5000_1;     //xy=265,212
 // GUItool: end automatically generated code
@@ -138,7 +141,7 @@ boolean LEDSON=1;
 boolean introperiod=1;  //flag for introductory period; used for keeping LED on for a little while
 
 int32_t lhi_fsamps[7] = {8000, 16000, 32000, 44100, 48000, 96000, 192000};
-#define I_SAMP 5   // 0 is 32 kHz; 1 is 44.1 kHz; 2 is 48 kHz; 3 is 96 kHz; 4 is 192 kHz
+#define I_SAMP 5   // 0 is 8 kHz; 1 is 16 kHz; 2 is 32 kHz; 3 is 44.1 kHz; 4 is 48 kHz; 5 is 96 kHz; 6 is 192 kHz
 
 float audio_srate = lhi_fsamps[I_SAMP];//44100.0;
 int isf = I_SAMP;
@@ -355,7 +358,7 @@ void setup() {
   long time_to_first_rec = startTime - t;
   Serial.print("Time to first record ");
   Serial.println(time_to_first_rec);
-
+  
   mode = 0;
 
   // create first folder to hold data
@@ -387,6 +390,7 @@ void loop() {
       if(t >= startTime){      // time to start?
         if(noDC==0) {
           audio_freeze_adc_hp(); // this will lower the DC offset voltage, and reduce noise
+          noDC = -1;
         }
         Serial.println("Record Start.");
         
@@ -401,15 +405,7 @@ void loop() {
         Serial.print("Next Start:");
         printTime(startTime);
 
-//        cDisplay();
-//        display.println("Rec");
-//        display.setTextSize(1);
-//        display.print("Stop Time: ");
-//        displayClock(stopTime, 30);
-//        display.display();
-
         mode = 1;
-  
         display.ssd1306_command(SSD1306_DISPLAYOFF); // turn off display during recording
         startRecording();
       }
@@ -420,26 +416,11 @@ void loop() {
   if (mode == 1) {
     continueRecording();  // download data  
 
-    /*
-     // update clock while recording
-      recLoopCount++;
-      if(recLoopCount>50){
-        recLoopCount = 0;
-        t = getTeensy3Time();
-        cDisplay();
-        if(rec_int > 0) {
-          display.println("Rec");
-          displayClock(stopTime, 20);
-        }
-        else{
-          display.println("Rec Contin");
-          display.setTextSize(1);
-          display.println(filename);
-        }
-        displayClock(t, BOTTOM);
-        display.display();
-      }
-      */
+//  if(printDiags){
+//        if (queue1.getQueue_dropped() > 0){
+//      Serial.println(queue1.getQueue_dropped());
+//    }
+//  }
     if(digitalRead(UP)==0 & digitalRead(DOWN)==0){
       // stop recording
       queue1.end();
@@ -479,60 +460,50 @@ void loop() {
         snooze_minute = floor(ss/60);
         ss -= snooze_minute * 60;
         snooze_second = ss;
-
-        Serial.println(snooze_hour);
-        Serial.println(snooze_minute);
-        Serial.println(snooze_second);
         
         if( (snooze_hour * 3600) + (snooze_minute * 60) + snooze_second >=10){
-            if (printDiags==0) Serial.println("Shutting bits down");
             digitalWrite(hydroPowPin, LOW); //hydrophone off
-            if (printDiags==0) Serial.println("hydrophone off");
-            audio_power_down();
-            if (printDiags==0) Serial.println("audio power down");
+            audio_power_down();  // when this is activated, seems to occassionally have trouble restarting; no LRCLK signal or RX on Teensy
 
             if(printDiags){
               Serial.print("Snooze HH MM SS ");
               Serial.print(snooze_hour);
               Serial.print(snooze_minute);
               Serial.println(snooze_second);
+              Serial.flush(); // make sure empty so doesn't prematurely wake
             }
+            // stop I2S
+            //I2S0_RCSR &= ~(I2S_RCSR_RE | I2S_RCSR_BCE);  // added because LRCLK did not always restart. This doesn't fix issue. Left commented so I know I tried it.
+            
             delay(100);
-            Serial.println("Going to Sleep");
-            delay(100);
   
-           // AudioNoInterrupts();
-  
-            //snooze_config.setAlarm(snooze_hour, snooze_minute, snooze_second);
-            //delay(100);
-            //Snooze.sleep( snooze_config );
-            //Snooze.deepSleep(snooze_config);
-            //Snooze.hibernate( snooze_config);
-  
-//            alarm.setAlarm(snooze_hour, snooze_minute, snooze_second);
-//            Snooze.sleep(config_teensy32);
             #ifdef USE_SNOOZE
               alarm.setRtcTimer(snooze_hour, snooze_minute, snooze_second); // to be compatible with new snooze library
-              Snooze.deepSleep(config_teensy32,VLLS0); // will not return from this, but restart the program
+              delay(100); // sometimes does not hibernate; trying delay
+              Snooze.sleep(config_teensy32); 
             #else
               setWakeupCallandSleep2(snooze_hour, snooze_minute, snooze_second);
             #endif  
+            
             /// ... Sleeping ....
             
             // Waking up
            // if (printDiags==0) usbDisable();
-            
+
             digitalWrite(hydroPowPin, HIGH); // hydrophone on
-   
-          //  
-          //  AudioInterrupts();
-            audio_power_up();
-            AudioInit(isf);
-            //sdInit();  //reinit SD because voltage can drop in hibernate
+            delay(300);  // give time for Serial to reconnect to USB
+
+          //  CORE_PIN23_CONFIG = PORT_PCR_MUX(6); // added because LRCLK did not always restart. This doesn't fix issue. Left commented so I know I tried it.
+           audio_power_up();  // when use audio_power_down() before sleeping, does not always get LRCLK. This did not fix.  
+          //  if(printDiags) Serial.println("audio init");
+          //  AudioInit(isf);  // restart I2S
+            
+            
          }
          
         //digitalWrite(displayPow, HIGH); //start display up on wake
         //delay(100);
+        Serial.println("Display");
         display.begin(SSD1306_SWITCHCAPVCC, 0x3C);  //initialize display
         mode = 0;  // standby mode
       }
@@ -569,10 +540,10 @@ void continueRecording() {
       
     buf_count += NREC;
 //WMXZ    audioIntervalCount += NREC;
-//    
-//    if(printDiags){
-//      Serial.print(".");
-//   }
+    
+    if(printDiags){
+      Serial.print(".");
+   }
   }
 }
 
@@ -591,24 +562,19 @@ void stopRecording() {
 }
 
 
-
-/*
 void sdInit(){
      if (!(sd.begin(10))) {
     // stop here if no SD card, but print a message
     Serial.println("Unable to access the SD card");
     
-    while (1) {
-      cDisplay();
-      display.println("SD error. Restart.");
-      displayClock(getTeensy3Time(), BOTTOM);
-      display.display();
-      delay(1000);
-      
-    }
+    cDisplay();
+    display.println("SD error. Restart.");
+    displayClock(getTeensy3Time(), BOTTOM);
+    display.display();
+    delay(1000);
   }
 }
-*/
+
 
 void FileInit()
 {

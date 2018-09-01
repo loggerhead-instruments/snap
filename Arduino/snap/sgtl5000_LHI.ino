@@ -1,3 +1,4 @@
+
 #include "control_sgtl5000.h"
 #include "Wire.h"
 
@@ -413,9 +414,11 @@
 #define DAP_AVC_CTRL        0x0124 //audio volume control
 // 0  Disable
 
-  bool audio_enable(int fs_mode)
-{
-  if(fs_mode>3) fs_mode=3;
+bool audio_enable(int fs_mode)
+{ int sgtl_mode=fs_mode-2;
+  if(sgtl_mode>3) sgtl_mode=3;
+  if(sgtl_mode<0) sgtl_mode=0;
+  
 //  muted = true;
 //  Serial.print("audio ID = ");
 //  delay(5);
@@ -439,14 +442,15 @@
   delay(400);
   //chipWrite(CHIP_LINE_OUT_VOL, 0x1D1D); // default approx 1.3 volts peak-to-peak
   chipWrite(CHIP_LINE_OUT_VOL, 0x1919); // default approx 1.3 volts peak-to-peak
-  chipWrite(CHIP_CLK_CTRL, fs_mode<<2);  // 256*Fs fs_mode = 0:32 kHz; 1:44.1 kHz; 2:48 kHz; 3:96 kHz
+  //
+  chipWrite(CHIP_CLK_CTRL, (sgtl_mode<<2));  // 256*Fs| sgtl_mode = 0:32 kHz; 1:44.1 kHz; 2:48 kHz; 3:96 kHz
   chipWrite(CHIP_I2S_CTRL, 0x0130); // SCLK=32*Fs, 16bit, I2S format
-  // default signal routing is ok?
   
+  // default signal routing is ok?
   //chipWrite(CHIP_SSS_CTRL, 0x0010); // ADC->I2S, I2S->DAC
   chipWrite(CHIP_SSS_CTRL, 0x0000); // ADC->I2S, ADC->DAC
 
-    chipWrite(CHIP_ADCDAC_CTRL, 0x0008); // DAC mute right; DAC left unmute; ADC HPF normal operation
+  chipWrite(CHIP_ADCDAC_CTRL, 0x0008); // DAC mute right; DAC left unmute; ADC HPF normal operation
   
   
   chipWrite(CHIP_DAC_VOL, 0xFF3C); // dac mute right; left 0 dB
@@ -552,3 +556,4 @@ void I2S_modification(uint32_t fsamp, uint16_t nbits)
   //restart I2S
   I2S0_RCSR |= I2S_RCSR_RE | I2S_RCSR_BCE;
 }
+
