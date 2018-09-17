@@ -1,5 +1,5 @@
-float mAmpRec = 50;  // actual about 43 mA
-float mAmpSleep = 3; // actual about 2.6 mA
+float mAmpRec = 45;  // actual about 43 mA
+float mAmpSleep = 2.8; // actual about 2.6 mA
 byte nBatPacks = 1;
 float mAhPerBat = 12000.0; // assume 12Ah per battery pack; good batteries should be 14000
 
@@ -295,10 +295,20 @@ void displaySettings(){
   float fileMB = (fileBytes + 32768) / 1000 / 1000; // add cluster size so don't underestimate fileMB
   float dielFraction = 1.0; //diel mode decreases time spent recording, increases time in sleep
   
-  float recDraw = mAmpRec;
-  float recFraction = (rec_dur * dielFraction) / (rec_dur + rec_int);
+  float recFraction = ((float) rec_dur * dielFraction) / (float) (rec_dur + rec_int);
   float sleepFraction = 1 - recFraction;
-  float avgCurrentDraw = (recDraw * recFraction) + (mAmpSleep * sleepFraction);
+  float avgCurrentDraw = (mAmpRec * recFraction) + (mAmpSleep * sleepFraction);
+
+//  Serial.print("Rec Fraction Sleep Fraction Avg Power:");
+//  Serial.print(rec_dur);
+//  Serial.print("  ");
+//  Serial.print(recFraction);
+//  Serial.print("  ");
+//  Serial.print(rec_int);
+//  Serial.print("  ");
+//  Serial.print(sleepFraction);
+//  Serial.print("  ");
+//  Serial.println(avgCurrentDraw);
 
   uint32_t powerSeconds = uint32_t (3600.0 * (mAhPerBat / avgCurrentDraw));
 
