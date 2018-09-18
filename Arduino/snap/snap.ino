@@ -514,9 +514,9 @@ void continueRecording() {
     buf_count += NREC;
 //WMXZ    audioIntervalCount += NREC;
     
-    if(printDiags){
-      Serial.print(".");
-   }
+//    if(printDiags){
+//      Serial.print(".");
+//   }
   }
 }
 
