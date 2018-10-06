@@ -311,20 +311,32 @@ void displaySettings(){
   //display.setCursor(60, 18 + (n*8));  // display file count for debugging
   //display.print(n+1); display.print(":");display.print(filesPerCard[n]); 
 
-  float totalSecondsMemory = totalRecSeconds / recFraction;
-  if(powerSeconds < totalSecondsMemory){
-   // displayClock(getTeensy3Time() + powerSeconds, 45, 0);
+  float totalSecondsMemory;
+  if(recFraction>0.0f) 
+    totalSecondsMemory = totalRecSeconds / recFraction;
+  else
+    totalSecondsMemory = -1;
+  if(totalSecondsMemory<0)
+  {
+    display.setCursor(0, 46);
+    display.print("Illegal rec_duration");
+  }
+  else 
+  {
+    if(powerSeconds < totalSecondsMemory){
+    // displayClock(getTeensy3Time() + powerSeconds, 45, 0);
     display.setCursor(0, 46);
     display.print("Battery Limit:");
     display.print(powerSeconds / 86400);
     display.print("d");
   }
   else{
-  //  displayClock(getTeensy3Time() + totalRecSeconds + totalSleepSeconds, 45, 0);
+    //  displayClock(getTeensy3Time() + totalRecSeconds + totalSleepSeconds, 45, 0);
     display.setCursor(0, 46);
     display.print("Memory Limit:");
     display.print(totalSecondsMemory / 86400);
     display.print("d");
+  }
   }
 }
 
@@ -400,4 +412,3 @@ void writeEEPROM(){
   EEPROM.write(12, recMode); //byte
   EEPROM.write(13, isf); //byte
 }
-
