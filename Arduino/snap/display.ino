@@ -286,7 +286,11 @@ void displaySettings(){
   display.print(rec_int);
   display.println("s  ");
 
-  display.printf("%.1f kHz\n",lhi_fsamps[isf]/1000.0f);
+  display.printf("%.1f kHz",lhi_fsamps[isf]/1000.0f);
+
+  display.print(" ");
+  display.printf("%.1f",gainDb);
+  display.print("dB gain");
 
   display.setTextSize(1);
   uint32_t totalRecSeconds = 0;

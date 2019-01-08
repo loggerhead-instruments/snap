@@ -13,7 +13,7 @@
 // Modified by WMXZ 15-05-2018 for SdFS anf multiple sampling frequencies
 // Optionally uses SdFS from Bill Greiman https://github.com/greiman/SdFs; but has higher current draw in sleep
 
-char codeVersion[12] = "2018-09-17";
+char codeVersion[12] = "2018-10-30";
 static boolean printDiags = 0;  // 1: serial print diagnostics; 0: no diagnostics
 
 #define USE_SDFS 0  // to be used for exFAT but works also for FAT16/32
@@ -292,6 +292,7 @@ void setup() {
   }
   //SdFile::dateTimeCallback(file_date_time);
   LoadScript(); // secret settings accessible from the card
+  AudioInit(isf); // this calls Wire.begin() in control_sgtl5000.cpp
   
   // Audio connections require memory, and the record queue
   // uses this memory to buffer incoming audio.
