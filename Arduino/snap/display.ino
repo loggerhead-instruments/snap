@@ -43,7 +43,13 @@ void printZero(int val){
 
 void manualSettings(){
   boolean startRec = 0, startUp, startDown;
+  Serial.print("Gain:");
+  Serial.println(gainSetting);
+  Serial.println("Read EEPROM");
   readEEPROM();
+  calcGain();
+  Serial.print("Gain:");
+  Serial.println(gainSetting);
 
   autoStartTime = getTeensy3Time();
 
@@ -108,7 +114,7 @@ void manualSettings(){
   }
   if (startMinute<0 | startMinute>59) {
     startMinute = 0;
-      EEPROM.write(9, startMinute); //byte
+    EEPROM.write(9, startMinute); //byte
   }
   if (endHour<0 | endHour>23) {
     endHour = 0;
@@ -130,7 +136,6 @@ void manualSettings(){
     gainSetting = 4;
     EEPROM.write(14, gainSetting); //byte
   }
-
 
 
 //  // if LOG.CSV present, skip manual settings

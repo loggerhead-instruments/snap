@@ -292,14 +292,12 @@ void setup() {
   }
   //SdFile::dateTimeCallback(file_date_time);
   LoadScript(); // secret settings accessible from the card
-  AudioInit(isf); // this calls Wire.begin() in control_sgtl5000.cpp
+  manualSettings();
   
   // Audio connections require memory, and the record queue
   // uses this memory to buffer incoming audio.
   // initialize now to estimate DC offset during setup
   AudioMemory(MQ+10);
-  
-  manualSettings();
   
   audio_srate = lhi_fsamps[isf];
 //WMXZ  audioIntervalSec = 256.0 / audio_srate; //buffer interval in seconds
@@ -682,8 +680,10 @@ void AudioInit(int ifs){
   I2S_modification(lhi_fsamps[ifs], 16);
   Wire.begin();
   audio_enable(ifs);
+}
 
-  switch(gainSetting){
+void calcGain(){
+    switch(gainSetting){
     case 0: gainDb = -20 * log10(3.12 / 2.0); break;
     case 1: gainDb = -20 * log10(2.63 / 2.0); break;
     case 2: gainDb = -20 * log10(2.22 / 2.0); break;
@@ -702,6 +702,7 @@ void AudioInit(int ifs){
     case 15: gainDb = -20 * log10(0.24 / 2.0); break;
   }
 }
+
 
 time_t getTeensy3Time()
 {
