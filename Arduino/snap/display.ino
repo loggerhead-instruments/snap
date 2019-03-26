@@ -91,18 +91,47 @@ void manualSettings(){
       display.println("  None");
       display.display();
   }
- 
-  
   
   // make sure settings valid (if EEPROM corrupted or not set yet)
-  if (rec_dur < 0 | rec_dur>100000) rec_dur = 60;
-  if (rec_int<0 | rec_int>100000) rec_int = 60;
-  if (startHour<0 | startHour>23) startHour = 0;
-  if (startMinute<0 | startMinute>59) startMinute = 0;
-  if (endHour<0 | endHour>23) endHour = 0;
-  if (endMinute<0 | endMinute>59) endMinute = 0;
-  if (recMode<0 | recMode>1) recMode = 0;
-  if (isf<0 | isf>4) isf = I_SAMP; // change 3 to 4 to allow 192 kHz
+  
+  if (rec_dur < 0 | rec_dur>100000) {
+    rec_dur = 60;
+    writeEEPROMlong(0, rec_dur);  //long
+  }
+  if (rec_int<0 | rec_int>100000) {
+    rec_int = 60;
+    writeEEPROMlong(4, rec_int);  //long
+  }
+  if (startHour<0 | startHour>23) {
+    startHour = 0;
+    EEPROM.write(8, startHour); //byte
+  }
+  if (startMinute<0 | startMinute>59) {
+    startMinute = 0;
+      EEPROM.write(9, startMinute); //byte
+  }
+  if (endHour<0 | endHour>23) {
+    endHour = 0;
+    EEPROM.write(10, endHour); //byte
+  }
+  if (endMinute<0 | endMinute>59) {
+    endMinute = 0;
+    EEPROM.write(11, endMinute); //byte
+  }
+  if (recMode<0 | recMode>1) {
+    recMode = 0;
+    EEPROM.write(12, recMode); //byte
+  }
+  if (isf<0 | isf>4) {
+    isf = I_SAMP; // change 3 to 4 to allow 192 kHz
+    EEPROM.write(13, isf); //byte
+  }
+  if (gainSetting<0 | gainSetting>15) {
+    gainSetting = 4;
+    EEPROM.write(14, gainSetting); //byte
+  }
+
+
 
 //  // if LOG.CSV present, skip manual settings
 //  #if USE_SDFS==1
@@ -381,6 +410,7 @@ void readEEPROM(){
   endMinute = EEPROM.read(11);
   recMode = EEPROM.read(12);
   isf = EEPROM.read(13);
+  gainSetting = EEPROM.read(14);
 }
 
 union {
@@ -413,5 +443,6 @@ void writeEEPROM(){
   EEPROM.write(11, endMinute); //byte
   EEPROM.write(12, recMode); //byte
   EEPROM.write(13, isf); //byte
+  EEPROM.write(14, gainSetting); //byte
 }
 

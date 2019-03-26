@@ -13,7 +13,7 @@
 // Modified by WMXZ 15-05-2018 for SdFS anf multiple sampling frequencies
 // Optionally uses SdFS from Bill Greiman https://github.com/greiman/SdFs; but has higher current draw in sleep
 
-char codeVersion[12] = "2018-10-30";
+char codeVersion[12] = "2019-03-26";
 static boolean printDiags = 0;  // 1: serial print diagnostics; 0: no diagnostics
 
 #define USE_SDFS 0  // to be used for exFAT but works also for FAT16/32
@@ -82,7 +82,7 @@ AudioControlSGTL5000     sgtl5000_1;     //xy=265,212
 // GUItool: end automatically generated code
 
 const int myInput = AUDIO_INPUT_LINEIN;
-int gainSetting = 4; //default gain setting; can be overridden in setup file
+unsigned int gainSetting = 4; //default gain setting; can be overridden in setup file
 int noDC = 0; // 0 = freezeDC offset; 1 = remove DC offset
 
 // Pin Assignments
@@ -682,8 +682,6 @@ void AudioInit(int ifs){
   I2S_modification(lhi_fsamps[ifs], 16);
   Wire.begin();
   audio_enable(ifs);
-  
-  sgtl5000_1.lineInLevel(gainSetting);  //default = 4
 
   switch(gainSetting){
     case 0: gainDb = -20 * log10(3.12 / 2.0); break;

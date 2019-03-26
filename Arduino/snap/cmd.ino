@@ -60,7 +60,9 @@ int ProcCmd(char *pCmd)
       case ('S' + ('G'<<8)):
       {
         sscanf(&pCmd[3],"%d",&lv1);
-        gainSetting = lv1;
+        gainSetting = (unsigned int) lv1;
+        if(gainSetting<0 | gainSetting>15) gainSetting = 4;
+        EEPROM.write(14, gainSetting); //byte
         break;
       }
       
