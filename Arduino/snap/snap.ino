@@ -8,12 +8,12 @@
 // Modified from PJRC audio code
 // http://www.pjrc.com/store/teensy3_audio.html
 //
-// Compile with 48 MHz Optimize Speed
+// Compile with 96 MHz Fastest
 
 // Modified by WMXZ 15-05-2018 for SdFS anf multiple sampling frequencies
 // Optionally uses SdFS from Bill Greiman https://github.com/greiman/SdFs; but has higher current draw in sleep
 
-char codeVersion[12] = "2019-03-26";
+char codeVersion[12] = "2019-04-09";
 static boolean printDiags = 0;  // 1: serial print diagnostics; 0: no diagnostics
 
 #define USE_SDFS 0  // to be used for exFAT but works also for FAT16/32
@@ -52,7 +52,7 @@ static boolean printDiags = 0;  // 1: serial print diagnostics; 0: no diagnostic
 #define CPU_RESTART_VAL 0x5FA0004
 #define CPU_RESTART (*CPU_RESTART_ADDR = CPU_RESTART_VAL);
 
-#define OLED_RESET 4
+#define OLED_RESET -1
 Adafruit_SSD1306 display(OLED_RESET);
 #define BOTTOM 55
 
