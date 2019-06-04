@@ -13,7 +13,7 @@
 // Modified by WMXZ 15-05-2018 for SdFS anf multiple sampling frequencies
 // Optionally uses SdFS from Bill Greiman https://github.com/greiman/SdFs; but has higher current draw in sleep
 
-char codeVersion[12] = "2019-04-12";
+char codeVersion[12] = "2019-05-28";
 static boolean printDiags = 0;  // 1: serial print diagnostics; 0: no diagnostics
 
 #define USE_SDFS 0  // to be used for exFAT but works also for FAT16/32
@@ -600,9 +600,10 @@ void FileInit()
         logFile.println("Stopping because Voltage less than 3.0 V");
         logFile.close();  
         // low voltage hang but keep checking voltage
-        while(readVoltage() < 3.0){
+        while(readVoltage() < 3.3){
             delay(30000);
         }
+        resetFunc();  // just reset so can start with timing reset
       }
       logFile.close();
    }

@@ -56,7 +56,7 @@ void manualSettings(){
 // get free space on cards
 
     cDisplay();
-    display.print("LS1 Init");
+    display.print("Snap Init");
     display.setTextSize(1);
     display.setCursor(0, 16);
     display.println("Card Free/Total MB");
@@ -129,7 +129,7 @@ void manualSettings(){
     EEPROM.write(12, recMode); //byte
   }
   if (isf<0 | isf>4) {
-    isf = I_SAMP; // change 3 to 4 to allow 192 kHz
+    isf = 3;
     EEPROM.write(13, isf); //byte
   }
   if (gainSetting<0 | gainSetting>15) {
