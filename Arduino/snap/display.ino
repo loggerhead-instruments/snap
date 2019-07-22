@@ -1,7 +1,7 @@
 float mAmpRec = 45;  // actual about 43 mA
 float mAmpSleep = 2.8; // actual about 2.6 mA
-byte nBatPacks = 1;
-float mAhPerBat = 12000.0; // assume 12Ah per battery pack; good batteries should be 14000
+byte nBatPacks = 5;
+float mAhPerBat = 10000.0; // assume 10Ah per LSH20 lithium metal battery
 
 uint32_t freeMB;
 uint32_t filesPerCard;
@@ -348,7 +348,7 @@ void displaySettings(){
 //  Serial.print("  ");
 //  Serial.println(avgCurrentDraw);
 
-  uint32_t powerSeconds = uint32_t (3600.0 * (mAhPerBat / avgCurrentDraw));
+  uint32_t powerSeconds = uint32_t (3600.0 * (mAhPerBat * nBatPacks / avgCurrentDraw));
 
   filesPerCard = 0;
   if(freeMB==0) filesPerCard = 0;

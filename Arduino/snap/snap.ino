@@ -1,5 +1,5 @@
 //
-// SNAP acoustic recorder
+// Titanium SNAP acoustic recorder
 //
 // Loggerhead Instruments
 // 2016-2018
@@ -13,7 +13,7 @@
 // Modified by WMXZ 15-05-2018 for SdFS anf multiple sampling frequencies
 // Optionally uses SdFS from Bill Greiman https://github.com/greiman/SdFs; but has higher current draw in sleep
 
-char codeVersion[12] = "2019-05-28";
+char codeVersion[12] = "2019-07-22";
 static boolean printDiags = 0;  // 1: serial print diagnostics; 0: no diagnostics
 
 #define USE_SDFS 0  // to be used for exFAT but works also for FAT16/32
