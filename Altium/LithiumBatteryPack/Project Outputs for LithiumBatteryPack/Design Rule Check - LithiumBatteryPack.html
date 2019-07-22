@@ -1,0 +1,543 @@
+<html>
+<head>
+<META http-equiv="Content-Type" content="text/html">
+<style type="text/css">
+		h1, h2, h3, h4, h5, h6 {
+			font-family : sans-serif;
+			color : white;
+			background-color : #21489e;
+			padding: 0.3em;
+		}
+		body {
+			font-family : verdana;
+		}
+		td, th {
+			padding: 0.5em;
+			text-align : center;
+			width : 18%;
+		}
+		th {
+			background-color : #A6CAF0;
+
+		}
+		th.column1, td.column1 {
+			text-align: left;
+			width : auto;
+		}
+		table {
+			width : 100%;
+		}
+		
+		.DRC_summary_header {							
+			padding-bottom : 0.1em;
+			border : 0px solid black;							
+			width: 100%;
+                        align: right;
+                        
+		}
+
+		.DRC_summary_header_col1, 
+		.DRC_summary_header_col2, 
+		.DRC_summary_header_col3
+		{
+			color : black;
+			font-size:150%;
+                        padding : 0em;
+			padding-top : 0.2em;
+			padding-bottom 0.2: 0em;
+			border : 0px solid black;
+			width : auto;
+			vertical-align: top;
+			font-weight: bold;				
+		}
+		
+		.DRC_summary_header_col1 	
+		{		                       
+			text-align: right;
+                        width: auto;	
+		}
+
+		.DRC_summary_header_col2 	
+		{		
+			text-align: center;	
+		}
+
+		.DRC_summary_header_col3 	
+		{		
+			text-align: left;	
+		}
+
+
+		
+		.header_holder
+		{
+		Width = 100%;
+		border = 0px solid green;
+		padding = 0;
+		}
+		
+		
+		
+		.front_matter, .front_matter_column1, .front_matter_column2, .front_matter_column3
+                {
+			left:0;
+			top:0;
+			padding-top : 0.1em;			
+			border : 0px solid black;
+			width : 100%;
+			vertical-align: top
+
+		}
+		.front_matter {	
+			
+			margin-top: 5px;
+ 			margin-left: 0px;					 			
+ 			horizontal-align: left;
+		}
+				
+		
+		.front_matter_column1 {
+			width : 10em;	
+			text-align  : right;
+			padding-right:0.1em;
+			
+		}
+		
+		.front_matter_column2 {
+                        width: 0.1em;
+			align: center;
+			text-align : center;
+			margin-right  : 0.1em;	
+			margin-left   : 0.1em;
+		}
+		.front_matter_column3 {
+			width         : auto;  
+			text-align    : left;	
+			margin-right  : 0.5em;				
+		}
+		
+		.total_column1, .total_column {
+			font-weight : bold;
+		}
+		.total_column1 {
+			text-align : right;
+		}
+		.warning, .error {
+			color : red;
+			font-weight : bold;
+		}
+		tr.onmouseout_odd {
+			background-color : #EEEEE0 
+		}
+		tr.onmouseout_even { 
+			background-color : #F3F3E3   
+		}
+		tr.onmouseover_odd, tr.onmouseover_even { 
+			background-color : lightYellow
+		} 
+		a:link, a:visited, .q a:link,.q a:active,.q {
+			color: #21489e; 
+		}
+		a:link.callback, a:visited.callback { 
+			color: #008000 
+		}
+		a:link.customize, a:visited.customize {
+			color: #C0C0C0;
+			position: absolute; 
+			right: 10px;
+		}	
+		p.contents_level1 {
+			font-weight : bold;
+			font-size : 110%;
+			margin : 0.5em;
+		}
+		p.contents_level2 {
+			position : relative;
+			left : 20px;
+			margin : 0.5em;
+		}
+	</style><script type="text/javascript">
+		function coordToMils(coord) {
+			var number = coord / 10000;
+			
+			if (number != number.toFixed(3))
+				number = number.toFixed(3);
+
+			return number + 'mil'
+		}
+
+		function coordToMM(coord) {
+			var number = 0.0254 * coord / 10000;
+			
+			if (number != number.toFixed(4))
+				number = number.toFixed(4);
+			
+			return number + 'mm'
+		}
+	
+		function convertCoord(coordNode, units) {
+			for (var i = 0; i < coordNode.childNodes.length; i++) {
+				coordNode.removeChild(coordNode.childNodes[i]);
+			}
+
+			var coord = coordNode.getAttribute('value');
+			if (coord != null) {
+				if (units == 'mm') {
+					textNode = document.createTextNode(coordToMM(coord));
+					coordNode.appendChild(textNode);
+				} else if (units == 'mil') {
+					textNode = document.createTextNode(coordToMils(coord));		
+					coordNode.appendChild(textNode);	
+				}
+			}
+		}
+	
+		function convertUnits(unitNode, units) {
+			for (var i = 0; i < unitNode.childNodes.length; i++) {
+				unitNode.removeChild(unitNode.childNodes[i]);		
+			}
+		
+			textNode = document.createTextNode(units); 
+			unitNode.appendChild(textNode);
+		}
+	
+		function changeUnits(radio_input, units) {
+			if (radio_input.checked) {
+			
+				var elements = document.getElementsByName('coordinate');
+				if (elements) {
+					for (var i = 0; i < elements.length; i++) {
+						convertCoord(elements[i], units);
+					}
+				}
+	
+				var elements = document.getElementsByName('units');
+				if (elements) {
+					for (var i = 0; i < elements.length; i++) {
+						convertUnits(elements[i], units);
+					}
+				}
+			}
+		}
+	</script><title>Design Rule Verification Report</title>
+</head>
+<body onload=""><img ALT="Altium" src="
+			file://C:\Users\Public\Documents\Altium\AD14\Templates\AD-rgb_logo_223x64.gif
+		"><a href="dxpprocess://Client:SetupPreferences?Server=PCB|PageName=Reports" class="customize"><acronym title="dxpprocess://Client:SetupPreferences?Server=PCB|PageName=Reports">customize</acronym></a><h1>Design Rule Verification Report</h1>
+<table class="header_holder">
+<td Style="width:70%">
+<table class="front_matter">
+<tr class="front_matter">
+<td class="front_matter_column1">Date</td>
+<td class="front_matter_column2">:</td>
+<td class="front_matter_column3">6/6/2019</td>
+</tr>
+<tr class="front_matter">
+<td class="front_matter_column1">Time</td>
+<td class="front_matter_column2">:</td>
+<td class="front_matter_column3">2:18:16 PM</td>
+</tr>
+<tr class="front_matter">
+<td class="front_matter_column1">Elapsed Time</td>
+<td class="front_matter_column2">:</td>
+<td class="front_matter_column3">00:00:00</td>
+</tr>
+<tr class="front_matter">
+<td class="front_matter_column1">Filename</td>
+<td class="front_matter_column2">:</td>
+<td class="front_matter_column3"><a href="file:///C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc" class="file"><acronym title="C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc">C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc</acronym></a></td>
+</tr>
+</table>
+</td>
+<td Style="Width:30%">
+<table class="DRC_summary_header">
+<tr>
+<td class="DRC_summary_header_col1">Warnings</td>
+<td class="DRC_summary_header_col2">:</td>
+<td class="DRC_summary_header_col3">0</td></tr>
+<tr>
+<td class="DRC_summary_header_col1">Rule Violations</td>
+<td class="DRC_summary_header_col2">:</td>
+<td class="DRC_summary_header_col3" style="color : red">51</td></tr>
+</table>
+</td>
+</table>
+<hr><a name="IDNAPIBPJHC52ZIVGTY4TJRWSQEKZX5EQ4M50JT2MBYIOSY3VH3KI"><h2>Summary</h2></a><table>
+<tr>
+<th class="column1">Warnings</th>
+<th class="column2">Count</th>
+</tr>
+<tr>
+<td style="font-weight : bold; text-align : right" class="column1">Total</td>
+<td style="font-weight : bold" class="column2">0</td>
+</tr>
+</table><br><table>
+<tr>
+<th class="column1">Rule Violations</th>
+<th class="column2">Count</th>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="#IDYOMM5TFNOZ2MEIMM3BQDGHKOHBC0N0VJ0D5TOLMKXCFDRZMPUD3B">Short-Circuit Constraint (Allowed=No) (All),(All)</a></td>
+<td class="column2">0</td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="#IDOY2OAKWM0PNTCFOBCWSYWYLAUFPNJJF3HBLGW3KKUMKQ1IID0LHD">Un-Routed Net Constraint ( (All) )</a></td>
+<td class="column2">0</td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="#IDD5IX1SQKYGQTIGDFSZUADPJNUNNEZOCZC3HAWZJB0WNFDDPQLFJB">Clearance Constraint (Gap=10mil) (All),(All)</a></td>
+<td class="column2">0</td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="#IDE0DW3H22VJFIE5BVWXVDBM32PHKVED30IUHHJOKKYTSGQARW42QK">Power Plane Connect Rule(Relief Connect )(Expansion=20mil) (Conductor Width=10mil) (Air Gap=10mil) (Entries=4) (All)</a></td>
+<td class="column2">0</td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="#IDEZXRQPUXMKCYIXCK4TNGJ0GADLX0ONZUXDAG5UMGMZOTKMSKPD1O">Width Constraint (Min=10mil) (Max=200mil) (Preferred=10mil) (All)</a></td>
+<td class="column2">0</td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="#IDNKNZGJY0B5MBFHXNRNWHLIAXHETZN4SRMGHOLBDPCI0X5TTHR2D">Height Constraint (Min=0mil) (Max=1000mil) (Prefered=500mil) (All)</a></td>
+<td class="column2">5</td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="#IDZXSEMSKA3M4QHKJPQLXR1TS0LI13GKNN0EBLPGSSQ0NTKK3DLRC">Hole Size Constraint (Min=1mil) (Max=100mil) (All)</a></td>
+<td class="column2">10</td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="#IDCRTJUNRHLBBADMQZSEEVGUSA2G44CGP2IE1RI5PPTRFEOYWQ5EVB">Hole To Hole Clearance (Gap=10mil) (All),(All)</a></td>
+<td class="column2">0</td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="#IDDIUMZV10XTN0IK3BHOEBSAQ0QB3UXOOAF1C1T4LRR2SRB3ZGYU2H">Minimum Solder Mask Sliver (Gap=10mil) (All),(All)</a></td>
+<td class="column2">25</td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="#IDN0PMHHGRBJQQBOXWIZ1M2TUVSINSMVKBERWD1HEQ3PJP2QSQK3IH">Silk To Solder Mask (Clearance=10mil) (IsPad),(All)</a></td>
+<td class="column2">5</td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="#IDJTBRETOHMJCJXJ434E1AARRQKVAC3H2MEQ10LPWFKX2ZNJLXK2I">Silk to Silk (Clearance=10mil) (All),(All)</a></td>
+<td class="column2">0</td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="#IDB33YB2QYFU2XGYFAXVWIO00UZLCXJCKST5WD4UM2VY5L2PII0XID">Silk primitive without silk layer</a></td>
+<td class="column2">5</td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="#IDDTNXSMCM3WJKAPPLK0DT4SSUJAGAJSJMYF3QZDC2JHIVRYDPEHO">Net Antennae (Tolerance=0mil) (All)</a></td>
+<td class="column2">1</td>
+</tr>
+<tr>
+<td style="font-weight : bold; text-align : right" class="column1">Total</td>
+<td style="font-weight : bold" class="column2">51</td>
+</tr>
+</table><br><hr><a name="IDNKNZGJY0B5MBFHXNRNWHLIAXHETZN4SRMGHOLBDPCI0X5TTHR2D"><table>
+<tr>
+<th style="text-align : left" colspan="1" class="rule">Height Constraint (Min=0mil) (Max=1000mil) (Prefered=500mil) (All)</th>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=13973.278mil|Location2.X=14013.178mil|Location1.Y=3005.74mil|Location2.Y=3014.26mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=13973.278mil|Location2.X=14013.178mil|Location1.Y=3005.74mil|Location2.Y=3014.26mil|Absolute=True">Height Constraint: SIP Component P1-D-cell (12618.228mil,-104.409mil) on Bottom Layer</acronym></a><br></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=11113.278mil|Location2.X=11153.178mil|Location1.Y=3005.74mil|Location2.Y=3014.26mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=11113.278mil|Location2.X=11153.178mil|Location1.Y=3005.74mil|Location2.Y=3014.26mil|Absolute=True">Height Constraint: SIP Component P2-D-cell (9758.228mil,-104.409mil) on Bottom Layer</acronym></a><br></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=8253.278mil|Location2.X=8293.178mil|Location1.Y=3005.74mil|Location2.Y=3014.26mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=8253.278mil|Location2.X=8293.178mil|Location1.Y=3005.74mil|Location2.Y=3014.26mil|Absolute=True">Height Constraint: SIP Component P3-D-cell (6898.228mil,-104.409mil) on Bottom Layer</acronym></a><br></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=5393.278mil|Location2.X=5433.178mil|Location1.Y=3005.74mil|Location2.Y=3014.26mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=5393.278mil|Location2.X=5433.178mil|Location1.Y=3005.74mil|Location2.Y=3014.26mil|Absolute=True">Height Constraint: SIP Component P4-D-cell (4038.228mil,-104.409mil) on Bottom Layer</acronym></a><br></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=2533.278mil|Location2.X=2573.178mil|Location1.Y=3005.74mil|Location2.Y=3014.26mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=2533.278mil|Location2.X=2573.178mil|Location1.Y=3005.74mil|Location2.Y=3014.26mil|Absolute=True">Height Constraint: SIP Component P5-D-cell (1178.228mil,-104.409mil) on Bottom Layer</acronym></a><br></td>
+</tr>
+</table></a><a href="#top">Back to top</a><br><br><a name="IDZXSEMSKA3M4QHKJPQLXR1TS0LI13GKNN0EBLPGSSQ0NTKK3DLRC"><table>
+<tr>
+<th style="text-align : left" colspan="1" class="rule">Hole Size Constraint (Min=1mil) (Max=100mil) (All)</th>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=3174.651mil|Location2.X=3333.381mil|Location1.Y=2930.635mil|Location2.Y=3089.365mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=3174.651mil|Location2.X=3333.381mil|Location1.Y=2930.635mil|Location2.Y=3089.365mil|Absolute=True">Hole Size Constraint (157.48mil &gt; 100mil) : Pad P5-3(1879.016mil,-104.409mil)  Multi-Layer</acronym></a><br></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=1773.076mil|Location2.X=1931.806mil|Location1.Y=2930.635mil|Location2.Y=3089.365mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=1773.076mil|Location2.X=1931.806mil|Location1.Y=2930.635mil|Location2.Y=3089.365mil|Absolute=True">Hole Size Constraint (157.48mil &gt; 100mil) : Pad P5-2(477.441mil,-104.409mil)  Multi-Layer</acronym></a><br></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=6034.651mil|Location2.X=6193.381mil|Location1.Y=2930.635mil|Location2.Y=3089.365mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=6034.651mil|Location2.X=6193.381mil|Location1.Y=2930.635mil|Location2.Y=3089.365mil|Absolute=True">Hole Size Constraint (157.48mil &gt; 100mil) : Pad P4-3(4739.016mil,-104.409mil)  Multi-Layer</acronym></a><br></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4633.076mil|Location2.X=4791.806mil|Location1.Y=2930.635mil|Location2.Y=3089.365mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4633.076mil|Location2.X=4791.806mil|Location1.Y=2930.635mil|Location2.Y=3089.365mil|Absolute=True">Hole Size Constraint (157.48mil &gt; 100mil) : Pad P4-2(3337.441mil,-104.409mil)  Multi-Layer</acronym></a><br></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=8894.651mil|Location2.X=9053.381mil|Location1.Y=2930.635mil|Location2.Y=3089.365mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=8894.651mil|Location2.X=9053.381mil|Location1.Y=2930.635mil|Location2.Y=3089.365mil|Absolute=True">Hole Size Constraint (157.48mil &gt; 100mil) : Pad P3-3(7599.016mil,-104.409mil)  Multi-Layer</acronym></a><br></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=7493.076mil|Location2.X=7651.806mil|Location1.Y=2930.635mil|Location2.Y=3089.365mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=7493.076mil|Location2.X=7651.806mil|Location1.Y=2930.635mil|Location2.Y=3089.365mil|Absolute=True">Hole Size Constraint (157.48mil &gt; 100mil) : Pad P3-2(6197.441mil,-104.409mil)  Multi-Layer</acronym></a><br></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=11754.651mil|Location2.X=11913.381mil|Location1.Y=2930.635mil|Location2.Y=3089.365mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=11754.651mil|Location2.X=11913.381mil|Location1.Y=2930.635mil|Location2.Y=3089.365mil|Absolute=True">Hole Size Constraint (157.48mil &gt; 100mil) : Pad P2-3(10459.016mil,-104.409mil)  Multi-Layer</acronym></a><br></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=10353.076mil|Location2.X=10511.806mil|Location1.Y=2930.635mil|Location2.Y=3089.365mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=10353.076mil|Location2.X=10511.806mil|Location1.Y=2930.635mil|Location2.Y=3089.365mil|Absolute=True">Hole Size Constraint (157.48mil &gt; 100mil) : Pad P2-2(9057.441mil,-104.409mil)  Multi-Layer</acronym></a><br></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=14614.651mil|Location2.X=14773.381mil|Location1.Y=2930.635mil|Location2.Y=3089.365mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=14614.651mil|Location2.X=14773.381mil|Location1.Y=2930.635mil|Location2.Y=3089.365mil|Absolute=True">Hole Size Constraint (157.48mil &gt; 100mil) : Pad P1-3(13319.016mil,-104.409mil)  Multi-Layer</acronym></a><br></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=13213.076mil|Location2.X=13371.806mil|Location1.Y=2930.635mil|Location2.Y=3089.365mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=13213.076mil|Location2.X=13371.806mil|Location1.Y=2930.635mil|Location2.Y=3089.365mil|Absolute=True">Hole Size Constraint (157.48mil &gt; 100mil) : Pad P1-2(11917.441mil,-104.409mil)  Multi-Layer</acronym></a><br></td>
+</tr>
+</table></a><a href="#top">Back to top</a><br><br><a name="IDDIUMZV10XTN0IK3BHOEBSAQ0QB3UXOOAF1C1T4LRR2SRB3ZGYU2H"><table>
+<tr>
+<th style="text-align : left" colspan="2" class="rule">Minimum Solder Mask Sliver (Gap=10mil) (All),(All)</th>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td style="width:50%; text-align:left" class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=7074.11mil|Location2.X=7095.889mil|Location1.Y=3150.291mil|Location2.Y=3193.724mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=7074.11mil|Location2.X=7095.889mil|Location1.Y=3150.291mil|Location2.Y=3193.724mil|Absolute=True">Pad U3-2(5709.999mil,57.598mil)  Top Layer</acronym></a></td>
+<td style="width:50%; text-align:left" class="column2"><a href="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=7048.519mil|Location2.X=7070.299mil|Location1.Y=3150.291mil|Location2.Y=3193.724mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=7048.519mil|Location2.X=7070.299mil|Location1.Y=3150.291mil|Location2.Y=3193.724mil|Absolute=True">Pad U3-1(5684.409mil,57.598mil)  Top Layer</acronym></a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td style="width:50%; text-align:left" class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=7099.7mil|Location2.X=7121.48mil|Location1.Y=3150.291mil|Location2.Y=3193.724mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=7099.7mil|Location2.X=7121.48mil|Location1.Y=3150.291mil|Location2.Y=3193.724mil|Absolute=True">Pad U3-3(5735.59mil,57.598mil)  Top Layer</acronym></a></td>
+<td style="width:50%; text-align:left" class="column2"><a href="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=7074.11mil|Location2.X=7095.889mil|Location1.Y=3150.291mil|Location2.Y=3193.724mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=7074.11mil|Location2.X=7095.889mil|Location1.Y=3150.291mil|Location2.Y=3193.724mil|Absolute=True">Pad U3-2(5709.999mil,57.598mil)  Top Layer</acronym></a></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td style="width:50%; text-align:left" class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=7074.11mil|Location2.X=7095.889mil|Location1.Y=3225.094mil|Location2.Y=3268.527mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=7074.11mil|Location2.X=7095.889mil|Location1.Y=3225.094mil|Location2.Y=3268.527mil|Absolute=True">Pad U3-5(5709.999mil,132.401mil)  Top Layer</acronym></a></td>
+<td style="width:50%; text-align:left" class="column2"><a href="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=7099.7mil|Location2.X=7121.48mil|Location1.Y=3225.094mil|Location2.Y=3268.527mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=7099.7mil|Location2.X=7121.48mil|Location1.Y=3225.094mil|Location2.Y=3268.527mil|Absolute=True">Pad U3-4(5735.59mil,132.401mil)  Top Layer</acronym></a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td style="width:50%; text-align:left" class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=7048.519mil|Location2.X=7070.299mil|Location1.Y=3225.094mil|Location2.Y=3268.527mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=7048.519mil|Location2.X=7070.299mil|Location1.Y=3225.094mil|Location2.Y=3268.527mil|Absolute=True">Pad U3-6(5684.409mil,132.401mil)  Top Layer</acronym></a></td>
+<td style="width:50%; text-align:left" class="column2"><a href="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=7074.11mil|Location2.X=7095.889mil|Location1.Y=3225.094mil|Location2.Y=3268.527mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=7074.11mil|Location2.X=7095.889mil|Location1.Y=3225.094mil|Location2.Y=3268.527mil|Absolute=True">Pad U3-5(5709.999mil,132.401mil)  Top Layer</acronym></a></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td style="width:50%; text-align:left" class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=7088.283mil|Location2.X=7131.716mil|Location1.Y=3096.63mil|Location2.Y=3132.189mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=7088.283mil|Location2.X=7131.716mil|Location1.Y=3096.63mil|Location2.Y=3132.189mil|Absolute=True">Pad C3-1(5734.999mil,0mil)  Top Layer</acronym></a></td>
+<td style="width:50%; text-align:left" class="column2"><a href="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=7037.102mil|Location2.X=7080.535mil|Location1.Y=3096.63mil|Location2.Y=3132.189mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=7037.102mil|Location2.X=7080.535mil|Location1.Y=3096.63mil|Location2.Y=3132.189mil|Absolute=True">Pad C3-2(5683.818mil,0mil)  Top Layer</acronym></a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td style="width:50%; text-align:left" class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=1348.52mil|Location2.X=1370.299mil|Location1.Y=3150.291mil|Location2.Y=3193.724mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=1348.52mil|Location2.X=1370.299mil|Location1.Y=3150.291mil|Location2.Y=3193.724mil|Absolute=True">Pad U5-2(-15.591mil,57.598mil)  Top Layer</acronym></a></td>
+<td style="width:50%; text-align:left" class="column2"><a href="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=1322.929mil|Location2.X=1344.709mil|Location1.Y=3150.291mil|Location2.Y=3193.724mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=1322.929mil|Location2.X=1344.709mil|Location1.Y=3150.291mil|Location2.Y=3193.724mil|Absolute=True">Pad U5-1(-41.181mil,57.598mil)  Top Layer</acronym></a></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td style="width:50%; text-align:left" class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=1374.11mil|Location2.X=1395.89mil|Location1.Y=3150.291mil|Location2.Y=3193.724mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=1374.11mil|Location2.X=1395.89mil|Location1.Y=3150.291mil|Location2.Y=3193.724mil|Absolute=True">Pad U5-3(10mil,57.598mil)  Top Layer</acronym></a></td>
+<td style="width:50%; text-align:left" class="column2"><a href="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=1348.52mil|Location2.X=1370.299mil|Location1.Y=3150.291mil|Location2.Y=3193.724mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=1348.52mil|Location2.X=1370.299mil|Location1.Y=3150.291mil|Location2.Y=3193.724mil|Absolute=True">Pad U5-2(-15.591mil,57.598mil)  Top Layer</acronym></a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td style="width:50%; text-align:left" class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=1348.52mil|Location2.X=1370.299mil|Location1.Y=3225.094mil|Location2.Y=3268.527mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=1348.52mil|Location2.X=1370.299mil|Location1.Y=3225.094mil|Location2.Y=3268.527mil|Absolute=True">Pad U5-5(-15.591mil,132.401mil)  Top Layer</acronym></a></td>
+<td style="width:50%; text-align:left" class="column2"><a href="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=1374.11mil|Location2.X=1395.89mil|Location1.Y=3225.094mil|Location2.Y=3268.527mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=1374.11mil|Location2.X=1395.89mil|Location1.Y=3225.094mil|Location2.Y=3268.527mil|Absolute=True">Pad U5-4(10mil,132.401mil)  Top Layer</acronym></a></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td style="width:50%; text-align:left" class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=1322.929mil|Location2.X=1344.709mil|Location1.Y=3225.094mil|Location2.Y=3268.527mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=1322.929mil|Location2.X=1344.709mil|Location1.Y=3225.094mil|Location2.Y=3268.527mil|Absolute=True">Pad U5-6(-41.181mil,132.401mil)  Top Layer</acronym></a></td>
+<td style="width:50%; text-align:left" class="column2"><a href="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=1348.52mil|Location2.X=1370.299mil|Location1.Y=3225.094mil|Location2.Y=3268.527mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=1348.52mil|Location2.X=1370.299mil|Location1.Y=3225.094mil|Location2.Y=3268.527mil|Absolute=True">Pad U5-5(-15.591mil,132.401mil)  Top Layer</acronym></a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td style="width:50%; text-align:left" class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=1353.284mil|Location2.X=1396.716mil|Location1.Y=3096.63mil|Location2.Y=3132.189mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=1353.284mil|Location2.X=1396.716mil|Location1.Y=3096.63mil|Location2.Y=3132.189mil|Absolute=True">Pad C5-1(0mil,0mil)  Top Layer</acronym></a></td>
+<td style="width:50%; text-align:left" class="column2"><a href="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=1302.102mil|Location2.X=1345.535mil|Location1.Y=3096.63mil|Location2.Y=3132.189mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=1302.102mil|Location2.X=1345.535mil|Location1.Y=3096.63mil|Location2.Y=3132.189mil|Absolute=True">Pad C5-2(-51.181mil,0mil)  Top Layer</acronym></a></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td style="width:50%; text-align:left" class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4228.519mil|Location2.X=4250.299mil|Location1.Y=3150.291mil|Location2.Y=3193.724mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4228.519mil|Location2.X=4250.299mil|Location1.Y=3150.291mil|Location2.Y=3193.724mil|Absolute=True">Pad U4-2(2864.409mil,57.598mil)  Top Layer</acronym></a></td>
+<td style="width:50%; text-align:left" class="column2"><a href="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4202.929mil|Location2.X=4224.708mil|Location1.Y=3150.291mil|Location2.Y=3193.724mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4202.929mil|Location2.X=4224.708mil|Location1.Y=3150.291mil|Location2.Y=3193.724mil|Absolute=True">Pad U4-1(2838.818mil,57.598mil)  Top Layer</acronym></a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td style="width:50%; text-align:left" class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4254.11mil|Location2.X=4275.889mil|Location1.Y=3150.291mil|Location2.Y=3193.724mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4254.11mil|Location2.X=4275.889mil|Location1.Y=3150.291mil|Location2.Y=3193.724mil|Absolute=True">Pad U4-3(2889.999mil,57.598mil)  Top Layer</acronym></a></td>
+<td style="width:50%; text-align:left" class="column2"><a href="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4228.519mil|Location2.X=4250.299mil|Location1.Y=3150.291mil|Location2.Y=3193.724mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4228.519mil|Location2.X=4250.299mil|Location1.Y=3150.291mil|Location2.Y=3193.724mil|Absolute=True">Pad U4-2(2864.409mil,57.598mil)  Top Layer</acronym></a></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td style="width:50%; text-align:left" class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4228.519mil|Location2.X=4250.299mil|Location1.Y=3225.094mil|Location2.Y=3268.527mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4228.519mil|Location2.X=4250.299mil|Location1.Y=3225.094mil|Location2.Y=3268.527mil|Absolute=True">Pad U4-5(2864.409mil,132.401mil)  Top Layer</acronym></a></td>
+<td style="width:50%; text-align:left" class="column2"><a href="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4254.11mil|Location2.X=4275.889mil|Location1.Y=3225.094mil|Location2.Y=3268.527mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4254.11mil|Location2.X=4275.889mil|Location1.Y=3225.094mil|Location2.Y=3268.527mil|Absolute=True">Pad U4-4(2889.999mil,132.401mil)  Top Layer</acronym></a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td style="width:50%; text-align:left" class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4202.929mil|Location2.X=4224.708mil|Location1.Y=3225.094mil|Location2.Y=3268.527mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4202.929mil|Location2.X=4224.708mil|Location1.Y=3225.094mil|Location2.Y=3268.527mil|Absolute=True">Pad U4-6(2838.818mil,132.401mil)  Top Layer</acronym></a></td>
+<td style="width:50%; text-align:left" class="column2"><a href="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4228.519mil|Location2.X=4250.299mil|Location1.Y=3225.094mil|Location2.Y=3268.527mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4228.519mil|Location2.X=4250.299mil|Location1.Y=3225.094mil|Location2.Y=3268.527mil|Absolute=True">Pad U4-5(2864.409mil,132.401mil)  Top Layer</acronym></a></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td style="width:50%; text-align:left" class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4242.693mil|Location2.X=4286.126mil|Location1.Y=3096.63mil|Location2.Y=3132.189mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4242.693mil|Location2.X=4286.126mil|Location1.Y=3096.63mil|Location2.Y=3132.189mil|Absolute=True">Pad C4-1(2889.409mil,0mil)  Top Layer</acronym></a></td>
+<td style="width:50%; text-align:left" class="column2"><a href="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4191.511mil|Location2.X=4234.944mil|Location1.Y=3096.63mil|Location2.Y=3132.189mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4191.511mil|Location2.X=4234.944mil|Location1.Y=3096.63mil|Location2.Y=3132.189mil|Absolute=True">Pad C4-2(2838.228mil,0mil)  Top Layer</acronym></a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td style="width:50%; text-align:left" class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9919.11mil|Location2.X=9940.889mil|Location1.Y=3150.291mil|Location2.Y=3193.724mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9919.11mil|Location2.X=9940.889mil|Location1.Y=3150.291mil|Location2.Y=3193.724mil|Absolute=True">Pad U2-2(8554.999mil,57.598mil)  Top Layer</acronym></a></td>
+<td style="width:50%; text-align:left" class="column2"><a href="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9893.519mil|Location2.X=9915.299mil|Location1.Y=3150.291mil|Location2.Y=3193.724mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9893.519mil|Location2.X=9915.299mil|Location1.Y=3150.291mil|Location2.Y=3193.724mil|Absolute=True">Pad U2-1(8529.409mil,57.598mil)  Top Layer</acronym></a></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td style="width:50%; text-align:left" class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9944.7mil|Location2.X=9966.48mil|Location1.Y=3150.291mil|Location2.Y=3193.724mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9944.7mil|Location2.X=9966.48mil|Location1.Y=3150.291mil|Location2.Y=3193.724mil|Absolute=True">Pad U2-3(8580.59mil,57.598mil)  Top Layer</acronym></a></td>
+<td style="width:50%; text-align:left" class="column2"><a href="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9919.11mil|Location2.X=9940.889mil|Location1.Y=3150.291mil|Location2.Y=3193.724mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9919.11mil|Location2.X=9940.889mil|Location1.Y=3150.291mil|Location2.Y=3193.724mil|Absolute=True">Pad U2-2(8554.999mil,57.598mil)  Top Layer</acronym></a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td style="width:50%; text-align:left" class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9919.11mil|Location2.X=9940.889mil|Location1.Y=3225.094mil|Location2.Y=3268.527mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9919.11mil|Location2.X=9940.889mil|Location1.Y=3225.094mil|Location2.Y=3268.527mil|Absolute=True">Pad U2-5(8554.999mil,132.401mil)  Top Layer</acronym></a></td>
+<td style="width:50%; text-align:left" class="column2"><a href="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9944.7mil|Location2.X=9966.48mil|Location1.Y=3225.094mil|Location2.Y=3268.527mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9944.7mil|Location2.X=9966.48mil|Location1.Y=3225.094mil|Location2.Y=3268.527mil|Absolute=True">Pad U2-4(8580.59mil,132.401mil)  Top Layer</acronym></a></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td style="width:50%; text-align:left" class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9893.519mil|Location2.X=9915.299mil|Location1.Y=3225.094mil|Location2.Y=3268.527mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9893.519mil|Location2.X=9915.299mil|Location1.Y=3225.094mil|Location2.Y=3268.527mil|Absolute=True">Pad U2-6(8529.409mil,132.401mil)  Top Layer</acronym></a></td>
+<td style="width:50%; text-align:left" class="column2"><a href="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9919.11mil|Location2.X=9940.889mil|Location1.Y=3225.094mil|Location2.Y=3268.527mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9919.11mil|Location2.X=9940.889mil|Location1.Y=3225.094mil|Location2.Y=3268.527mil|Absolute=True">Pad U2-5(8554.999mil,132.401mil)  Top Layer</acronym></a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td style="width:50%; text-align:left" class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9933.283mil|Location2.X=9976.716mil|Location1.Y=3096.63mil|Location2.Y=3132.189mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9933.283mil|Location2.X=9976.716mil|Location1.Y=3096.63mil|Location2.Y=3132.189mil|Absolute=True">Pad C2-1(8579.999mil,0mil)  Top Layer</acronym></a></td>
+<td style="width:50%; text-align:left" class="column2"><a href="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9882.102mil|Location2.X=9925.535mil|Location1.Y=3096.63mil|Location2.Y=3132.189mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9882.102mil|Location2.X=9925.535mil|Location1.Y=3096.63mil|Location2.Y=3132.189mil|Absolute=True">Pad C2-2(8528.818mil,0mil)  Top Layer</acronym></a></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td style="width:50%; text-align:left" class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=12784.11mil|Location2.X=12805.889mil|Location1.Y=3150.291mil|Location2.Y=3193.724mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=12784.11mil|Location2.X=12805.889mil|Location1.Y=3150.291mil|Location2.Y=3193.724mil|Absolute=True">Pad U1-2(11419.999mil,57.598mil)  Top Layer</acronym></a></td>
+<td style="width:50%; text-align:left" class="column2"><a href="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=12758.519mil|Location2.X=12780.299mil|Location1.Y=3150.291mil|Location2.Y=3193.724mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=12758.519mil|Location2.X=12780.299mil|Location1.Y=3150.291mil|Location2.Y=3193.724mil|Absolute=True">Pad U1-1(11394.409mil,57.598mil)  Top Layer</acronym></a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td style="width:50%; text-align:left" class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=12809.7mil|Location2.X=12831.48mil|Location1.Y=3150.291mil|Location2.Y=3193.724mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=12809.7mil|Location2.X=12831.48mil|Location1.Y=3150.291mil|Location2.Y=3193.724mil|Absolute=True">Pad U1-3(11445.59mil,57.598mil)  Top Layer</acronym></a></td>
+<td style="width:50%; text-align:left" class="column2"><a href="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=12784.11mil|Location2.X=12805.889mil|Location1.Y=3150.291mil|Location2.Y=3193.724mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=12784.11mil|Location2.X=12805.889mil|Location1.Y=3150.291mil|Location2.Y=3193.724mil|Absolute=True">Pad U1-2(11419.999mil,57.598mil)  Top Layer</acronym></a></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td style="width:50%; text-align:left" class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=12784.11mil|Location2.X=12805.889mil|Location1.Y=3225.094mil|Location2.Y=3268.527mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=12784.11mil|Location2.X=12805.889mil|Location1.Y=3225.094mil|Location2.Y=3268.527mil|Absolute=True">Pad U1-5(11419.999mil,132.401mil)  Top Layer</acronym></a></td>
+<td style="width:50%; text-align:left" class="column2"><a href="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=12809.7mil|Location2.X=12831.48mil|Location1.Y=3225.094mil|Location2.Y=3268.527mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=12809.7mil|Location2.X=12831.48mil|Location1.Y=3225.094mil|Location2.Y=3268.527mil|Absolute=True">Pad U1-4(11445.59mil,132.401mil)  Top Layer</acronym></a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td style="width:50%; text-align:left" class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=12758.519mil|Location2.X=12780.299mil|Location1.Y=3225.094mil|Location2.Y=3268.527mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=12758.519mil|Location2.X=12780.299mil|Location1.Y=3225.094mil|Location2.Y=3268.527mil|Absolute=True">Pad U1-6(11394.409mil,132.401mil)  Top Layer</acronym></a></td>
+<td style="width:50%; text-align:left" class="column2"><a href="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=12784.11mil|Location2.X=12805.889mil|Location1.Y=3225.094mil|Location2.Y=3268.527mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=12784.11mil|Location2.X=12805.889mil|Location1.Y=3225.094mil|Location2.Y=3268.527mil|Absolute=True">Pad U1-5(11419.999mil,132.401mil)  Top Layer</acronym></a></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td style="width:50%; text-align:left" class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=12798.283mil|Location2.X=12841.716mil|Location1.Y=3096.63mil|Location2.Y=3132.189mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=12798.283mil|Location2.X=12841.716mil|Location1.Y=3096.63mil|Location2.Y=3132.189mil|Absolute=True">Pad C1-1(11444.999mil,0mil)  Top Layer</acronym></a></td>
+<td style="width:50%; text-align:left" class="column2"><a href="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=12747.102mil|Location2.X=12790.535mil|Location1.Y=3096.63mil|Location2.Y=3132.189mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=12747.102mil|Location2.X=12790.535mil|Location1.Y=3096.63mil|Location2.Y=3132.189mil|Absolute=True">Pad C1-2(11393.818mil,0mil)  Top Layer</acronym></a></td>
+</tr>
+</table></a><a href="#top">Back to top</a><br><br><a name="IDN0PMHHGRBJQQBOXWIZ1M2TUVSINSMVKBERWD1HEQ3PJP2QSQK3IH"><table>
+<tr>
+<th style="text-align : left" colspan="2" class="rule">Silk To Solder Mask (Clearance=10mil) (IsPad),(All)</th>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td style="width:50%; text-align:left" class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=7135.59mil|Location2.X=7143.464mil|Location1.Y=3100.63mil|Location2.Y=3128.189mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=7135.59mil|Location2.X=7143.464mil|Location1.Y=3100.63mil|Location2.Y=3128.189mil|Absolute=True">Track (5764.527mil,-9.842mil)(5764.527mil,9.842mil)  Top Overlay</acronym></a></td>
+<td style="width:50%; text-align:left" class="column2"><a href="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=7088.283mil|Location2.X=7131.716mil|Location1.Y=3096.63mil|Location2.Y=3132.189mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=7088.283mil|Location2.X=7131.716mil|Location1.Y=3096.63mil|Location2.Y=3132.189mil|Absolute=True">Pad C3-1(5734.999mil,0mil)  Top Layer</acronym></a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td style="width:50%; text-align:left" class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=1400.591mil|Location2.X=1408.465mil|Location1.Y=3100.63mil|Location2.Y=3128.189mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=1400.591mil|Location2.X=1408.465mil|Location1.Y=3100.63mil|Location2.Y=3128.189mil|Absolute=True">Track (29.528mil,-9.842mil)(29.528mil,9.842mil)  Top Overlay</acronym></a></td>
+<td style="width:50%; text-align:left" class="column2"><a href="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=1353.284mil|Location2.X=1396.716mil|Location1.Y=3096.63mil|Location2.Y=3132.189mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=1353.284mil|Location2.X=1396.716mil|Location1.Y=3096.63mil|Location2.Y=3132.189mil|Absolute=True">Pad C5-1(0mil,0mil)  Top Layer</acronym></a></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td style="width:50%; text-align:left" class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4290mil|Location2.X=4297.874mil|Location1.Y=3100.63mil|Location2.Y=3128.189mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4290mil|Location2.X=4297.874mil|Location1.Y=3100.63mil|Location2.Y=3128.189mil|Absolute=True">Track (2918.937mil,-9.842mil)(2918.937mil,9.842mil)  Top Overlay</acronym></a></td>
+<td style="width:50%; text-align:left" class="column2"><a href="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4242.693mil|Location2.X=4286.126mil|Location1.Y=3096.63mil|Location2.Y=3132.189mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4242.693mil|Location2.X=4286.126mil|Location1.Y=3096.63mil|Location2.Y=3132.189mil|Absolute=True">Pad C4-1(2889.409mil,0mil)  Top Layer</acronym></a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td style="width:50%; text-align:left" class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9980.59mil|Location2.X=9988.464mil|Location1.Y=3100.63mil|Location2.Y=3128.189mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9980.59mil|Location2.X=9988.464mil|Location1.Y=3100.63mil|Location2.Y=3128.189mil|Absolute=True">Track (8609.527mil,-9.842mil)(8609.527mil,9.842mil)  Top Overlay</acronym></a></td>
+<td style="width:50%; text-align:left" class="column2"><a href="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9933.283mil|Location2.X=9976.716mil|Location1.Y=3096.63mil|Location2.Y=3132.189mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9933.283mil|Location2.X=9976.716mil|Location1.Y=3096.63mil|Location2.Y=3132.189mil|Absolute=True">Pad C2-1(8579.999mil,0mil)  Top Layer</acronym></a></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td style="width:50%; text-align:left" class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=12845.59mil|Location2.X=12853.464mil|Location1.Y=3100.63mil|Location2.Y=3128.189mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=12845.59mil|Location2.X=12853.464mil|Location1.Y=3100.63mil|Location2.Y=3128.189mil|Absolute=True">Track (11474.527mil,-9.842mil)(11474.527mil,9.842mil)  Top Overlay</acronym></a></td>
+<td style="width:50%; text-align:left" class="column2"><a href="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=12798.283mil|Location2.X=12841.716mil|Location1.Y=3096.63mil|Location2.Y=3132.189mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=12798.283mil|Location2.X=12841.716mil|Location1.Y=3096.63mil|Location2.Y=3132.189mil|Absolute=True">Pad C1-1(11444.999mil,0mil)  Top Layer</acronym></a></td>
+</tr>
+</table></a><a href="#top">Back to top</a><br><br><a name="IDB33YB2QYFU2XGYFAXVWIO00UZLCXJCKST5WD4UM2VY5L2PII0XID"><table>
+<tr>
+<th style="text-align : left" colspan="1" class="rule">Silk primitive without silk layer</th>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=14563.228mil|Location2.X=14812.658mil|Location1.Y=1415.94mil|Location2.Y=1637.04mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=14563.228mil|Location2.X=14812.658mil|Location1.Y=1415.94mil|Location2.Y=1637.04mil|Absolute=True">Silk To Board Region Clearance (Out of silkscreen region) : Text "D-cell" (13453.728mil,-1617.909mil)  Bottom Overlay</acronym></a><br></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=11703.228mil|Location2.X=11952.658mil|Location1.Y=1415.94mil|Location2.Y=1637.04mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=11703.228mil|Location2.X=11952.658mil|Location1.Y=1415.94mil|Location2.Y=1637.04mil|Absolute=True">Silk To Board Region Clearance (Out of silkscreen region) : Text "D-cell" (10593.728mil,-1617.909mil)  Bottom Overlay</acronym></a><br></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=8843.228mil|Location2.X=9092.658mil|Location1.Y=1415.94mil|Location2.Y=1637.04mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=8843.228mil|Location2.X=9092.658mil|Location1.Y=1415.94mil|Location2.Y=1637.04mil|Absolute=True">Silk To Board Region Clearance (Out of silkscreen region) : Text "D-cell" (7733.728mil,-1617.909mil)  Bottom Overlay</acronym></a><br></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=5983.228mil|Location2.X=6232.658mil|Location1.Y=1415.94mil|Location2.Y=1637.04mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=5983.228mil|Location2.X=6232.658mil|Location1.Y=1415.94mil|Location2.Y=1637.04mil|Absolute=True">Silk To Board Region Clearance (Out of silkscreen region) : Text "D-cell" (4873.728mil,-1617.909mil)  Bottom Overlay</acronym></a><br></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=3123.228mil|Location2.X=3372.658mil|Location1.Y=1415.94mil|Location2.Y=1637.04mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=3123.228mil|Location2.X=3372.658mil|Location1.Y=1415.94mil|Location2.Y=1637.04mil|Absolute=True">Silk To Board Region Clearance (Out of silkscreen region) : Text "D-cell" (2013.728mil,-1617.909mil)  Bottom Overlay</acronym></a><br></td>
+</tr>
+</table></a><a href="#top">Back to top</a><br><br><a name="IDDTNXSMCM3WJKAPPLK0DT4SSUJAGAJSJMYF3QZDC2JHIVRYDPEHO"><table>
+<tr>
+<th style="text-align : left" colspan="1" class="rule">Net Antennae (Tolerance=0mil) (All)</th>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=13105.201mil|Location2.X=13336.948mil|Location1.Y=3305.201mil|Location2.Y=3689.447mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\dmann\Dropbox\Development\X1\LithiumBatteryPack.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=13105.201mil|Location2.X=13336.948mil|Location1.Y=3305.201mil|Location2.Y=3689.447mil|Absolute=True">Net Antennae: Track (-90.039mil,294.292mil)(11833.701mil,294.292mil)  Top Layer</acronym></a><br></td>
+</tr>
+</table></a><a href="#top">Back to top</a><br><br></body>
+</html>
