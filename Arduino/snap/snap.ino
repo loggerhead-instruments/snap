@@ -254,9 +254,10 @@ void setup() {
   delay(140);
   cDisplay();
   display.println("Loggerhead");
-//  Serial.println("Loggerhead");
-//  display.println("USB <->");
+  display.println("Titanium");
+  display.print("Snap");
   display.display();
+  delay(2000);
   // Check for external USB connection to microSD
 // while(digitalRead(usbSense)){
 //    delay(500);
@@ -269,10 +270,6 @@ void setup() {
   
   pinMode(usbSense, OUTPUT);  //not using any more, set to OUTPUT
   digitalWrite(usbSense, LOW); 
-
-  cDisplay();
-  display.println("Loggerhead");
-  display.display();
   
   // Initialize the SD card
   SPI.setMOSI(7);

@@ -97,6 +97,8 @@ void manualSettings(){
       display.println("  None");
       display.display();
   }
+
+  delay(3000);
   
   // make sure settings valid (if EEPROM corrupted or not set yet)
   
