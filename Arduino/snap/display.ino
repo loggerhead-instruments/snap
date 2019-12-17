@@ -450,4 +450,3 @@ void writeEEPROM(){
   EEPROM.write(13, isf); //byte
   EEPROM.write(14, gainSetting); //byte
 }
-

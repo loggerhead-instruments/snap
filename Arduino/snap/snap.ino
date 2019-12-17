@@ -2,7 +2,7 @@
 // SNAP acoustic recorder
 //
 // Loggerhead Instruments
-// 2016-2018
+// 2016-2019
 // David Mann
 // 
 // Modified from PJRC audio code
@@ -13,8 +13,8 @@
 // Modified by WMXZ 15-05-2018 for SdFS anf multiple sampling frequencies
 // Optionally uses SdFS from Bill Greiman https://github.com/greiman/SdFs; but has higher current draw in sleep
 
-char codeVersion[12] = "2019-05-28";
-static boolean printDiags = 0;  // 1: serial print diagnostics; 0: no diagnostics
+char codeVersion[12] = "2019-12-05";
+static boolean printDiags = 1;  // 1: serial print diagnostics; 0: no diagnostics
 
 #define USE_SDFS 0  // to be used for exFAT but works also for FAT16/32
 #define MQ 100 // to be used with LHI record queue (modified local version)
@@ -87,21 +87,18 @@ int noDC = 0; // 0 = freezeDC offset; 1 = remove DC offset
 
 // Pin Assignments
 const int hydroPowPin = 2;
+const int sgtlEn = 6;
 
-// AMX
+// Snap
 const int UP = 4;
 const int DOWN = 3;  // new board pin
 //const int DOWN = 5; // old board down pin
 const int SELECT = 8;
 const int displayPow = 20;
-const int ledGreen = 16;
-const int ledRed = 17;
-const int BURN1 = 5;
+#define ledGreen 17
 const int SDSW = 0;
-const int ledWhite = 21;
-const int usbSense = 6;
-const int vSense = 21; 
-//const int vSense = A14;  // moved to Pin 21 for X1
+#define vSense A7 
+//const int vSense = A14;  // moved to Pin 21 (A7) for X1
 
 // Pins used by audio shield
 // https://www.pjrc.com/store/teensy3_audio.html
@@ -227,24 +224,23 @@ void setup() {
 
   pinMode(hydroPowPin, OUTPUT);
   pinMode(displayPow, OUTPUT);
+  pinMode(sgtlEn, OUTPUT);
 
   pinMode(vSense, INPUT);
   analogReference(DEFAULT);
 
   digitalWrite(hydroPowPin, HIGH);
   digitalWrite(displayPow, HIGH);
+  digitalWrite(sgtlEn, HIGH);
 
-  pinMode(usbSense, OUTPUT);
-  digitalWrite(usbSense, LOW); // make sure no pull-up
-  pinMode(usbSense, INPUT);
   
   //setup display and controls
-  pinMode(UP, INPUT);
-  pinMode(DOWN, INPUT);
-  pinMode(SELECT, INPUT);
-  digitalWrite(UP, HIGH);
-  digitalWrite(DOWN, HIGH);
-  digitalWrite(SELECT, HIGH);  
+  pinMode(UP, INPUT_PULLUP);
+  pinMode(DOWN, INPUT_PULLUP);
+  pinMode(SELECT, INPUT_PULLUP);
+//  digitalWrite(UP, HIGH);
+//  digitalWrite(DOWN, HIGH);
+//  digitalWrite(SELECT, HIGH);  
 
   //setSyncProvider(getTeensy3Time); //use Teensy RTC to keep time
   t = getTeensy3Time();
@@ -254,21 +250,11 @@ void setup() {
   delay(140);
   cDisplay();
   display.println("Loggerhead");
-//  Serial.println("Loggerhead");
-//  display.println("USB <->");
   display.display();
-  // Check for external USB connection to microSD
-// while(digitalRead(usbSense)){
-//    delay(500);
-//  }
 
-  // Power down USB if not using Serial monitor
-//  if (printDiags==0){
-//      usbDisable();
-//  }
-  
-  pinMode(usbSense, OUTPUT);  //not using any more, set to OUTPUT
-  digitalWrite(usbSense, LOW); 
+
+  pinMode(ledGreen, OUTPUT);
+  digitalWrite(ledGreen, HIGH);
 
   cDisplay();
   display.println("Loggerhead");
@@ -373,9 +359,7 @@ void loop() {
       //
       //static uint32_t to; if(t >to) Serial.println(t); to=t;
       //
-      if(t >= burnTime){
-        digitalWrite(BURN1, HIGH);
-      }
+
       if(t >= startTime){      // time to start?
         if(noDC==0) {
           audio_freeze_adc_hp(); // this will lower the DC offset voltage, and reduce noise
@@ -412,6 +396,7 @@ void loop() {
 //  }
     if(digitalRead(UP)==0 & digitalRead(DOWN)==0){
       // stop recording
+      digitalWrite(ledGreen, HIGH);
       queue1.end();
       // update wav file header
       wav_hdr.rLen = 36 + buf_count * 256 * 2;
@@ -469,10 +454,11 @@ void loop() {
             /// ... Sleeping ....
             
             // Waking up
-           // if (printDiags==0) usbDisable();
+
 
             digitalWrite(hydroPowPin, HIGH); // hydrophone on
             delay(300);  // give time for Serial to reconnect to USB
+           // AudioInit(isf);
             audio_power_up();  // when use audio_power_down() before sleeping, does not always get LRCLK. This did not fix.  
          }
         Serial.println("Display");
@@ -500,7 +486,7 @@ void continueRecording() {
     // into a 512 byte buffer.  micro SD disk access
     // is most efficient when full (or multiple of) 512 byte sector size
     // writes are used.
-    //digitalWrite(ledGreen, HIGH);
+    digitalWrite(ledGreen, HIGH);
     for(int ii=0;ii<NREC;ii++)
     { byte *ptr = buffer+ii*512;
       memcpy(ptr, queue1.readBuffer(), 256);
@@ -508,6 +494,7 @@ void continueRecording() {
       memcpy(ptr+256, queue1.readBuffer(), 256);
       queue1.freeBuffer();
     }
+    digitalWrite(ledGreen, LOW);
     if(frec.write(buffer, NREC*512)==-1) resetFunc(); //audio to .wav file
       
     buf_count += NREC;
@@ -783,4 +770,3 @@ float readVoltage(){
    voltage = 5.9 * voltage / 8.0;   //fudging scaling based on actual measurements; shoud be max of 3.3V at 1023
    return voltage;
 }
-
