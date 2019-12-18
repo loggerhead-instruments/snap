@@ -128,7 +128,7 @@ void manualSettings(){
     recMode = 0;
     EEPROM.write(12, recMode); //byte
   }
-  if (isf<0 | isf>4) {
+  if (isf<0 | isf>9) {
     isf = 3;
     EEPROM.write(13, isf); //byte
   }
@@ -244,7 +244,7 @@ void manualSettings(){
         display.print(second(getTeensy3Time()));
         break;
       case setFsamp:
-        isf = updateVal(isf, 0, 5);
+        isf = updateVal(isf, 0, 9);
         display.printf("SF: %.1f",lhi_fsamps[isf]/1000.0f);
         break;
     }
