@@ -1,3 +1,8 @@
+// - enter menu item to set
+// - show voltage (show warning if low)
+
+
+
 float mAmpRec = 45;  // actual about 43 mA
 float mAmpSleep = 2.8; // actual about 2.6 mA
 byte nBatPacks = 1;
@@ -7,11 +12,25 @@ uint32_t freeMB;
 uint32_t filesPerCard;
 csd_t m_csd;
 
+int curMenuItem = 0;
+#define maxMenuItem 6
+char *menuItem[] = {"Start",
+                     "Record",
+                     "Sleep",
+                     "Samp Rate",
+                     "Gain",
+                     "Set Time"
+                     };
 
+char *helpText[] = {"UP/DN:scroll menu\nENTER:Start Recording",
+                    "UP/DN:scroll menu\nENTER:Set Record Dur",
+                    "UP/DN:scroll menu\nENTER:Set Sleep Dur",
+                    "UP/DN:scroll menu\nENTER:Set Sample Rate",
+                    "UP/DN:scroll menu\nENTER:Set Gain (dB)",
+                    "UP/DN:scroll menu\nENTER:Set Time"};
 /* DISPLAY FUNCTIONS
  *  
  */
-
 time_t autoStartTime;
  
 void printDigits(int digits){
@@ -137,23 +156,14 @@ void manualSettings(){
     EEPROM.write(14, gainSetting); //byte
   }
 
-
-//  // if LOG.CSV present, skip manual settings
-//  #if USE_SDFS==1
-//    FsFile logFile = sd.open("LOG.CSV");
-//  #else
-//    File logFile = sd.open("LOG.CSV");
-//  #endif
-//  if(logFile){
-//    startRec = 1;
-//    logFile.close();
-//  }
-  
+// Main Menu Loop
   while(startRec==0){
     static int curSetting = noSet;
     static int newYear, newMonth, newDay, newHour, newMinute, newSecond, oldYear, oldMonth, oldDay, oldHour, oldMinute, oldSecond;
+    t = getTeensy3Time();
     
-    // Check for mode change
+    
+    // Check for button press
     boolean selectVal = digitalRead(SELECT);
     if(selectVal==0){
       curSetting += 1;
@@ -164,11 +174,27 @@ void manualSettings(){
       if(recMode==MODE_NORMAL & (curSetting>14)) curSetting = 0;
    }
 
-    cDisplay();
-
-    t = getTeensy3Time();
-
+    selectVal = digitalRead(DOWN);
+    if(selectVal==0){
+      while(digitalRead(DOWN)==0){
+        delay(10); // wait until let go
+      }
+      curMenuItem++;
+      if(curMenuItem>=maxMenuItem) curMenuItem = 0;
+    }
+    
+    selectVal = digitalRead(UP);
+    if(selectVal==0){
+      while(digitalRead(UP)==0){
+        delay(10); // wait until let go
+      }
+      curMenuItem--;
+      if(curMenuItem<0) curMenuItem = maxMenuItem - 1;
+    }
+    
     if (t - autoStartTime > 600) startRec = 1; //autostart if no activity for 10 minutes
+
+    // Excecute button press
     switch (curSetting){
       case noSet:
         if (settingsChanged) {
@@ -176,7 +202,7 @@ void manualSettings(){
           settingsChanged = 0;
           autoStartTime = getTeensy3Time();  //reset autoStartTime
         }
-        display.print("UP+DN->Rec"); 
+
         // Check for start recording
         startUp = digitalRead(UP);
         startDown = digitalRead(DOWN);
@@ -248,6 +274,9 @@ void manualSettings(){
         display.printf("SF: %.1f",lhi_fsamps[isf]/1000.0f);
         break;
     }
+    
+    cDisplay();
+    displayMenu();
     displaySettings();
     displayClock(getTeensy3Time(), BOTTOM);
     display.display();
@@ -310,23 +339,32 @@ void displaySettings(){
   t = getTeensy3Time();
   display.setTextSize(1);
   display.setTextColor(WHITE);
-  display.setCursor(0, 18);
-
-  display.print("Rec:");
-  display.print(rec_dur);
-  display.println("s ");
+  display.setCursor(0, 38);
+  display.print("Rec");
+  display.setCursor(25, 38);
+  display.print("Slp");
+  display.setCursor(50, 38);
+  display.print("kHz");
+  display.setCursor(75, 38);
+  display.print("dB");
   
-  display.print("Sleep:");
+  
+  
+  display.setCursor(0, 46);
+  //display.print("Rec:");
+  display.print(rec_dur);
+
+  
+  //display.print("Sleep:");
+  display.setCursor(25, 46);
   display.print(rec_int);
-  display.println("s  ");
 
-  display.printf("%.1f kHz",lhi_fsamps[isf]/1000.0f);
+  display.setCursor(50, 46);
+  display.printf("%.0f",lhi_fsamps[isf]/1000.0f);
 
-  display.print(" ");
-  display.printf("%.1f",gainDb);
-  display.print("dB gain");
+  display.setCursor(75, 46);
+  display.printf("%.0f",gainDb);
 
-  display.setTextSize(1);
   uint32_t totalRecSeconds = 0;
 
   float fileBytes = (2 * rec_dur * lhi_fsamps[isf]) + 44;
@@ -359,19 +397,23 @@ void displaySettings(){
   //display.setCursor(60, 18 + (n*8));  // display file count for debugging
   //display.print(n+1); display.print(":");display.print(filesPerCard[n]); 
 
+  
   float totalSecondsMemory = totalRecSeconds / recFraction;
   if(powerSeconds < totalSecondsMemory){
    // displayClock(getTeensy3Time() + powerSeconds, 45, 0);
-    display.setCursor(0, 46);
-    display.print("Battery Limit:");
-    display.print(powerSeconds / 86400);
+    //display.print("B:");
+    display.setCursor(92, 38);
+    display.print("Lim B");
+    display.setCursor(92, 46);
+    display.print((int) powerSeconds / 86400);
     display.print("d");
   }
   else{
   //  displayClock(getTeensy3Time() + totalRecSeconds + totalSleepSeconds, 45, 0);
-    display.setCursor(0, 46);
-    display.print("Memory Limit:");
-    display.print(totalSecondsMemory / 86400);
+    display.setCursor(92, 38);
+    display.print("Lim B");
+    display.setCursor(92, 46);
+    display.print((int)totalSecondsMemory / 86400);
     display.print("d");
   }
 }
@@ -449,4 +491,11 @@ void writeEEPROM(){
   EEPROM.write(12, recMode); //byte
   EEPROM.write(13, isf); //byte
   EEPROM.write(14, gainSetting); //byte
+}
+
+void displayMenu(){
+  display.setTextSize(2);
+  display.println(menuItem[curMenuItem]);
+  display.setTextSize(1);
+  display.println(helpText[curMenuItem]);
 }
