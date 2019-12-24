@@ -8,7 +8,7 @@
 // Modified from PJRC audio code
 // http://www.pjrc.com/store/teensy3_audio.html
 //
-// Compile with 72 MHz Fastest
+// Compile with 96 MHz Fastest
 
 // Modified by WMXZ 15-05-2018 for SdFS anf multiple sampling frequencies
 
@@ -794,9 +794,10 @@ void read_myID() {
 
 float readVoltage(){
    float  voltage = 0;
-   for(int n = 0; n<8; n++){
+   int nReads = 20;
+   for(int n = 0; n<nReads; n++){
     voltage += (float) analogRead(vSense) / 1024.0;
    }
-   voltage = 5.9 * voltage / 8.0;   //fudging scaling based on actual measurements; shoud be max of 3.3V at 1023
+   voltage = 6.4 * voltage / nReads;   //fudging scaling based on actual measurements; shoud be max of 3.3V at 1023
    return voltage;
 }

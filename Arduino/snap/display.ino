@@ -17,17 +17,17 @@ int curMenuItem = 0;
 char *menuItem[] = {"Start",
                      "Record",
                      "Sleep",
-                     "Samp Rate",
+                     "Rate",
                      "Gain",
-                     "Set Time"
+                     "Time"
                      };
 
-char *helpText[] = {"UP/DN:scroll menu\nENTER:Start Recording",
-                    "UP/DN:scroll menu\nENTER:Set Record Dur",
-                    "UP/DN:scroll menu\nENTER:Set Sleep Dur",
-                    "UP/DN:scroll menu\nENTER:Set Sample Rate",
-                    "UP/DN:scroll menu\nENTER:Set Gain (dB)",
-                    "UP/DN:scroll menu\nENTER:Set Time"};
+char *helpText[] = {"ENTER:Start RecordingUP/DN:scroll menu",
+                    "ENTER:Set Record Dur\nUP/DN:scroll menu",
+                    "ENTER:Set Sleep Dur\nUP/DN:scroll menu",
+                    "ENTER:Set Sample RateUP/DN:scroll menu",
+                    "ENTER:Set Gain (dB)\nUP/DN:scroll menu",
+                    "ENTER:Set Time\nUP/DN:scroll menu"};
 /* DISPLAY FUNCTIONS
  *  
  */
@@ -44,21 +44,12 @@ void printZero(int val){
   if(val<10) display.print('0');
 }
 
-#define noSet 0
+#define setStart 0
 #define setRecDur 1
 #define setRecSleep 2
-#define setYear 3
-#define setMonth 4
-#define setDay 5
-#define setHour 6
-#define setMinute 7
-#define setSecond 8
-#define setMode 9
-#define setStartHour 10
-#define setStartMinute 11
-#define setEndHour 12
-#define setEndMinute 13
-#define setFsamp 14
+#define setFsamp 3
+#define setGain 4
+#define setDateTime 5
 
 void manualSettings(){
   boolean startRec = 0, startUp, startDown;
@@ -158,23 +149,13 @@ void manualSettings(){
 
 // Main Menu Loop
   while(startRec==0){
-    static int curSetting = noSet;
     static int newYear, newMonth, newDay, newHour, newMinute, newSecond, oldYear, oldMonth, oldDay, oldHour, oldMinute, oldSecond;
     t = getTeensy3Time();
+    if (t - autoStartTime > 600) startRec = 1; //autostart if no activity for 10 minutes
     
     
     // Check for button press
-    boolean selectVal = digitalRead(SELECT);
-    if(selectVal==0){
-      curSetting += 1;
-      while(digitalRead(SELECT)==0){ // wait until let go of button
-        delay(10);
-      }
-      if(recMode==MODE_NORMAL & (curSetting>8) & (curSetting<14)) curSetting = 14;
-      if(recMode==MODE_NORMAL & (curSetting>14)) curSetting = 0;
-   }
-
-    selectVal = digitalRead(DOWN);
+    boolean selectVal = digitalRead(DOWN);
     if(selectVal==0){
       while(digitalRead(DOWN)==0){
         delay(10); // wait until let go
@@ -191,93 +172,97 @@ void manualSettings(){
       curMenuItem--;
       if(curMenuItem<0) curMenuItem = maxMenuItem - 1;
     }
-    
-    if (t - autoStartTime > 600) startRec = 1; //autostart if no activity for 10 minutes
 
-    // Excecute button press
-    switch (curSetting){
-      case noSet:
-        if (settingsChanged) {
-          writeEEPROM();
-          settingsChanged = 0;
-          autoStartTime = getTeensy3Time();  //reset autoStartTime
-        }
 
-        // Check for start recording
-        startUp = digitalRead(UP);
-        startDown = digitalRead(DOWN);
-        if(startUp==0 & startDown==0) {
-          cDisplay();
-          writeEEPROM(); //save settings
-          display.print("Starting..");
-          display.display();
-          delay(1500);
-          startRec = 1;  //start recording
-        }
-        break;
-      case setRecDur:
-        rec_dur = updateVal(rec_dur, 1, 3600);
-        display.print("Rec:");
-        display.print(rec_dur);
-        display.println("s");
-        break;
-      case setRecSleep:
-        rec_int = updateVal(rec_int, 0, 3600 * 24);
-        display.print("Slp:");
-        display.print(rec_int);
-        display.println("s");
-        break;
-      case setYear:
-        oldYear = year(t);
-        newYear = updateVal(oldYear,2000, 2100);
-        if(oldYear!=newYear) setTeensyTime(hour(t), minute(t), second(t), day(t), month(t), newYear);
-        display.print("Year:");
-        display.print(year(getTeensy3Time()));
-        break;
-      case setMonth:
-        oldMonth = month(t);
-        newMonth = updateVal(oldMonth, 1, 12);
-        if(oldMonth != newMonth) setTeensyTime(hour(t), minute(t), second(t), day(t), newMonth, year(t));
-        display.print("Month:");
-        display.print(month(getTeensy3Time()));
-        break;
-      case setDay:
-        oldDay = day(t);
-        newDay = updateVal(oldDay, 1, 31);
-        if(oldDay!=newDay) setTeensyTime(hour(t), minute(t), second(t), newDay, month(t), year(t));
-        display.print("Day:");
-        display.print(day(getTeensy3Time()));
-        break;
-      case setHour:
-        oldHour = hour(t);
-        newHour = updateVal(oldHour, 0, 23);
-        if(oldHour!=newHour) setTeensyTime(newHour, minute(t), second(t), day(t), month(t), year(t));
-        display.print("Hour:");
-        display.print(hour(getTeensy3Time()));
-        break;
-      case setMinute:
-        oldMinute = minute(t);
-        newMinute = updateVal(oldMinute, 0, 59);
-        if(oldMinute!=newMinute) setTeensyTime(hour(t), newMinute, second(t), day(t), month(t), year(t));
-        display.print("Minute:");
-        display.print(minute(getTeensy3Time()));
-        break;
-      case setSecond:
-        oldSecond = second(t);
-        newSecond = updateVal(oldSecond, 0, 59);
-        if(oldSecond!=newSecond) setTeensyTime(hour(t), minute(t), newSecond, day(t), month(t), year(t));
-        display.print("Second:");
-        display.print(second(getTeensy3Time()));
-        break;
-      case setFsamp:
-        isf = updateVal(isf, 0, 9);
-        display.printf("SF: %.1f",lhi_fsamps[isf]/1000.0f);
-        break;
+    // Enter pressed from main menu
+    selectVal = digitalRead(SELECT);
+    if(selectVal==0){
+      while(digitalRead(SELECT)==0){ // wait until let go of button
+        delay(10);
+      }
+
+      // Process enter
+      switch (curMenuItem){
+        case setStart:
+            cDisplay();
+            writeEEPROM(); //save settings
+            display.println("Starting..");
+            display.setTextSize(1);
+            display.print("Press UP+DN to Stop");
+            display.display();
+            delay(2000);
+            startRec = 1;  //start recording 
+            break;
+//        case setRecDur:
+//          rec_dur = updateVal(rec_dur, 1, 3600);
+//          display.print("Rec:");
+//          display.print(rec_dur);
+//          display.println("s");
+//          break;
+//        case setRecSleep:
+//          rec_int = updateVal(rec_int, 0, 3600 * 24);
+//          display.print("Slp:");
+//          display.print(rec_int);
+//          display.println("s");
+//          break;
+//        case setYear:
+//          oldYear = year(t);
+//          newYear = updateVal(oldYear,2000, 2100);
+//          if(oldYear!=newYear) setTeensyTime(hour(t), minute(t), second(t), day(t), month(t), newYear);
+//          display.print("Year:");
+//          display.print(year(getTeensy3Time()));
+//          break;
+//        case setMonth:
+//          oldMonth = month(t);
+//          newMonth = updateVal(oldMonth, 1, 12);
+//          if(oldMonth != newMonth) setTeensyTime(hour(t), minute(t), second(t), day(t), newMonth, year(t));
+//          display.print("Month:");
+//          display.print(month(getTeensy3Time()));
+//          break;
+//        case setDay:
+//          oldDay = day(t);
+//          newDay = updateVal(oldDay, 1, 31);
+//          if(oldDay!=newDay) setTeensyTime(hour(t), minute(t), second(t), newDay, month(t), year(t));
+//          display.print("Day:");
+//          display.print(day(getTeensy3Time()));
+//          break;
+//        case setHour:
+//          oldHour = hour(t);
+//          newHour = updateVal(oldHour, 0, 23);
+//          if(oldHour!=newHour) setTeensyTime(newHour, minute(t), second(t), day(t), month(t), year(t));
+//          display.print("Hour:");
+//          display.print(hour(getTeensy3Time()));
+//          break;
+//        case setMinute:
+//          oldMinute = minute(t);
+//          newMinute = updateVal(oldMinute, 0, 59);
+//          if(oldMinute!=newMinute) setTeensyTime(hour(t), newMinute, second(t), day(t), month(t), year(t));
+//          display.print("Minute:");
+//          display.print(minute(getTeensy3Time()));
+//          break;
+//        case setSecond:
+//          oldSecond = second(t);
+//          newSecond = updateVal(oldSecond, 0, 59);
+//          if(oldSecond!=newSecond) setTeensyTime(hour(t), minute(t), newSecond, day(t), month(t), year(t));
+//          display.print("Second:");
+//          display.print(second(getTeensy3Time()));
+//          break;
+//        case setFsamp:
+//          isf = updateVal(isf, 0, 9);
+//          display.printf("SF: %.1f",lhi_fsamps[isf]/1000.0f);
+//          break;
+      }
+      if (settingsChanged) {
+        writeEEPROM();
+        settingsChanged = 0;
+        autoStartTime = getTeensy3Time();  //reset autoStartTime
+      }
     }
     
     cDisplay();
     displayMenu();
     displaySettings();
+    displayVoltage();
     displayClock(getTeensy3Time(), BOTTOM);
     display.display();
     delay(10);
@@ -498,4 +483,11 @@ void displayMenu(){
   display.println(menuItem[curMenuItem]);
   display.setTextSize(1);
   display.println(helpText[curMenuItem]);
+}
+
+void displayVoltage(){
+  display.setTextSize(1);
+  display.setCursor(100, 0);
+  display.print(readVoltage(),1);
+  display.print("V");
 }
