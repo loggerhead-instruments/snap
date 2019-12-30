@@ -27,7 +27,7 @@ char *helpText[] = {"ENTER:Start RecordingUP/DN:scroll menu",
                     "ENTER:Set Sleep Dur\nUP/DN:scroll menu",
                     "ENTER:Set Sample RateUP/DN:scroll menu",
                     "ENTER:Set Gain (dB)\nUP/DN:scroll menu",
-                    "ENTER:Set Time\nUP/DN:scroll menu"};
+                    "ENTER:Set Date/Time\nUP/DN:scroll menu"};
 /* DISPLAY FUNCTIONS
  *  
  */
@@ -250,52 +250,92 @@ void manualSettings(){
             display.display();
             delay(10);
           }
+
+        case setDateTime:
+          while(digitalRead(SELECT)==1){
+            oldYear = year(t);
+            newYear = updateVal(oldYear,2000, 2100);
+            if(oldYear!=newYear) setTeensyTime(hour(t), minute(t), second(t), day(t), month(t), newYear);
+            cDisplay();
+            display.println("Year:");
+            display.print(year(getTeensy3Time()));
+            displaySettings();
+            displayVoltage();
+            display.display();
+            delay(10);
+          }
+          while(digitalRead(SELECT)==0); // wait to let go
+          
+          while(digitalRead(SELECT)==1){
+            oldMonth = month(t);
+            newMonth = updateVal(oldMonth, 1, 12);
+            if(oldMonth != newMonth) setTeensyTime(hour(t), minute(t), second(t), day(t), newMonth, year(t));
+            cDisplay();
+            display.println("Month:");
+            display.print(month(getTeensy3Time()));
+            displaySettings();
+            displayVoltage();
+            display.display();
+            delay(10);
+          }
+          while(digitalRead(SELECT)==0); // wait to let go
+
+          while(digitalRead(SELECT)==1){
+            oldDay = day(t);
+            newDay = updateVal(oldDay, 1, 31);
+            if(oldDay!=newDay) setTeensyTime(hour(t), minute(t), second(t), newDay, month(t), year(t));
+            cDisplay();
+            display.println("Day:");
+            display.print(day(getTeensy3Time()));
+            displaySettings();
+            displayVoltage();
+            display.display();
+            delay(10);
+          }
+          while(digitalRead(SELECT)==0); // wait to let go
+
+          while(digitalRead(SELECT)==1){
+            oldHour = hour(t);
+            newHour = updateVal(oldHour, 0, 23);
+            if(oldHour!=newHour) setTeensyTime(newHour, minute(t), second(t), day(t), month(t), year(t));
+            cDisplay();
+            display.println("Hour:");
+            display.print(hour(getTeensy3Time()));
+            displaySettings();  
+            displayVoltage();
+            display.display();
+            delay(10);
+          }
+          while(digitalRead(SELECT)==0); // wait to let go
+
+          while(digitalRead(SELECT)==1){
+            oldMinute = minute(t);
+            newMinute = updateVal(oldMinute, 0, 59);
+            if(oldMinute!=newMinute) setTeensyTime(hour(t), newMinute, second(t), day(t), month(t), year(t));
+            cDisplay();
+            display.println("Minute:");
+            display.print(minute(getTeensy3Time()));
+            displaySettings();
+            displayVoltage();
+            display.display();
+            delay(10);
+          }
+          while(digitalRead(SELECT)==0); // wait to let go
+
+          while(digitalRead(SELECT)==1){
+            oldSecond = second(t);
+            newSecond = updateVal(oldSecond, 0, 59);
+            if(oldSecond!=newSecond) setTeensyTime(hour(t), minute(t), newSecond, day(t), month(t), year(t));
+            cDisplay();
+            display.println("Second:");
+            display.print(second(getTeensy3Time()));
+            displaySettings();
+            displayVoltage();
+            display.display();
+            delay(10);
+          }
           while(digitalRead(SELECT)==0); // wait to let go
           break;
-          
-//        case setYear:
-//          oldYear = year(t);
-//          newYear = updateVal(oldYear,2000, 2100);
-//          if(oldYear!=newYear) setTeensyTime(hour(t), minute(t), second(t), day(t), month(t), newYear);
-//          display.print("Year:");
-//          display.print(year(getTeensy3Time()));
-//          break;
-//        case setMonth:
-//          oldMonth = month(t);
-//          newMonth = updateVal(oldMonth, 1, 12);
-//          if(oldMonth != newMonth) setTeensyTime(hour(t), minute(t), second(t), day(t), newMonth, year(t));
-//          display.print("Month:");
-//          display.print(month(getTeensy3Time()));
-//          break;
-//        case setDay:
-//          oldDay = day(t);
-//          newDay = updateVal(oldDay, 1, 31);
-//          if(oldDay!=newDay) setTeensyTime(hour(t), minute(t), second(t), newDay, month(t), year(t));
-//          display.print("Day:");
-//          display.print(day(getTeensy3Time()));
-//          break;
-//        case setHour:
-//          oldHour = hour(t);
-//          newHour = updateVal(oldHour, 0, 23);
-//          if(oldHour!=newHour) setTeensyTime(newHour, minute(t), second(t), day(t), month(t), year(t));
-//          display.print("Hour:");
-//          display.print(hour(getTeensy3Time()));
-//          break;
-//        case setMinute:
-//          oldMinute = minute(t);
-//          newMinute = updateVal(oldMinute, 0, 59);
-//          if(oldMinute!=newMinute) setTeensyTime(hour(t), newMinute, second(t), day(t), month(t), year(t));
-//          display.print("Minute:");
-//          display.print(minute(getTeensy3Time()));
-//          break;
-//        case setSecond:
-//          oldSecond = second(t);
-//          newSecond = updateVal(oldSecond, 0, 59);
-//          if(oldSecond!=newSecond) setTeensyTime(hour(t), minute(t), newSecond, day(t), month(t), year(t));
-//          display.print("Second:");
-//          display.print(second(getTeensy3Time()));
-//          break;
-
       }
       if (settingsChanged) {
         writeEEPROM();
