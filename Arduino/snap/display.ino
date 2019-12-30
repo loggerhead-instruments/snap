@@ -155,18 +155,18 @@ void manualSettings(){
     
     
     // Check for button press
-    boolean selectVal = digitalRead(DOWN);
+    boolean selectVal = digitalRead(UP);
     if(selectVal==0){
-      while(digitalRead(DOWN)==0){
+      while(digitalRead(UP)==0){
         delay(10); // wait until let go
       }
       curMenuItem++;
       if(curMenuItem>=maxMenuItem) curMenuItem = 0;
     }
     
-    selectVal = digitalRead(UP);
+    selectVal = digitalRead(DOWN);
     if(selectVal==0){
-      while(digitalRead(UP)==0){
+      while(digitalRead(DOWN)==0){
         delay(10); // wait until let go
       }
       curMenuItem--;
@@ -193,18 +193,66 @@ void manualSettings(){
             delay(2000);
             startRec = 1;  //start recording 
             break;
-//        case setRecDur:
-//          rec_dur = updateVal(rec_dur, 1, 3600);
-//          display.print("Rec:");
-//          display.print(rec_dur);
-//          display.println("s");
-//          break;
-//        case setRecSleep:
-//          rec_int = updateVal(rec_int, 0, 3600 * 24);
-//          display.print("Slp:");
-//          display.print(rec_int);
-//          display.println("s");
-//          break;
+        case setRecDur:
+            while(digitalRead(SELECT)==1){
+              rec_dur = updateVal(rec_dur, 1, 3600);
+              cDisplay();
+              display.print("Rec:");
+              display.print(rec_dur);
+              display.println("s");
+              displaySettings();
+              displayVoltage();
+              display.display();
+              delay(10);
+            }
+            while(digitalRead(SELECT)==0); // wait to let go
+            break;
+          
+        case setRecSleep:
+          while(digitalRead(SELECT)==1){
+            rec_int = updateVal(rec_int, 0, 3600 * 24);
+            cDisplay();
+            display.print("Slp:");
+            display.print(rec_int);
+            display.println("s");
+            displaySettings();
+            displayVoltage();
+            display.display();
+            delay(10);
+          }
+          while(digitalRead(SELECT)==0); // wait to let go
+          break;
+
+        case setFsamp:
+          while(digitalRead(SELECT)==1){
+            isf = updateVal(isf, 0, 8);
+            cDisplay();
+            display.printf("SF:%.1f",lhi_fsamps[isf]/1000.0f);
+            displaySettings();
+            displayVoltage();
+            display.display();
+            delay(10);
+          }
+          while(digitalRead(SELECT)==0); // wait to let go
+          break;
+
+        case setGain:
+          while(digitalRead(SELECT)==1){
+            gainSetting = updateVal(gainSetting, 0, 15);
+            calcGain();
+            cDisplay();
+            display.print("Gain:");
+            display.println(gainSetting);
+            display.print(gainDb);
+            display.print("dB");
+            displaySettings();
+            displayVoltage();
+            display.display();
+            delay(10);
+          }
+          while(digitalRead(SELECT)==0); // wait to let go
+          break;
+          
 //        case setYear:
 //          oldYear = year(t);
 //          newYear = updateVal(oldYear,2000, 2100);
@@ -247,10 +295,7 @@ void manualSettings(){
 //          display.print("Second:");
 //          display.print(second(getTeensy3Time()));
 //          break;
-//        case setFsamp:
-//          isf = updateVal(isf, 0, 9);
-//          display.printf("SF: %.1f",lhi_fsamps[isf]/1000.0f);
-//          break;
+
       }
       if (settingsChanged) {
         writeEEPROM();
