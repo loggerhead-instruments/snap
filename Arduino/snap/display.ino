@@ -197,43 +197,47 @@ void manualSettings(){
             while(digitalRead(SELECT)==1){
               rec_dur = updateVal(rec_dur, 1, 3600);
               cDisplay();
-              display.print("Rec:");
+              display.println("Record:");
               display.print(rec_dur);
               display.println("s");
               displaySettings();
               displayVoltage();
               display.display();
-              delay(10);
+              delay(2);
             }
             while(digitalRead(SELECT)==0); // wait to let go
+            curMenuItem = setStart;
             break;
           
         case setRecSleep:
           while(digitalRead(SELECT)==1){
             rec_int = updateVal(rec_int, 0, 3600 * 24);
             cDisplay();
-            display.print("Slp:");
+            display.println("Sleep:");
             display.print(rec_int);
             display.println("s");
             displaySettings();
             displayVoltage();
             display.display();
-            delay(10);
+            delay(2);
           }
           while(digitalRead(SELECT)==0); // wait to let go
+          curMenuItem = setStart;
           break;
 
         case setFsamp:
           while(digitalRead(SELECT)==1){
             isf = updateVal(isf, 0, 8);
             cDisplay();
-            display.printf("SF:%.1f",lhi_fsamps[isf]/1000.0f);
+            display.println("Rate");
+            display.printf("%.1f kHz",lhi_fsamps[isf]/1000.0f);
             displaySettings();
             displayVoltage();
             display.display();
-            delay(10);
+            delay(2);
           }
           while(digitalRead(SELECT)==0); // wait to let go
+          curMenuItem = setStart;
           break;
 
         case setGain:
@@ -248,9 +252,12 @@ void manualSettings(){
             displaySettings();
             displayVoltage();
             display.display();
-            delay(10);
+            delay(2);
           }
-
+          while(digitalRead(SELECT)==0); // wait to let go
+          curMenuItem = setStart;
+          break;
+          
         case setDateTime:
           while(digitalRead(SELECT)==1){
             oldYear = year(t);
@@ -262,7 +269,7 @@ void manualSettings(){
             displaySettings();
             displayVoltage();
             display.display();
-            delay(10);
+            delay(2);
           }
           while(digitalRead(SELECT)==0); // wait to let go
           
@@ -276,7 +283,7 @@ void manualSettings(){
             displaySettings();
             displayVoltage();
             display.display();
-            delay(10);
+            delay(2);
           }
           while(digitalRead(SELECT)==0); // wait to let go
 
@@ -290,7 +297,7 @@ void manualSettings(){
             displaySettings();
             displayVoltage();
             display.display();
-            delay(10);
+            delay(2);
           }
           while(digitalRead(SELECT)==0); // wait to let go
 
@@ -304,7 +311,7 @@ void manualSettings(){
             displaySettings();  
             displayVoltage();
             display.display();
-            delay(10);
+            delay(2);
           }
           while(digitalRead(SELECT)==0); // wait to let go
 
@@ -318,7 +325,7 @@ void manualSettings(){
             displaySettings();
             displayVoltage();
             display.display();
-            delay(10);
+            delay(2);
           }
           while(digitalRead(SELECT)==0); // wait to let go
 
@@ -332,9 +339,10 @@ void manualSettings(){
             displaySettings();
             displayVoltage();
             display.display();
-            delay(10);
+            delay(2);
           }
           while(digitalRead(SELECT)==0); // wait to let go
+          curMenuItem = setStart;
           break;
       }
       if (settingsChanged) {
