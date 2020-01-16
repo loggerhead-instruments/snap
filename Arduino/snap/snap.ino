@@ -408,7 +408,7 @@ void loop() {
         printTime(stopTime);
         Serial.print("Next Start:");
         printTime(startTime);
-
+        digitalWrite(ledGreen, LOW);
         mode = 1;
         display.ssd1306_command(SSD1306_DISPLAYOFF); // turn off display during recording
         startRecording();
@@ -516,7 +516,7 @@ void continueRecording() {
     // into a 512 byte buffer.  micro SD disk access
     // is most efficient when full (or multiple of) 512 byte sector size
     // writes are used.
-    digitalWrite(ledGreen, HIGH);
+  //  digitalWrite(ledGreen, HIGH);
     for(int ii=0;ii<NREC;ii++){ 
       byte *ptr = buffer+ii*512;
       memcpy(ptr, queue1.readBuffer(), 256);
@@ -524,7 +524,7 @@ void continueRecording() {
       memcpy(ptr+256, queue1.readBuffer(), 256);
       queue1.freeBuffer();
     }
-    digitalWrite(ledGreen, LOW);
+  //  digitalWrite(ledGreen, LOW);
     if(file.write(buffer, NREC*512)==-1) resetFunc(); //audio to .wav file
       
     buf_count += NREC;
