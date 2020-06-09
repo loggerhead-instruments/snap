@@ -3,8 +3,8 @@
 
 
 
-float mAmpRec = 45;  // actual about 43 mA
-float mAmpSleep = 2.8; // actual about 2.6 mA
+float mAmpRec = 95;  // at 300 kHz
+float mAmpSleep = 3.8;
 byte nBatPacks = 1;
 float mAhPerBat = 12000.0; // assume 12Ah per battery pack; good batteries should be 14000
 
@@ -489,7 +489,7 @@ void displaySettings(){
   else{
   //  displayClock(getTeensy3Time() + totalRecSeconds + totalSleepSeconds, 45, 0);
     display.setCursor(92, 38);
-    display.print("Lim B");
+    display.print("Lim M");
     display.setCursor(92, 46);
     display.print((int)totalSecondsMemory / 86400);
     display.print("d");

@@ -12,7 +12,7 @@
 
 // Modified by WMXZ 15-05-2018 for SdFS anf multiple sampling frequencies
 
-char codeVersion[12] = "2020-01-22";
+char codeVersion[12] = "2020-06-09";
 static boolean printDiags = 1;  // 1: serial print diagnostics; 0: no diagnostics
 
 #define MQ 100 // to be used with LHI record queue (modified local version)
