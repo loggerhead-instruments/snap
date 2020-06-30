@@ -13,7 +13,7 @@
 // Modified by WMXZ 15-05-2018 for SdFS anf multiple sampling frequencies
 // Optionally uses SdFS from Bill Greiman https://github.com/greiman/SdFs; but has higher current draw in sleep
 
-char codeVersion[12] = "2019-12-05";
+char codeVersion[12] = "2020-06-30";
 static boolean printDiags = 1;  // 1: serial print diagnostics; 0: no diagnostics
 
 #define USE_SDFS 0  // to be used for exFAT but works also for FAT16/32
@@ -61,7 +61,7 @@ Adafruit_SSD1306 display(OLED_RESET);
 
 #define NREC 32 // increase disk buffer to speed up disk access
 
-static uint8_t myID[8];
+static uint32_t myID[4];
 
 unsigned long baud = 115200;
 
@@ -192,10 +192,9 @@ unsigned char prev_dtr = 0;
 
 
 void setup() {
-  read_myID();
-  
   Serial.begin(baud);
   delay(500);
+
 
   Serial.println(RTC_TSR);
   Serial.println(RTC_TSR);
@@ -219,6 +218,8 @@ void setup() {
   Serial.println(RTC_TSR);
   delay(1000);
   Serial.println(RTC_TSR);
+
+  read_myID();
   
   Wire.begin();
 
@@ -574,7 +575,7 @@ void FileInit()
   #endif
       logFile.print(filename);
       logFile.print(',');
-      for(int n=0; n<8; n++){
+      for(int n=0; n<4; n++){
         logFile.print(myID[n]);
       }
       logFile.print(',');
@@ -740,26 +741,12 @@ void resetFunc(void){
 }
 
 
-void read_EE(uint8_t word, uint8_t *buf, uint8_t offset)  {
-  noInterrupts();
-  FTFL_FCCOB0 = 0x41;             // Selects the READONCE command
-  FTFL_FCCOB1 = word;             // read the given word of read once area
-
-  // launch command and wait until complete
-  FTFL_FSTAT = FTFL_FSTAT_CCIF;
-  while(!(FTFL_FSTAT & FTFL_FSTAT_CCIF))
-    ;
-  *(buf+offset+0) = FTFL_FCCOB4;
-  *(buf+offset+1) = FTFL_FCCOB5;       
-  *(buf+offset+2) = FTFL_FCCOB6;       
-  *(buf+offset+3) = FTFL_FCCOB7;       
-  interrupts();
-}
-
     
 void read_myID() {
-  read_EE(0xe,myID,0); // should be 04 E9 E5 xx, this being PJRC's registered OUI
-  read_EE(0xf,myID,4); // xx xx xx xx
+  myID[0] = SIM_UIDH;
+  myID[1] = SIM_UIDMH;
+  myID[2] = SIM_UIDML;
+  myID[3] = SIM_UIDL;
 }
 
 float readVoltage(){
