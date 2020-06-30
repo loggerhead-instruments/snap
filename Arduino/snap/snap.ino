@@ -12,7 +12,7 @@
 
 // Modified by WMXZ 15-05-2018 for SdFS anf multiple sampling frequencies
 
-char codeVersion[12] = "2020-06-09";
+char codeVersion[12] = "2020-06-12";
 static boolean printDiags = 1;  // 1: serial print diagnostics; 0: no diagnostics
 
 #define MQ 100 // to be used with LHI record queue (modified local version)
@@ -516,7 +516,7 @@ void continueRecording() {
     // into a 512 byte buffer.  micro SD disk access
     // is most efficient when full (or multiple of) 512 byte sector size
     // writes are used.
-  //  digitalWrite(ledGreen, HIGH);
+    digitalWrite(ledGreen, HIGH);
     for(int ii=0;ii<NREC;ii++){ 
       byte *ptr = buffer+ii*512;
       memcpy(ptr, queue1.readBuffer(), 256);
@@ -524,7 +524,7 @@ void continueRecording() {
       memcpy(ptr+256, queue1.readBuffer(), 256);
       queue1.freeBuffer();
     }
-  //  digitalWrite(ledGreen, LOW);
+    digitalWrite(ledGreen, LOW);
     if(file.write(buffer, NREC*512)==-1) resetFunc(); //audio to .wav file
       
     buf_count += NREC;
