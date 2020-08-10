@@ -13,7 +13,7 @@
 // Modified by WMXZ 15-05-2018 for SdFS anf multiple sampling frequencies
 // Optionally uses SdFS from Bill Greiman https://github.com/greiman/SdFs; but has higher current draw in sleep
 
-char codeVersion[12] = "2020-07-06";
+char codeVersion[12] = "2020-08-10";
 static boolean printDiags = 1;  // 1: serial print diagnostics; 0: no diagnostics
 
 #define USE_SDFS 0  // to be used for exFAT but works also for FAT16/32
@@ -151,7 +151,7 @@ long nbufs_per_file;
 boolean settingsChanged = 0;
 
 long file_count;
-char filename[40];
+char filename[60];
 char dirname[20];
 int folderMonth;
 
@@ -555,7 +555,7 @@ void FileInit()
 
    // open file 
    sd.chdir(dirname);
-   sprintf(filename,"%04d%02d%02dT%02d%02d%02d.wav", year(t), month(t), day(t), hour(t), minute(t), second(t));  //filename is DDHHMMSS
+   sprintf(filename,"%04d%02d%02dT%02d%02d%02d_%lu%lu_%2.1f.wav", year(t), month(t), day(t), hour(t), minute(t), second(t), myID[0], myID[1], gainDb);  //filename is DDHHMMSS
 
 
    // log file
@@ -574,12 +574,6 @@ void FileInit()
     if(File logFile = sd.open("LOG.CSV",  O_CREAT | O_APPEND | O_WRITE)){
   #endif
       logFile.print(filename);
-      logFile.print(',');
-      for(int n=0; n<2; n++){
-        logFile.print(myID[n]);
-      }
-      logFile.print(',');
-      logFile.print(gainDb); 
       logFile.print(',');
       logFile.print(voltage); 
       logFile.print(',');
@@ -646,7 +640,7 @@ void logFileHeader(){
 #else
   if(File logFile = sd.open("LOG.CSV",  O_CREAT | O_APPEND | O_WRITE)){
 #endif
-      logFile.println("filename, ID, gain (dB), Voltage, Version");
+      logFile.println("filename, Voltage, Version");
       logFile.close();
   }
 }
