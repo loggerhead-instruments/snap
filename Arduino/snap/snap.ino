@@ -482,7 +482,7 @@ void startRecording() {
 
 byte buffer[NREC*512];
 void continueRecording() {
-  if (queue1.available() >= NREC) {
+  if (queue1.available() >= NREC * 2) {
     // Fetch 2 blocks (or multiples) from the audio library and copy
     // into a 512 byte buffer.  micro SD disk access
     // is most efficient when full (or multiple of) 512 byte sector size
