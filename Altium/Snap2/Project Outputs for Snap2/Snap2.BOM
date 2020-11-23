@@ -1,0 +1,29 @@
+Bill of Material for 
+On 8/30/2020 at 8:09:47 PM
+
+ Comment             Pattern     Quantity  Components
+------------------------------------------------------------------------------
+ 0.01uF              0402             3    C12, C18, C23                Ceramic Chip Capacitor - Standard 
+ 0.1uF               0402             8    C7, C8, C10, C13, C15, C17   Ceramic Chip Capacitor - Standard 
+                                           C19, C21
+ 1.0uF               0402             3    C24, C25, C26                Ceramic Chip Capacitor - Standard 
+ 100k                3-0603           2    R1, R2                       Precision Thick Film Chip Resistor, 10 Ohm to 1M Ohm Range, 1% and 0.5% Tolerance, 0603 Size, 0.063 W 
+ 10k                 3-0603           4    R3, R4, R5, R6               Precision Thick Film Chip Resistor, 10 Ohm to 1M Ohm Range, 1% and 0.5% Tolerance, 0603 Size, 0.063 W 
+ 10uF                Tant0805         5    C2, C6, C9, C14, C20                              
+ 1uF                 0402             4    C1, C11, C16, C22            Ceramic Chip Capacitor - Standard 
+ 330X                3-0603           1    R7                           Precision Thick Film Chip Resistor, 10 Ohm to 1M Ohm Range, 1% and 0.5% Tolerance, 0603 Size, 0.063 W 
+ 4.7k                3-0603           2    R8, R9                       Precision Thick Film Chip Resistor, 10 Ohm to 1M Ohm Range, 1% and 0.5% Tolerance, 0603 Size, 0.063 W 
+ CoinCellHolder      CoinCellHolder    1    P3                                                
+ Display             HDR1X4           1    P8                           Header, 4-Pin        
+ GND Tie             HDR1X2           1    P12                          Header, 2-Pin        
+ Header 2            HDR1X2           1    P2                           Header, 2-Pin        
+ HYDROPHONE          HDR1X3           1    P11                          Header, 3-Pin        
+ LED_0603            Diode0603        1    D1                                                
+ LM66100             SC-70-6          1    U1                                                
+ LP3985IM5-3.3       MF05A_N          3    U3, U5, U6                   Micropower, 150mA Low-Noise Ultra Low-Dropout CMOS Voltage Regulator 
+ microSD Hirose      DM3D microSD     1    P6                                                
+ pushbutton          SOP4             3    P5, P7, P9                                        
+ SGTL5000            QFN32            1    U4                           SGTL5000             
+ switch              HDR1X3           1    P4                           Header, 3-Pin        
+ Teensy3.x           Teensy3.x        1    P1                                                
+ TLV70018DCKR        TI-DCK5_V        1    U7                           Single Output LDO, 200 mA, Fixed 1.8 V Output, 2 to 5.5 V Input, with Low IQ, 5-pin SC70 (DCK), -40 to 125 degC, Green (RoHS & no Sb/Br) 
