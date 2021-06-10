@@ -8,12 +8,12 @@
 // Modified from PJRC audio code
 // http://www.pjrc.com/store/teensy3_audio.html
 //
-// Compile with 72 MHz Fastest
+// Compile with 96 MHz Fastest
 
 // Modified by WMXZ 15-05-2018 for SdFS anf multiple sampling frequencies
 // Optionally uses SdFS from Bill Greiman https://github.com/greiman/SdFs; but has higher current draw in sleep
 
-char codeVersion[12] = "2019-07-22";
+char codeVersion[12] = "2021-06-08";
 static boolean printDiags = 0;  // 1: serial print diagnostics; 0: no diagnostics
 
 #define USE_SDFS 0  // to be used for exFAT but works also for FAT16/32
@@ -87,6 +87,7 @@ int noDC = 0; // 0 = freezeDC offset; 1 = remove DC offset
 
 // Pin Assignments
 const int hydroPowPin = 2;
+const int sgtlEn = 6;
 
 // AMX
 const int UP = 4;
@@ -94,14 +95,9 @@ const int DOWN = 3;  // new board pin
 //const int DOWN = 5; // old board down pin
 const int SELECT = 8;
 const int displayPow = 20;
-const int ledGreen = 16;
-const int ledRed = 17;
-const int BURN1 = 5;
+#define ledGreen 17
 const int SDSW = 0;
-const int ledWhite = 21;
-const int usbSense = 6;
-const int vSense = 21; 
-//const int vSense = A14;  // moved to Pin 21 for X1
+#define vSense 21 
 
 // Pins used by audio shield
 // https://www.pjrc.com/store/teensy3_audio.html
@@ -132,7 +128,9 @@ boolean audioFlag = 1;
 boolean LEDSON=1;
 boolean introperiod=1;  //flag for introductory period; used for keeping LED on for a little while
 
-int32_t lhi_fsamps[7] = {8000, 16000, 32000, 44100, 48000, 96000, 192000};
+
+// int32_t lhi_fsamps[7] = {8000, 16000, 32000, 44100, 48000, 96000, 192000};
+int32_t lhi_fsamps[7] = {8000, 32000, 64000, 100000, 125000, 200000, 250000};
 #define I_SAMP 5   // 0 is 8 kHz; 1 is 16 kHz; 2 is 32 kHz; 3 is 44.1 kHz; 4 is 48 kHz; 5 is 96 kHz; 6 is 192 kHz
 
 float audio_srate = lhi_fsamps[I_SAMP];//44100.0;
@@ -227,24 +225,25 @@ void setup() {
 
   pinMode(hydroPowPin, OUTPUT);
   pinMode(displayPow, OUTPUT);
+  pinMode(sgtlEn, OUTPUT);
 
   pinMode(vSense, INPUT);
   analogReference(DEFAULT);
 
   digitalWrite(hydroPowPin, HIGH);
   digitalWrite(displayPow, HIGH);
-
-  pinMode(usbSense, OUTPUT);
-  digitalWrite(usbSense, LOW); // make sure no pull-up
-  pinMode(usbSense, INPUT);
+  digitalWrite(sgtlEn, HIGH);
   
   //setup display and controls
-  pinMode(UP, INPUT);
-  pinMode(DOWN, INPUT);
-  pinMode(SELECT, INPUT);
+  pinMode(UP, INPUT_PULLUP);
+  pinMode(DOWN, INPUT_PULLUP);
+  pinMode(SELECT, INPUT_PULLUP);
   digitalWrite(UP, HIGH);
   digitalWrite(DOWN, HIGH);
   digitalWrite(SELECT, HIGH);  
+
+  pinMode(ledGreen, OUTPUT);
+  digitalWrite(ledGreen, HIGH);
 
   //setSyncProvider(getTeensy3Time); //use Teensy RTC to keep time
   t = getTeensy3Time();
@@ -258,18 +257,6 @@ void setup() {
   display.print("Snap");
   display.display();
   delay(2000);
-  // Check for external USB connection to microSD
-// while(digitalRead(usbSense)){
-//    delay(500);
-//  }
-
-  // Power down USB if not using Serial monitor
-//  if (printDiags==0){
-//      usbDisable();
-//  }
-  
-  pinMode(usbSense, OUTPUT);  //not using any more, set to OUTPUT
-  digitalWrite(usbSense, LOW); 
   
   // Initialize the SD card
   SPI.setMOSI(7);
@@ -370,9 +357,6 @@ void loop() {
       //
       //static uint32_t to; if(t >to) Serial.println(t); to=t;
       //
-      if(t >= burnTime){
-        digitalWrite(BURN1, HIGH);
-      }
       if(t >= startTime){      // time to start?
         if(noDC==0) {
           audio_freeze_adc_hp(); // this will lower the DC offset voltage, and reduce noise
@@ -410,6 +394,7 @@ void loop() {
     if(digitalRead(UP)==0 & digitalRead(DOWN)==0){
       // stop recording
       queue1.end();
+      digitalWrite(ledGreen, HIGH);
       // update wav file header
       wav_hdr.rLen = 36 + buf_count * 256 * 2;
       wav_hdr.dLen = buf_count * 256 * 2;
@@ -497,7 +482,7 @@ void continueRecording() {
     // into a 512 byte buffer.  micro SD disk access
     // is most efficient when full (or multiple of) 512 byte sector size
     // writes are used.
-    //digitalWrite(ledGreen, HIGH);
+    digitalWrite(ledGreen, HIGH);
     for(int ii=0;ii<NREC;ii++)
     { byte *ptr = buffer+ii*512;
       memcpy(ptr, queue1.readBuffer(), 256);
@@ -505,6 +490,7 @@ void continueRecording() {
       memcpy(ptr+256, queue1.readBuffer(), 256);
       queue1.freeBuffer();
     }
+    digitalWrite(ledGreen, LOW);
     if(frec.write(buffer, NREC*512)==-1) resetFunc(); //audio to .wav file
       
     buf_count += NREC;
@@ -780,4 +766,3 @@ float readVoltage(){
    voltage = 5.9 * voltage / 8.0;   //fudging scaling based on actual measurements; shoud be max of 3.3V at 1023
    return voltage;
 }
-
