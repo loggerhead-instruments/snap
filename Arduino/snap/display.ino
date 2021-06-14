@@ -128,7 +128,7 @@ void manualSettings(){
     recMode = 0;
     EEPROM.write(12, recMode); //byte
   }
-  if (isf<0 | isf>4) {
+  if (isf<0 | isf>7) {
     isf = 3;
     EEPROM.write(13, isf); //byte
   }

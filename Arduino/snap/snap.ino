@@ -130,9 +130,9 @@ boolean LEDSON=1;
 boolean introperiod=1;  //flag for introductory period; used for keeping LED on for a little while
 
 int32_t lhi_fsamps[7] = {8000, 32000, 64000, 100000, 125000, 200000, 250000};
-#define I_SAMP 5   // 0 is 8 kHz; 1 is 16 kHz; 2 is 32 kHz; 3 is 44.1 kHz; 4 is 48 kHz; 5 is 96 kHz; 6 is 192 kHz
+#define a 3   // 0 is 8 kHz; 1 is 16 kHz; 2 is 32 kHz; 3 is 44.1 kHz; 4 is 48 kHz; 5 is 96 kHz; 6 is 192 kHz
 
-float audio_srate = lhi_fsamps[I_SAMP];//44100.0;
+float audio_srate = lhi_fsamps[I_SAMP];//64000
 int isf = I_SAMP;
 
 //WMXZ float audioIntervalSec = 256.0 / audio_srate; //buffer interval in seconds
