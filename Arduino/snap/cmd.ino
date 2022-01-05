@@ -66,6 +66,11 @@ int ProcCmd(char *pCmd)
         break;
       }
       
+      case ('F' + ('D'<<8)):
+      {
+        noDC = 0;
+        break;
+      }
       case ('N' + ('D'<<8)):
       {
         noDC = 1;
@@ -156,7 +161,3 @@ boolean LoadScript()
   }
  return 1;	
 }
-
-
-
-

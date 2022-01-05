@@ -128,8 +128,8 @@ void manualSettings(){
     recMode = 0;
     EEPROM.write(12, recMode); //byte
   }
-  if (isf<0 | isf>4) {
-    isf = 3;
+  if (isf<0 | isf>=I_SAMP) {
+    isf = 4;
     EEPROM.write(13, isf); //byte
   }
   if (gainSetting<0 | gainSetting>15) {
@@ -244,7 +244,7 @@ void manualSettings(){
         display.print(second(getTeensy3Time()));
         break;
       case setFsamp:
-        isf = updateVal(isf, 0, 5);
+        isf = updateVal(isf, 0, I_SAMP-1);
         display.printf("SF: %.1f",lhi_fsamps[isf]/1000.0f);
         break;
     }
