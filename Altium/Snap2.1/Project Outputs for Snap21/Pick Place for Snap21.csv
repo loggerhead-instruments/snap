@@ -1,0 +1,64 @@
+Altium Designer Pick and Place Locations
+C:\w\snap\Altium\Snap2.1\Project Outputs for Snap21\Pick Place for Snap21.csv
+
+========================================================================================================================
+File Design Information:
+
+Date:       10/01/22
+Time:       17:21
+Revision:   6e3cf208639b35bd72a00f3fb202693ecd73c940
+Variant:    No variations
+Units used: mm
+
+"Designator","Comment","Layer","Footprint","Center-X(mm)","Center-Y(mm)","Rotation","Description"
+"U1","LM66100","TopLayer","SC-70-6","-90.1700","-8.7630","90",""
+"C1","1uF","TopLayer","0402","-90.1700","-10.9220","180","Ceramic Chip Capacitor - Standard"
+"D2","PMEG3050EP*","TopLayer","Diode_PMEG3050EP","-96.0530","-8.3820","180",""
+"R9","4.7k","TopLayer","3-0603","-76.3270","-18.5420","0","Precision Thick Film Chip Resistor, 10 Ohm to 1M Ohm Range, 1% and 0.5% Tolerance, 0603 Size, 0.063 W"
+"R8","4.7k","TopLayer","3-0603","-76.3270","-21.2090","0","Precision Thick Film Chip Resistor, 10 Ohm to 1M Ohm Range, 1% and 0.5% Tolerance, 0603 Size, 0.063 W"
+"U7","TLV70018DCKR","TopLayer","TI-DCK5_V","-17.3990","-0.5080","180","Single Output LDO, 200 mA, Fixed 1.8 V Output, 2 to 5.5 V Input, with Low IQ, 5-pin SC70 (DCK), -40 to 125 degC, Green (RoHS & no Sb/Br)"
+"U6","LP3985IM5-3.3","TopLayer","MF05A_N","-9.9060","-9.0170","90","Micropower, 150mA Low-Noise Ultra Low-Dropout CMOS Voltage Regulator"
+"U5","LP3985IM5-3.3","TopLayer","MF05A_N","-22.4790","-30.4840","90","Micropower, 150mA Low-Noise Ultra Low-Dropout CMOS Voltage Regulator"
+"U4","SGTL5000","TopLayer","QFN32","-19.1770","-6.7310","0","SGTL5000"
+"U3","LP3985IM5-3.3","TopLayer","MF05A_N","-29.2100","-3.8100","270","Micropower, 150mA Low-Noise Ultra Low-Dropout CMOS Voltage Regulator"
+"R7","330X","TopLayer","3-0603","-74.2950","-23.6220","180","Precision Thick Film Chip Resistor, 10 Ohm to 1M Ohm Range, 1% and 0.5% Tolerance, 0603 Size, 0.063 W"
+"R6","10k","TopLayer","3-0603","-35.3060","-24.6380","90","Precision Thick Film Chip Resistor, 10 Ohm to 1M Ohm Range, 1% and 0.5% Tolerance, 0603 Size, 0.063 W"
+"R5","10k","TopLayer","3-0603","-55.2450","-24.6380","90","Precision Thick Film Chip Resistor, 10 Ohm to 1M Ohm Range, 1% and 0.5% Tolerance, 0603 Size, 0.063 W"
+"R4","10k","TopLayer","3-0603","-72.0090","-28.8290","0","Precision Thick Film Chip Resistor, 10 Ohm to 1M Ohm Range, 1% and 0.5% Tolerance, 0603 Size, 0.063 W"
+"R3","10k","TopLayer","3-0603","-43.4340","-24.6380","90","Precision Thick Film Chip Resistor, 10 Ohm to 1M Ohm Range, 1% and 0.5% Tolerance, 0603 Size, 0.063 W"
+"R2","100k","TopLayer","3-0603","-86.6140","-11.4300","0","Precision Thick Film Chip Resistor, 10 Ohm to 1M Ohm Range, 1% and 0.5% Tolerance, 0603 Size, 0.063 W"
+"R1","100k","TopLayer","3-0603","-86.6140","-9.9060","180","Precision Thick Film Chip Resistor, 10 Ohm to 1M Ohm Range, 1% and 0.5% Tolerance, 0603 Size, 0.063 W"
+"P11","HYDROPHONE","TopLayer","HDR1X3","-28.5750","-18.4150","270","Header, 3-Pin"
+"P9","pushbutton","TopLayer","SOP4","-35.7920","-31.0240","180",""
+"P8","Display","TopLayer","HDR1X4","-49.4030","-1.0160","0","Header, 4-Pin"
+"P7","pushbutton","TopLayer","SOP4","-59.9220","-31.0240","180",""
+"P6","microSD Hirose","TopLayer","DM3D_microSD","-92.9005","-27.3790","90",""
+"P5","pushbutton","TopLayer","SOP4","-47.8570","-31.0240","180",""
+"P4","switch EG1218","TopLayer","HDR1X3","-94.7420","-2.1590","0","Header, 3-Pin"
+"P3","CoinCellHolder","BottomLayer","CoinCellHolder","-49.2211","-18.2159","135",""
+"P2","Header 2","TopLayer","HDR1X2","-86.8680","-16.3830","270","Header, 2-Pin"
+"P1","Teensy3.x","BottomLayer","Teensy3.x","-75.0570","-17.3990","0",""
+"D1","LED_0603","TopLayer","Diode0603","-78.3590","-23.6220","180",""
+"C26","1.0uF","TopLayer","0402","-20.8280","-1.0160","180","Ceramic Chip Capacitor - Standard"
+"C25","1.0uF","TopLayer","0402","-13.9700","-1.1430","0","Ceramic Chip Capacitor - Standard"
+"C24","1.0uF","TopLayer","0402","-18.4150","-11.5570","90","Ceramic Chip Capacitor - Standard"
+"C23","0.01uF","TopLayer","0402","-9.0170","-5.4610","90","Ceramic Chip Capacitor - Standard"
+"C22","1uF","TopLayer","0402","-10.5410","-11.8110","0","Ceramic Chip Capacitor - Standard"
+"C21","0.1uF","TopLayer","0402","-10.9220","-5.2070","90","Ceramic Chip Capacitor - Standard"
+"C20","10uF","TopLayer","Tant0805","-12.5730","-5.2070","270",""
+"C19","0.1uF","TopLayer","0402","-22.2250","-11.5570","180","Ceramic Chip Capacitor - Standard"
+"C18","0.01uF","TopLayer","0402","-21.4630","-26.6740","90","Ceramic Chip Capacitor - Standard"
+"C17","0.1uF","TopLayer","0402","-14.8590","-8.0010","270","Ceramic Chip Capacitor - Standard"
+"C16","1uF","TopLayer","0402","-22.7330","-33.7820","0","Ceramic Chip Capacitor - Standard"
+"C15","0.1uF","TopLayer","0402","-23.4950","-26.6740","90","Ceramic Chip Capacitor - Standard"
+"C14","10uF","TopLayer","Tant0805","-25.1460","-26.6740","270",""
+"C13","0.1uF","TopLayer","0402","-24.1300","-7.4930","270","Ceramic Chip Capacitor - Standard"
+"C12","0.01uF","TopLayer","0402","-30.2260","-7.7470","270","Ceramic Chip Capacitor - Standard"
+"C11","1uF","TopLayer","0402","-28.7020","-0.6350","180","Ceramic Chip Capacitor - Standard"
+"C10","0.1uF","TopLayer","0402","-28.1940","-7.7470","270","Ceramic Chip Capacitor - Standard"
+"C9","10uF","TopLayer","Tant0805","-26.2890","-7.7470","90",""
+"C8","0.1uF","TopLayer","0402","-20.8280","-2.2860","180","Ceramic Chip Capacitor - Standard"
+"C7","0.1uF","TopLayer","0402","-86.2330","-4.6990","270","Ceramic Chip Capacitor - Standard"
+"C6","10uF","TopLayer","Tant0805","-87.7570","-4.6990","90",""
+"P12","GND Tie","TopLayer","HDR1X2","-35.8140","-8.8900","180","Header, 2-Pin"
+"C2","10uF","TopLayer","Tant0805","-78.1050","-5.8420","180",""

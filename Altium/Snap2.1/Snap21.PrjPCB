@@ -197,10 +197,132 @@ ClassGenCCAutoRoomEnabled=1
 ClassGenNCAutoScope=None
 DItemRevisionGUID=
 GenerateClassCluster=0
+DocumentUniqueId=ZEQYDKVO
+
+[Document10]
+DocumentPath=CAMtastic1.Cam
+AnnotationEnabled=1
+AnnotateStartValue=1
+AnnotationIndexControlEnabled=0
+AnnotateSuffix=
+AnnotateScope=All
+AnnotateOrder=-1
+DoLibraryUpdate=1
+DoDatabaseUpdate=1
+ClassGenCCAutoEnabled=1
+ClassGenCCAutoRoomEnabled=1
+ClassGenNCAutoScope=None
+DItemRevisionGUID=
+GenerateClassCluster=0
+DocumentUniqueId=
+
+[Document11]
+DocumentPath=CAMtastic2.Cam
+AnnotationEnabled=1
+AnnotateStartValue=1
+AnnotationIndexControlEnabled=0
+AnnotateSuffix=
+AnnotateScope=All
+AnnotateOrder=-1
+DoLibraryUpdate=1
+DoDatabaseUpdate=1
+ClassGenCCAutoEnabled=1
+ClassGenCCAutoRoomEnabled=1
+ClassGenNCAutoScope=None
+DItemRevisionGUID=
+GenerateClassCluster=0
 DocumentUniqueId=
 
 [GeneratedDocument1]
 DocumentPath=Project Outputs for Snap21\Design Rule Check - Snap21.html
+DItemRevisionGUID=
+
+[GeneratedDocument2]
+DocumentPath=Project Outputs for Snap21\Pick Place for Snap21.csv
+DItemRevisionGUID=
+
+[GeneratedDocument3]
+DocumentPath=Project Outputs for Snap21\Snap21.DRR
+DItemRevisionGUID=
+
+[GeneratedDocument4]
+DocumentPath=Project Outputs for Snap21\Snap21.EXTREP
+DItemRevisionGUID=
+
+[GeneratedDocument5]
+DocumentPath=Project Outputs for Snap21\Snap21.GBL
+DItemRevisionGUID=
+
+[GeneratedDocument6]
+DocumentPath=Project Outputs for Snap21\Snap21.GBO
+DItemRevisionGUID=
+
+[GeneratedDocument7]
+DocumentPath=Project Outputs for Snap21\Snap21.GBP
+DItemRevisionGUID=
+
+[GeneratedDocument8]
+DocumentPath=Project Outputs for Snap21\Snap21.GBS
+DItemRevisionGUID=
+
+[GeneratedDocument9]
+DocumentPath=Project Outputs for Snap21\Snap21.GM1
+DItemRevisionGUID=
+
+[GeneratedDocument10]
+DocumentPath=Project Outputs for Snap21\Snap21.GM13
+DItemRevisionGUID=
+
+[GeneratedDocument11]
+DocumentPath=Project Outputs for Snap21\Snap21.GM15
+DItemRevisionGUID=
+
+[GeneratedDocument12]
+DocumentPath=Project Outputs for Snap21\Snap21.GP1
+DItemRevisionGUID=
+
+[GeneratedDocument13]
+DocumentPath=Project Outputs for Snap21\Snap21.GP2
+DItemRevisionGUID=
+
+[GeneratedDocument14]
+DocumentPath=Project Outputs for Snap21\Snap21.GPB
+DItemRevisionGUID=
+
+[GeneratedDocument15]
+DocumentPath=Project Outputs for Snap21\Snap21.GPT
+DItemRevisionGUID=
+
+[GeneratedDocument16]
+DocumentPath=Project Outputs for Snap21\Snap21.GTL
+DItemRevisionGUID=
+
+[GeneratedDocument17]
+DocumentPath=Project Outputs for Snap21\Snap21.GTO
+DItemRevisionGUID=
+
+[GeneratedDocument18]
+DocumentPath=Project Outputs for Snap21\Snap21.GTP
+DItemRevisionGUID=
+
+[GeneratedDocument19]
+DocumentPath=Project Outputs for Snap21\Snap21.GTS
+DItemRevisionGUID=
+
+[GeneratedDocument20]
+DocumentPath=Project Outputs for Snap21\Snap21.LDP
+DItemRevisionGUID=
+
+[GeneratedDocument21]
+DocumentPath=Project Outputs for Snap21\Snap21.REP
+DItemRevisionGUID=
+
+[GeneratedDocument22]
+DocumentPath=Project Outputs for Snap21\Snap21.RUL
+DItemRevisionGUID=
+
+[GeneratedDocument23]
+DocumentPath=Project Outputs for Snap21\Snap21.TXT
 DItemRevisionGUID=
 
 [Configuration1]
@@ -422,44 +544,46 @@ Name=Assembly Outputs
 Description=
 TargetPrinter=NPID79B7C (HP LaserJet Pro M148dw)
 PrinterOptions=Record=PrinterOptions|Copies=1|Duplex=1|TrueTypeOptions=3|Collate=1|PrintJobKind=1|PrintWhat=1
-OutputType1=Test Points For Assembly
-OutputName1=Test Point Report
+OutputType1=Assembly
+OutputName1=Assembly Drawings
 OutputDocumentPath1=
 OutputVariantName1=[No Variations]
 OutputDefault1=0
+PageOptions1=Record=PageOptions|CenterHorizontal=True|CenterVertical=True|PrintScale=1.00|XCorrection=1.00|YCorrection=1.00|PrintKind=1|BorderSize=5000000|LeftOffset=0|BottomOffset=0|Orientation=2|PaperLength=1000|PaperWidth=1000|Scale=100|PaperSource=7|PrintQuality=-4|MediaType=1|DitherType=10|PrintScaleMode=1|PaperKind=Letter|PaperIndex=1
 OutputType2=Pick Place
 OutputName2=Generates pick and place files
 OutputDocumentPath2=
 OutputVariantName2=[No Variations]
 OutputDefault2=0
-Configuration2_Name1=OutputConfigurationParameter1
-Configuration2_Item1=Record=PickPlaceView|Units=Metric|GenerateCSVFormat=True|GenerateTextFormat=False
-OutputType3=Assembly
-OutputName3=Assembly Drawings
+Configuration2_Name1=ForceUpdateSettings
+Configuration2_Item1=False
+Configuration2_Name2=OutputConfigurationParameter1
+Configuration2_Item2=Record=PickPlaceView|Units=Metric|GenerateCSVFormat=True|GenerateTextFormat=False|ShowUnits=False|Separator=.|ExcludeFilterParam=False|IncludeVariations=False|IncludeStandardNoBOM=True|Filter= |FilterActive=False|YFlip=False|Column#1=Name:Designator,Fixed:True,Metric:False,Visible:True,Sort:None,Position:0|Column#2=Name:Comment,Fixed:True,Metric:False,Visible:True,Sort:None,Position:1|Column#3=Name:Layer,Fixed:True,Metric:False,Visible:True,Sort:None,Position:2|Column#4=Name:Footprint,Fixed:True,Metric:False,Visible:True,Sort:None,Position:3|Column#5=Name:Footprint Description,Fixed:True,Metric:False,Visible:False,Sort:None,Position:4|Column#6=Name:Center-X,Fixed:True,Metric:True,Visible:True,Sort:None,Position:5|Column#7=Name:Center-Y,Fixed:True,Metric:True,Visible:True,Sort:None,Position:6|Column#8=Name:Rotation,Fixed:True,Metric:False,Visible:True,Sort:None,Position:7|Column#9=Name:Description,Fixed:True,Metric:False,Visible:True,Sort:None,Position:8|Column#10=Name:ComponentKind,Fixed:True,Metric:False,Visible:False,Sort:None,Position:9|Column#11=Name:Height,Fixed:True,Metric:True,Visible:False,Sort:None,Position:10|Column#12=Name:Ref-X,Fixed:True,Metric:True,Visible:False,Sort:None,Position:11|Column#13=Name:Ref-Y,Fixed:True,Metric:True,Visible:False,Sort:None,Position:12|Column#14=Name:Pad-X,Fixed:True,Metric:True,Visible:False,Sort:None,Position:13|Column#15=Name:Pad-Y,Fixed:True,Metric:True,Visible:False,Sort:None,Position:14|Column#16=Name:Variation,Fixed:True,Metric:False,Visible:False,Sort:None,Position:15|Column#17=Name:Fixed Output Options(V),Fixed:False,Metric:False,Visible:False,Sort:None,Position:31|Column#18=Name:ComponentLink3Description,Fixed:False,Metric:False,Visible:False,Sort:None,Position:24|Column#19=Name:Vout Adj(Min)(V),Fixed:False,Metric:False,Visible:False,Sort:None,Position:66|Column#20=Name:LatestRevisionNote,Fixed:False,Metric:False,Visible:False,Sort:None,Position:35|Column#21=Name:Code_JEITA,Fixed:False,Metric:False,Visible:False,Sort:None,Position:19|Column#22=Name:Supplier 4,Fixed:False,Metric:False,Visible:False,Sort:None,Position:54|Column#23=Name:Vout Adj(Max)(V),Fixed:False,Metric:False,Visible:False,Sort:None,Position:65|Column#24=Name:Iq(Typ)(mA),Fixed:False,Metric:False,Visible:False,Sort:None,Position:33|Column#25=Name:Supplier 5,Fixed:False,Metric:False,Visible:False,Sort:None,Position:55|Column#26=Name:Supplier Part Number 2,Fixed:False,Metric:False,Visible:False,Sort:None,Position:57|Column#27=Name:DigiKeyPartNumber,Fixed:False,Metric:False,Visible:False,Sort:None,Position:29|Column#28=Name:Mounting Technology,Fixed:False,Metric:False,Visible:False,Sort:None,Position:37|Column#29=Name:Supplier Part Number 4,Fixed:False,Metric:False,Visible:False,Sort:None,Position:59|Column#30=Name:Eco-Plan,Fixed:False,Metric:False,Visible:False,Sort:None,Position:30|Column#31=Name:ComponentLink3URL,Fixed:False,Metric:False,Visible:False,Sort:None,Position:25|Column#32=Name:Vdo(Typ)(mV),Fixed:False,Metric:False,Visible:False,Sort:None,Position:62|Column#33=Name:CompType,Fixed:False,Metric:False,Visible:False,Sort:None,Position:26|Column#34=Name:DatasheetDocument,Fixed:False,Metric:False,Visible:False,Sort:None,Position:27|Column#35=Name:Note,Fixed:False,Metric:False,Visible:False,Sort:None,Position:38|Column#36=Name:Supplier 1,Fixed:False,Metric:False,Visible:False,Sort:None,Position:51|Column#37=Name:Published,Fixed:False,Metric:False,Visible:False,Sort:None,Position:47|Column#38=Name:Supplier Part Number 1,Fixed:False,Metric:False,Visible:False,Sort:None,Position:56|Column#39=Name:ComponentLink2URL,Fixed:False,Metric:False,Visible:False,Sort:None,Position:23|Column#40=Name:Manufacturer,Fixed:False,Metric:False,Visible:False,Sort:None,Position:36|Column#41=Name:Supplier 2,Fixed:False,Metric:False,Visible:False,Sort:None,Position:52|Column#42=Name:PowerWise,Fixed:False,Metric:False,Visible:False,Sort:None,Position:46|Column#43=Name:Code_JEDEC,Fixed:False,Metric:False,Visible:False,Sort:None,Position:18|Column#44=Name:PinCount,Fixed:False,Metric:False,Visible:False,Sort:None,Position:45|Column#45=Name:RoHS,Fixed:False,Metric:False,Visible:False,Sort:None,Position:49|Column#46=Name:Supplier 3,Fixed:False,Metric:False,Visible:False,Sort:None,Position:53|Column#47=Name:PartNumber,Fixed:False,Metric:False,Visible:False,Sort:None,Position:44|Column#48=Name:Code_IPC,Fixed:False,Metric:False,Visible:False,Sort:None,Position:17|Column#49=Name:ComponentLink2Description,Fixed:False,Metric:False,Visible:False,Sort:None,Position:22|Column#50=Name:Supplier Part Number 5,Fixed:False,Metric:False,Visible:False,Sort:None,Position:60|Column#51=Name:Accuracy(%),Fixed:False,Metric:False,Visible:False,Sort:None,Position:16|Column#52=Name:PackageDescription,Fixed:False,Metric:False,Visible:False,Sort:None,Position:39|Column#53=Name:SubFamily,Fixed:False,Metric:False,Visible:False,Sort:None,Position:50|Column#54=Name:ComponentLink1URL,Fixed:False,Metric:False,Visible:False,Sort:None,Position:21|Column#55=Name:PackageDocument,Fixed:False,Metric:False,Visible:False,Sort:None,Position:40|Column#56=Name:Iout(Max)(A),Fixed:False,Metric:False,Visible:False,Sort:None,Position:32|Column#57=Name:Vin(Min)(V),Fixed:False,Metric:False,Visible:False,Sort:None,Position:64|Column#58=Name:Value,Fixed:False,Metric:False,Visible:False,Sort:None,Position:61|Column#59=Name:LatestRevisionDate,Fixed:False,Metric:False,Visible:False,Sort:None,Position:34|Column#60=Name:PackageReference,Fixed:False,Metric:False,Visible:False,Sort:None,Position:41|Column#61=Name:Vin(Max)(V),Fixed:False,Metric:False,Visible:False,Sort:None,Position:63|Column#62=Name:Publisher,Fixed:False,Metric:False,Visible:False,Sort:None,Position:48|Column#63=Name:ComponentLink1Description,Fixed:False,Metric:False,Visible:False,Sort:None,Position:20|Column#64=Name:PackageTopMarking,Fixed:False,Metric:False,Visible:False,Sort:None,Position:42|Column#65=Name:Supplier Part Number 3,Fixed:False,Metric:False,Visible:False,Sort:None,Position:58|Column#66=Name:DatasheetVersion,Fixed:False,Metric:False,Visible:False,Sort:None,Position:28|Column#67=Name:PackageVersion,Fixed:False,Metric:False,Visible:False,Sort:None,Position:43|DocumentPath=C:\w\snap\Altium\Snap2.1\Snap21.PcbDoc
+OutputType3=Test Points For Assembly
+OutputName3=Test Point Report
 OutputDocumentPath3=
 OutputVariantName3=[No Variations]
 OutputDefault3=0
-PageOptions3=Record=PageOptions|CenterHorizontal=True|CenterVertical=True|PrintScale=1.00|XCorrection=1.00|YCorrection=1.00|PrintKind=1|BorderSize=5000000|LeftOffset=0|BottomOffset=0|Orientation=2|PaperLength=1000|PaperWidth=1000|Scale=100|PaperSource=7|PrintQuality=-4|MediaType=1|DitherType=10|PrintScaleMode=1|PaperKind=Letter|PaperIndex=1
 
 [OutputGroup5]
 Name=Fabrication Outputs
 Description=
 TargetPrinter=NPID79B7C (HP LaserJet Pro M148dw)
 PrinterOptions=Record=PrinterOptions|Copies=1|Duplex=1|TrueTypeOptions=3|Collate=1|PrintJobKind=1|PrintWhat=1
-OutputType1=Board Stack Report
-OutputName1=Report Board Stack
+OutputType1=CompositeDrill
+OutputName1=Composite Drill Drawing
 OutputDocumentPath1=
 OutputVariantName1=
 OutputDefault1=0
 PageOptions1=Record=PageOptions|CenterHorizontal=True|CenterVertical=True|PrintScale=1.00|XCorrection=1.00|YCorrection=1.00|PrintKind=1|BorderSize=5000000|LeftOffset=0|BottomOffset=0|Orientation=2|PaperLength=1000|PaperWidth=1000|Scale=100|PaperSource=7|PrintQuality=-4|MediaType=1|DitherType=10|PrintScaleMode=1|PaperKind=Letter|PaperIndex=1
-OutputType2=CompositeDrill
-OutputName2=Composite Drill Drawing
+OutputType2=Drill
+OutputName2=Drill Drawing/Guides
 OutputDocumentPath2=
 OutputVariantName2=
 OutputDefault2=0
 PageOptions2=Record=PageOptions|CenterHorizontal=True|CenterVertical=True|PrintScale=1.00|XCorrection=1.00|YCorrection=1.00|PrintKind=1|BorderSize=5000000|LeftOffset=0|BottomOffset=0|Orientation=2|PaperLength=1000|PaperWidth=1000|Scale=100|PaperSource=7|PrintQuality=-4|MediaType=1|DitherType=10|PrintScaleMode=1|PaperKind=Letter|PaperIndex=1
-OutputType3=Drill
-OutputName3=Drill Drawing/Guides
+OutputType3=Board Stack Report
+OutputName3=Report Board Stack
 OutputDocumentPath3=
 OutputVariantName3=
 OutputDefault3=0
@@ -470,48 +594,56 @@ OutputDocumentPath4=
 OutputVariantName4=[No Variations]
 OutputDefault4=0
 PageOptions4=Record=PageOptions|CenterHorizontal=True|CenterVertical=True|PrintScale=1.00|XCorrection=1.00|YCorrection=1.00|PrintKind=1|BorderSize=5000000|LeftOffset=0|BottomOffset=0|Orientation=2|PaperLength=1000|PaperWidth=1000|Scale=100|PaperSource=7|PrintQuality=-4|MediaType=1|DitherType=10|PrintScaleMode=1|PaperKind=Letter|PaperIndex=1
-OutputType5=Gerber
-OutputName5=Gerber Files
+OutputType5=Mask
+OutputName5=Solder/Paste Mask Prints
 OutputDocumentPath5=
-OutputVariantName5=[No Variations]
+OutputVariantName5=
 OutputDefault5=0
-OutputType6=Mask
-OutputName6=Solder/Paste Mask Prints
+PageOptions5=Record=PageOptions|CenterHorizontal=True|CenterVertical=True|PrintScale=1.00|XCorrection=1.00|YCorrection=1.00|PrintKind=1|BorderSize=5000000|LeftOffset=0|BottomOffset=0|Orientation=2|PaperLength=1000|PaperWidth=1000|Scale=100|PaperSource=7|PrintQuality=-4|MediaType=1|DitherType=10|PrintScaleMode=1|PaperKind=Letter|PaperIndex=1
+OutputType6=Test Points
+OutputName6=Test Point Report
 OutputDocumentPath6=
 OutputVariantName6=
 OutputDefault6=0
-PageOptions6=Record=PageOptions|CenterHorizontal=True|CenterVertical=True|PrintScale=1.00|XCorrection=1.00|YCorrection=1.00|PrintKind=1|BorderSize=5000000|LeftOffset=0|BottomOffset=0|Orientation=2|PaperLength=1000|PaperWidth=1000|Scale=100|PaperSource=7|PrintQuality=-4|MediaType=1|DitherType=10|PrintScaleMode=1|PaperKind=Letter|PaperIndex=1
-OutputType7=NC Drill
-OutputName7=NC Drill Files
+OutputType7=ODB
+OutputName7=ODB++ Files
 OutputDocumentPath7=
-OutputVariantName7=
+OutputVariantName7=[No Variations]
 OutputDefault7=0
-OutputType8=ODB
-OutputName8=ODB++ Files
+OutputType8=Plane
+OutputName8=Power-Plane Prints
 OutputDocumentPath8=
-OutputVariantName8=[No Variations]
+OutputVariantName8=
 OutputDefault8=0
-OutputType9=Plane
-OutputName9=Power-Plane Prints
+PageOptions8=Record=PageOptions|CenterHorizontal=True|CenterVertical=True|PrintScale=1.00|XCorrection=1.00|YCorrection=1.00|PrintKind=1|BorderSize=5000000|LeftOffset=0|BottomOffset=0|Orientation=2|PaperLength=1000|PaperWidth=1000|Scale=100|PaperSource=7|PrintQuality=-4|MediaType=1|DitherType=10|PrintScaleMode=1|PaperKind=Letter|PaperIndex=1
+OutputType9=NC Drill
+OutputName9=NC Drill Files
 OutputDocumentPath9=
 OutputVariantName9=
 OutputDefault9=0
-PageOptions9=Record=PageOptions|CenterHorizontal=True|CenterVertical=True|PrintScale=1.00|XCorrection=1.00|YCorrection=1.00|PrintKind=1|BorderSize=5000000|LeftOffset=0|BottomOffset=0|Orientation=2|PaperLength=1000|PaperWidth=1000|Scale=100|PaperSource=7|PrintQuality=-4|MediaType=1|DitherType=10|PrintScaleMode=1|PaperKind=Letter|PaperIndex=1
-OutputType10=Test Points
-OutputName10=Test Point Report
+Configuration9_Name1=ForceUpdateSettings
+Configuration9_Item1=False
+Configuration9_Name2=OutputConfigurationParameter1
+Configuration9_Item2=BoardEdgeRoutToolDia=2000000|GenerateBoardEdgeRout=False|GenerateDrilledSlotsG85=False|GenerateEIADrillFile=False|GenerateSeparatePlatedNonPlatedFiles=False|NumberOfDecimals=5|NumberOfUnits=2|OptimizeChangeLocationCommands=True|OriginPosition=Relative|Record=DrillView|Units=Imperial|ZeroesMode=SuppressTrailingZeroes|DocumentPath=C:\w\snap\Altium\Snap2.1\Snap21.PcbDoc
+OutputType10=Gerber X2
+OutputName10=Gerber X2 Files
 OutputDocumentPath10=
 OutputVariantName10=
 OutputDefault10=0
-OutputType11=Gerber X2
-OutputName11=Gerber X2 Files
+OutputType11=IPC2581
+OutputName11=IPC-2581 Files
 OutputDocumentPath11=
 OutputVariantName11=
 OutputDefault11=0
-OutputType12=IPC2581
-OutputName12=IPC-2581 Files
+OutputType12=Gerber
+OutputName12=Gerber Files
 OutputDocumentPath12=
-OutputVariantName12=
+OutputVariantName12=[No Variations]
 OutputDefault12=0
+Configuration12_Name1=ForceUpdateSettings
+Configuration12_Item1=False
+Configuration12_Name2=OutputConfigurationParameter1
+Configuration12_Item2=AddToAllLayerClasses.Set= |AddToAllPlots.Set=SerializeLayerHash.Version~2,ClassName~TPlotLayerStateArray|CentrePlots=False|DrillDrawingSymbol=GraphicsSymbol|DrillDrawingSymbolSize=200000|EmbeddedApertures=True|FilmBorderSize=10000000|FilmXSize=200000000|FilmYSize=160000000|FlashAllFills=False|FlashPadShapes=True|G54OnApertureChange=False|GenerateDRCRulesFile=True|GenerateDRCRulesFile=True|GenerateReliefShapes=True|GenerateReports=True|GerberUnit=Imperial|GerberUnit=Imperial|IncludeUnconnectedMidLayerPads=True|LayerClassesMirror.Set= |LayerClassesPlot.Set= |LeadingAndTrailingZeroesMode=SuppressLeadingZeroes|MaxApertureSize=2500000|MinusApertureTolerance=50|MinusApertureTolerance=50|Mirror.Set=SerializeLayerHash.Version~2,ClassName~TPlotLayerStateArray|MirrorDrillDrawingPlots=False|MirrorDrillGuidePlots=False|NoRegularPolygons=False|NumberOfDecimals=5|NumberOfDecimals=5|OptimizeChangeLocationCommands=True|OptimizeChangeLocationCommands=True|OriginPosition=Relative|Panelize=False|Plot.Set=SerializeLayerHash.Version~2,ClassName~TPlotLayerStateArray,16973830~1,16973832~1,16973834~1,16777217~1,16842753~1,16842754~1,16842751~1,16973835~1,16973833~1,16973831~1,16908289~1,16908301~1,16908303~1,16973848~1,16973849~1|PlotPositivePlaneLayers=False|PlotUsedDrillDrawingLayerPairs=False|PlotUsedDrillGuideLayerPairs=False|PlusApertureTolerance=50|PlusApertureTolerance=50|Record=GerberView|SoftwareArcs=False|Sorted=False|Sorted=False|DocumentPath=C:\w\snap\Altium\Snap2.1\Snap21.PcbDoc
 
 [OutputGroup6]
 Name=Report Outputs

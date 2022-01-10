@@ -1,0 +1,10 @@
+Output: Generates pick and place files
+Type  : Pick Place
+From  : Variant [[No Variations]] of Project [Snap21.PrjPCB]
+   Generated File[Pick Place for Snap21.csv]
+
+
+Files Generated   : 1
+Documents Printed : 0
+
+Finished Output Generation At 5:21:28 PM On 1/10/2022

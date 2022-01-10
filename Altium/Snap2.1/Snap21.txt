@@ -1,0 +1,10 @@
+Board Information Report
+Filename     : C:\w\snap\Altium\Snap2.1\Snap21.PcbDoc
+Date         : 1/10/2022
+Time         : 5:10:10 PM
+Time Elapsed : 00:00:00
+
+General
+    Board Size, 4345milsx1525mils
+    Components on board, 51
+count : 2
