@@ -1,5 +1,5 @@
 ----------------------------------------------------------------------------------------------------------------------------------
-NCDrill File Report For: Snap21.PcbDoc   1/10/2022  5:18:23 PM
+NCDrill File Report For: Snap21.PcbDoc   1/13/2022  11:50:39 AM
 ----------------------------------------------------------------------------------------------------------------------------------
 
 Layer Pair : Top Layer to Bottom Layer
@@ -7,7 +7,7 @@ ASCII RoundHoles File : Snap21.TXT
 
 Tool       Hole Size               Hole Tolerance               Hole Type       Hole Count   Plated         Tool Travel
 ----------------------------------------------------------------------------------------------------------------------------------
-T1      10mil (0.254mm)                                           Round             25        PTH        8.27inch (210.05mm)
+T1      10mil (0.254mm)                                           Round             25        PTH        8.28inch (210.32mm)
 T2      28mil (0.711mm)                                           Round             7         PTH        4.10inch (104.24mm)
 T3      35mil (0.889mm)                                           Round             2         PTH        0.10inch (2.54mm)
 T4      35mil (0.9mm)                                             Round             14        PTH        4.01inch (101.73mm)

@@ -1,10 +1,12 @@
-Output: Generates pick and place files
-Type  : Pick Place
-From  : Variant [[No Variations]] of Project [Snap21.PrjPCB]
-   Generated File[Pick Place for Snap21.csv]
+Output: NC Drill Files
+Type  : NC Drill
+From  : Project [Snap21.PrjPCB]
+   Generated File[Snap21.TXT]
+   Generated File[Snap21.LDP]
+   Generated File[Snap21.DRR]
 
 
-Files Generated   : 1
+Files Generated   : 3
 Documents Printed : 0
 
-Finished Output Generation At 5:21:28 PM On 1/10/2022
+Finished Output Generation At 11:50:39 AM On 1/13/2022

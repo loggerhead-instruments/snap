@@ -2,6 +2,66 @@
 FileName = Snap21.GBR
 AutoAperture = True
 *************************************************************
+Generating : Mechanical 15
+      File : Snap21.GM15
+
+    Adding Layer      : Mechanical 15
+
+
+Used DCodes :
+    D13
+    D82
+*************************************************************
+
+*************************************************************
+Generating : Mechanical 13
+      File : Snap21.GM13
+
+    Adding Layer      : Mechanical 13
+
+
+Used DCodes :
+    D13
+*************************************************************
+
+*************************************************************
+Generating : Mechanical 1
+      File : Snap21.GM1
+
+    Adding Layer      : Mechanical 1
+
+
+Used DCodes :
+    D12
+*************************************************************
+
+*************************************************************
+Generating : Bottom Overlay
+      File : Snap21.GBO
+
+    Adding Layer      : Bottom Overlay
+
+
+Used DCodes :
+    D12
+*************************************************************
+
+*************************************************************
+Generating : Bottom Paste
+      File : Snap21.GBP
+
+    Adding Layer      : Bottom Paste
+
+    Adding Layer      : Bottom Layer
+
+    Adding Layer      : Multi-Layer
+
+
+Used DCodes :
+    D80
+*************************************************************
+
+*************************************************************
 Generating : Bottom Solder
       File : Snap21.GBS
 
@@ -61,198 +121,6 @@ Used DCodes :
     D56
     D57
     D58
-*************************************************************
-
-*************************************************************
-Generating : Top Layer
-      File : Snap21.GTL
-
-    Adding Layer      : Top Layer
-
-    Adding Layer      : Multi-Layer
-
-
-Used DCodes :
-    D12
-    D14
-    D15
-    D16
-    D17
-    D19
-    D20
-    D21
-    D22
-    D23
-    D24
-    D25
-    D26
-    D27
-    D28
-    D29
-    D30
-    D31
-    D32
-    D45
-    D59
-    D60
-    D61
-    D62
-    D63
-    D64
-    D65
-    D66
-    D67
-    D68
-    D69
-*************************************************************
-
-*************************************************************
-Generating : Internal Plane 1
-      File : Snap21.GP1
-
-    Adding Layer      : Internal Plane 1
-
-    Adding Layer      : Multi-Layer
-
-
-Used DCodes :
-    D12
-    D45
-    D53
-    D70
-    D71
-    D72
-    D73
-    D74
-    D75
-    D76
-    D77
-    D78
-*************************************************************
-
-*************************************************************
-Generating : Mechanical 15
-      File : Snap21.GM15
-
-    Adding Layer      : Mechanical 15
-
-
-Used DCodes :
-    D13
-    D82
-*************************************************************
-
-*************************************************************
-Generating : Mechanical 13
-      File : Snap21.GM13
-
-    Adding Layer      : Mechanical 13
-
-
-Used DCodes :
-    D13
-*************************************************************
-
-*************************************************************
-Generating : Bottom Pad Master
-      File : Snap21.GPB
-
-    Adding Layer      : Bottom Layer
-
-    Adding Layer      : Multi-Layer
-
-
-Used DCodes :
-    D31
-    D65
-    D66
-    D67
-    D68
-    D80
-*************************************************************
-
-*************************************************************
-Generating : Bottom Layer
-      File : Snap21.GBL
-
-    Adding Layer      : Bottom Layer
-
-    Adding Layer      : Multi-Layer
-
-
-Used DCodes :
-    D12
-    D31
-    D45
-    D61
-    D63
-    D65
-    D66
-    D67
-    D68
-    D69
-    D80
-*************************************************************
-
-*************************************************************
-Generating : Internal Plane 2
-      File : Snap21.GP2
-
-    Adding Layer      : Internal Plane 2
-
-    Adding Layer      : Multi-Layer
-
-
-Used DCodes :
-    D12
-    D45
-    D53
-    D70
-    D71
-    D72
-    D74
-    D75
-    D76
-    D77
-    D78
-    D79
-*************************************************************
-
-*************************************************************
-Generating : Bottom Paste
-      File : Snap21.GBP
-
-    Adding Layer      : Bottom Paste
-
-    Adding Layer      : Bottom Layer
-
-    Adding Layer      : Multi-Layer
-
-
-Used DCodes :
-    D80
-*************************************************************
-
-*************************************************************
-Generating : Bottom Overlay
-      File : Snap21.GBO
-
-    Adding Layer      : Bottom Overlay
-
-
-Used DCodes :
-    D12
-*************************************************************
-
-*************************************************************
-Generating : Mechanical 1
-      File : Snap21.GM1
-
-    Adding Layer      : Mechanical 1
-
-
-Used DCodes :
-    D12
 *************************************************************
 
 *************************************************************
@@ -336,5 +204,137 @@ Used DCodes :
     D66
     D67
     D68
+*************************************************************
+
+*************************************************************
+Generating : Bottom Pad Master
+      File : Snap21.GPB
+
+    Adding Layer      : Bottom Layer
+
+    Adding Layer      : Multi-Layer
+
+
+Used DCodes :
+    D31
+    D65
+    D66
+    D67
+    D68
+    D80
+*************************************************************
+
+*************************************************************
+Generating : Bottom Layer
+      File : Snap21.GBL
+
+    Adding Layer      : Bottom Layer
+
+    Adding Layer      : Multi-Layer
+
+
+Used DCodes :
+    D12
+    D31
+    D45
+    D61
+    D63
+    D65
+    D66
+    D67
+    D68
+    D69
+    D80
+*************************************************************
+
+*************************************************************
+Generating : Internal Plane 2
+      File : Snap21.GP2
+
+    Adding Layer      : Internal Plane 2
+
+    Adding Layer      : Multi-Layer
+
+
+Used DCodes :
+    D12
+    D45
+    D53
+    D70
+    D71
+    D72
+    D74
+    D75
+    D76
+    D77
+    D78
+    D79
+*************************************************************
+
+*************************************************************
+Generating : Internal Plane 1
+      File : Snap21.GP1
+
+    Adding Layer      : Internal Plane 1
+
+    Adding Layer      : Multi-Layer
+
+
+Used DCodes :
+    D12
+    D45
+    D53
+    D70
+    D71
+    D72
+    D73
+    D74
+    D75
+    D76
+    D77
+    D78
+*************************************************************
+
+*************************************************************
+Generating : Top Layer
+      File : Snap21.GTL
+
+    Adding Layer      : Top Layer
+
+    Adding Layer      : Multi-Layer
+
+
+Used DCodes :
+    D12
+    D14
+    D15
+    D16
+    D17
+    D19
+    D20
+    D21
+    D22
+    D23
+    D24
+    D25
+    D26
+    D27
+    D28
+    D29
+    D30
+    D31
+    D32
+    D45
+    D59
+    D60
+    D61
+    D62
+    D63
+    D64
+    D65
+    D66
+    D67
+    D68
+    D69
 *************************************************************
 
