@@ -1,7 +1,7 @@
 Board Information Report
 Filename     : C:\w\snap\Altium\Snap2.1\Snap21.PcbDoc
-Date         : 1/10/2022
-Time         : 5:10:10 PM
+Date         : 1/28/2022
+Time         : 3:02:44 PM
 Time Elapsed : 00:00:00
 
 General
