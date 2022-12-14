@@ -1,7 +1,7 @@
 Protel Design System Design Rule Check
 PCB File : C:\w\snap\Altium\Snap3\Snap3.PcbDoc
-Date     : 12/12/2022
-Time     : 2:33:48 PM
+Date     : 12/14/2022
+Time     : 4:14:36 PM
 
 Processing Rule : Clearance Constraint (Gap=6mil) (All),(All)
    Violation between Clearance Constraint: (Collision < 6mil) Between Pad P12-1(2970mil,-285mil) on Multi-Layer And Track (2870mil,-285mil)(2960mil,-285mil) on Top Layer 

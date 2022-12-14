@@ -1,7 +1,7 @@
 Board Information Report
 Filename     : C:\w\snap\Altium\Snap3\Snap3.PcbDoc
-Date         : 12/12/2022
-Time         : 2:32:07 PM
+Date         : 12/14/2022
+Time         : 4:16:22 PM
 Time Elapsed : 00:00:00
 
 General
@@ -14,11 +14,10 @@ count : 0
 
 Plated Hole Size, Pads, Vias
     0mils, 186, 0
-    10mils, 0, 1
-    12mils, 0, 30
+    12mils, 0, 31
     28mils, 0, 8
     35mils, 2, 0
     35.433mils, 14, 0
     36mils, 31, 0
     125mils, 6, 0
-count : 8
+count : 7
