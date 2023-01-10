@@ -139,6 +139,8 @@ int buf_count;
 unsigned long nbufs_per_file;
 boolean settingsChanged = 0;
 
+volatile uint16_t delayDays = 0;
+
 unsigned long file_count;
 char filename[100];
 char dirname[20];
@@ -282,7 +284,7 @@ void setup() {
   AudioInit(isf); // set with new settings
 
   cDisplay();
-
+  
   if(rec_int >= 60) roundSeconds = 60;
   if(rec_int >= 300) roundSeconds = 300;
   
@@ -290,10 +292,60 @@ void setup() {
   startTime = t;
   startTime -= startTime % roundSeconds;  
   startTime += roundSeconds; //move forward
+  startTime += delayDays * 86400;
   stopTime = startTime + rec_dur;  // this will be set on start of recording
 
-  if (recMode==MODE_DIEL) setDielTime();  // adjust start time to diel mode
-  
+  // delay start
+  if(delayDays > 0){
+    // power down SD, SGTL
+    digitalWrite(hydroPowPin, LOW);
+    digitalWrite(SDPOW1, LOW);
+    
+    // sleep walk
+    long time_to_first_rec = startTime - t;
+    Serial.print("Time to first record ");
+    Serial.println(time_to_first_rec);
+    for(int x = 0; x<30; x++){
+      cDisplay();
+      display.println("Sleep");
+      t = getTeensy3Time(1);
+      display.setTextSize(1);
+      display.println("Start");
+      displayClock(startTime, 26);
+      displayClock(t, BOTTOM);
+      display.display();
+      delay(1000);
+    }
+
+    while(time_to_first_rec > 60){
+      display.ssd1306_command(SSD1306_DISPLAYOFF); // turn off display during recording
+      digitalWrite(ledGreen, HIGH);
+      alarm.setRtcTimer(0, 0, 20); // sleep 20 seconds
+      delay(10);
+      digitalWrite(ledGreen, LOW);
+      Snooze.sleep(config_teensy32);
+      //Snooze.deepSleep( config_teensy32 );
+      /// .... sleeping ...
+      digitalWrite(SGTL_EN, HIGH); // power on so I2C works
+      t = getTeensy3Time(1);
+      digitalWrite(SGTL_EN, LOW);
+      time_to_first_rec = startTime - t;
+    }
+    digitalWrite(hydroPowPin, HIGH);
+    digitalWrite(SDPOW1, HIGH);
+    digitalWrite(SGTL_EN, HIGH);
+    delay(1000);
+    // Initialize the SD card
+    SPI.setMOSI(7);
+    SPI.setSCK(14);
+    SPI.setMISO(12);
+    sd.begin(chipSelect[0]);
+    AudioInit(isf);
+  }
+
+  // once start set delayDays to 0 in case reboots
+  writeEEPROMlong(18, 0);
+
   nbufs_per_file = (long) (ceil(((rec_dur * audio_srate / 256.0) / (float) NREC)) * (float) NREC) * NCHAN;
   long ss = rec_int - wakeahead;
   if (ss<0) ss=0;
@@ -739,7 +791,7 @@ float readVoltage(){
    for(int n = 0; n<8; n++){
     voltage += (float) analogRead(vSense) / 1024.0;
    }
-   voltage = 7.27 * voltage / 8.0;   //fudging scaling based on actual measurements; shoud be max of 3.3V at 1023
+   voltage = 5.75 * voltage / 8.0;   //fudging scaling based on actual measurements; shoud be max of 3.3V at 1023
    return voltage;
 }
 
