@@ -3,7 +3,7 @@
 // THIS VERSION ONLY WORKS WITH Snap3 boards or higher
 //
 // Loggerhead Instruments
-// 2021
+// 2023
 // David Mann 
 
 // 
@@ -15,9 +15,11 @@
 // Modified by WMXZ 15-05-2018 for SdFS anf multiple sampling frequencies
 // Optionally uses SdFS from Bill Greiman https://github.com/greiman/SdFs; but has higher current draw in sleep
 
+// v3.1: Allow 1 hour long files with continuous recording
+
 //*****************************************************************************************
 
-char codeVersion[5] = "3.00";
+char codeVersion[5] = "3.10";
 static boolean printDiags = 0;  // 1: serial print diagnostics; 0: no diagnostics
 #define MQ 100 // to be used with LHI record queue (modified local version)
 int roundSeconds = 60;//start time modulo to nearest roundSeconds
@@ -301,7 +303,7 @@ void setup() {
     digitalWrite(hydroPowPin, LOW);
     digitalWrite(SDPOW1, LOW);
     
-    // sleep walk
+    // sleep walk (~3.7 mA current)
     long time_to_first_rec = startTime - t;
     Serial.print("Time to first record ");
     Serial.println(time_to_first_rec);

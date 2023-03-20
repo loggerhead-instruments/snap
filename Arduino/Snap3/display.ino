@@ -281,7 +281,7 @@ void manualSettings(){
         case setRecSleep:
           while(digitalRead(SELECT)==1){
             rec_int = updateVal(rec_int, 0, 3600 * 24);
-            if(rec_int == 0) rec_dur = 600; // continuous record shortest file 600s
+            // if(rec_int == 0) rec_dur = 600; // continuous record shortest file 600s
             cDisplay();
             display.println("Sleep:");
             display.print(rec_int);
