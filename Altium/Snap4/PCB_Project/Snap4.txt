@@ -1,0 +1,20 @@
+Board Information Report
+Filename     : C:\w\snap\Altium\Snap4\PCB_Project\Snap4.PcbDoc
+Date         : 7/22/2023
+Time         : 2:42:19 PM
+Time Elapsed : 00:00:00
+
+General
+    Board Size, 3550milsx1850mils
+    Components on board, 59
+count : 2
+
+Non-Plated Hole Size, Pads, Vias
+count : 0
+
+Plated Hole Size, Pads, Vias
+    0mils, 205, 0
+    7.874mils, 12, 4
+    35.433mils, 19, 0
+    125mils, 4, 0
+count : 4
