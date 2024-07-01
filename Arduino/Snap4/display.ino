@@ -98,7 +98,7 @@ void manualSettings(){
   
 // get free space on cards
     cDisplay();
-    display.print("Snap 4.0");
+    display.print("Snap 4");
     display.setTextSize(1);
     display.setCursor(0, 16);
     display.println("Card Free/Total MB");

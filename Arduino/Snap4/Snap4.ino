@@ -20,7 +20,7 @@
 //*****************************************************************************************
 
 char codeVersion[5] = "4.00";
-static boolean printDiags = 0;  // 1: serial print diagnostics; 0: no diagnostics
+static boolean printDiags = 1;  // 1: serial print diagnostics; 0: no diagnostics
 #define MQ 100 // to be used with LHI record queue (modified local version)
 int roundSeconds = 60;//start time modulo to nearest roundSeconds
 int wakeahead = 4;  //wake from snooze to give hydrophone to power up
