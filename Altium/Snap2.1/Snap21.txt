@@ -1,10 +1,23 @@
 Board Information Report
 Filename     : C:\w\snap\Altium\Snap2.1\Snap21.PcbDoc
-Date         : 1/28/2022
-Time         : 3:02:44 PM
+Date         : 7/17/2023
+Time         : 4:16:29 PM
 Time Elapsed : 00:00:00
 
 General
     Board Size, 4345milsx1525mils
     Components on board, 51
 count : 2
+
+Non-Plated Hole Size, Pads, Vias
+count : 0
+
+Plated Hole Size, Pads, Vias
+    0mils, 157, 0
+    10mils, 0, 25
+    28mils, 0, 7
+    35mils, 2, 0
+    35.433mils, 14, 0
+    36mils, 34, 0
+    125mils, 4, 0
+count : 7
