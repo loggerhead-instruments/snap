@@ -790,10 +790,10 @@ void read_myID() {
 float readVoltage(){
    float  voltage = 0.0;
    // Serial.println(analogRead(vSense));
-   for(int n = 0; n<8; n++){
-    voltage += (float) analogRead(vSense) / 1024.0;
+   for(int n = 0; n<10; n++){
+    voltage += (float) analogRead(vSense);
    }
-   voltage = 4 * 1.2 * voltage / 8.0;   //shoud be max of 1.2V at 1023  4* is V divider with R1 =200k R2=68k
+   voltage = (0.00065 * voltage) - 0.3357;   //ADC values 3.7V->609 y=0.0065x-0.3357 5V->812 R1 =200k R2=68k
    return voltage;
 }
 

@@ -742,7 +742,7 @@ void displayMenu(){
 void displayVoltage(){
   display.setTextSize(1);
   display.setCursor(100, 0);
-  display.print(readVoltage(),1);
+  display.print(readVoltage(), 1);
   display.print("V");
 }
 
