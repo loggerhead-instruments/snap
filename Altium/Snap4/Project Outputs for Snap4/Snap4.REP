@@ -2,59 +2,30 @@
 FileName = Snap4.GBR
 AutoAperture = True
 *************************************************************
-Generating : Mechanical 15
-      File : Snap4.GM15
+Generating : Internal Plane 2
+      File : Snap4.GP2
 
-    Adding Layer      : Mechanical 15
+    Adding Layer      : Internal Plane 2
 
-
-Used DCodes :
-    D15
-    D111
-*************************************************************
-
-*************************************************************
-Generating : Mechanical 13
-      File : Snap4.GM13
-
-    Adding Layer      : Mechanical 13
+    Adding Layer      : Multi-Layer
 
 
 Used DCodes :
     D11
-    D13
-    D14
-    D15
+    D97
+    D98
+    D99
+    D100
+    D101
+    D102
+    D103
+    D104
+    D105
 *************************************************************
 
 *************************************************************
-Generating : Mechanical 1
-      File : Snap4.GM1
-
-    Adding Layer      : Mechanical 1
-
-
-Used DCodes :
-    D10
-    D110
-*************************************************************
-
-*************************************************************
-Generating : Bottom Overlay
-      File : Snap4.GBO
-
-    Adding Layer      : Bottom Overlay
-
-
-Used DCodes :
-    D10
-*************************************************************
-
-*************************************************************
-Generating : Bottom Paste
-      File : Snap4.GBP
-
-    Adding Layer      : Bottom Paste
+Generating : Bottom Layer
+      File : Snap4.GBL
 
     Adding Layer      : Bottom Layer
 
@@ -62,6 +33,20 @@ Generating : Bottom Paste
 
 
 Used DCodes :
+    D11
+    D14
+    D46
+    D72
+    D85
+    D86
+    D90
+    D91
+    D92
+    D93
+    D94
+    D95
+    D96
+    D107
     D108
 *************************************************************
 
@@ -77,7 +62,6 @@ Generating : Bottom Solder
 
 
 Used DCodes :
-    D76
     D77
     D78
     D79
@@ -85,6 +69,7 @@ Used DCodes :
     D81
     D82
     D83
+    D84
     D109
 *************************************************************
 
@@ -100,7 +85,6 @@ Generating : Top Solder
 
 
 Used DCodes :
-    D46
     D47
     D48
     D49
@@ -138,6 +122,237 @@ Used DCodes :
     D81
     D82
     D83
+    D84
+*************************************************************
+
+*************************************************************
+Generating : Top Layer
+      File : Snap4.GTL
+
+    Adding Layer      : Top Layer
+
+    Adding Layer      : Multi-Layer
+
+
+Used DCodes :
+    D10
+    D11
+    D14
+    D17
+    D18
+    D19
+    D20
+    D21
+    D22
+    D23
+    D24
+    D25
+    D26
+    D27
+    D28
+    D29
+    D30
+    D31
+    D32
+    D33
+    D34
+    D35
+    D36
+    D37
+    D39
+    D40
+    D41
+    D42
+    D43
+    D44
+    D45
+    D46
+    D72
+    D85
+    D86
+    D87
+    D88
+    D89
+    D90
+    D91
+    D92
+    D93
+    D94
+    D95
+    D96
+*************************************************************
+
+*************************************************************
+Generating : Internal Plane 1
+      File : Snap4.GP1
+
+    Adding Layer      : Internal Plane 1
+
+    Adding Layer      : Multi-Layer
+
+
+Used DCodes :
+    D11
+    D97
+    D98
+    D99
+    D100
+    D101
+    D102
+    D103
+    D104
+    D105
+    D106
+*************************************************************
+
+*************************************************************
+Generating : Mechanical 15
+      File : Snap4.GM15
+
+    Adding Layer      : Mechanical 15
+
+
+Used DCodes :
+    D16
+    D111
+*************************************************************
+
+*************************************************************
+Generating : Mechanical 13
+      File : Snap4.GM13
+
+    Adding Layer      : Mechanical 13
+
+
+Used DCodes :
+    D12
+    D14
+    D15
+    D16
+*************************************************************
+
+*************************************************************
+Generating : Top Overlay
+      File : Snap4.GTO
+
+    Adding Layer      : Top Overlay
+
+
+Used DCodes :
+    D10
+    D11
+    D12
+    D13
+    D14
+    D15
+    D16
+*************************************************************
+
+*************************************************************
+Generating : Top Pad Master
+      File : Snap4.GPT
+
+    Adding Layer      : Top Layer
+
+    Adding Layer      : Multi-Layer
+
+
+Used DCodes :
+    D17
+    D18
+    D19
+    D20
+    D21
+    D22
+    D23
+    D24
+    D25
+    D26
+    D27
+    D28
+    D29
+    D30
+    D31
+    D32
+    D33
+    D34
+    D35
+    D36
+    D37
+    D39
+    D40
+    D41
+    D42
+    D43
+    D44
+    D45
+    D46
+    D88
+    D89
+    D90
+    D91
+    D92
+    D93
+    D94
+    D95
+*************************************************************
+
+*************************************************************
+Generating : Bottom Pad Master
+      File : Snap4.GPB
+
+    Adding Layer      : Bottom Layer
+
+    Adding Layer      : Multi-Layer
+
+
+Used DCodes :
+    D46
+    D90
+    D91
+    D92
+    D93
+    D94
+    D95
+    D108
+*************************************************************
+
+*************************************************************
+Generating : Bottom Paste
+      File : Snap4.GBP
+
+    Adding Layer      : Bottom Paste
+
+    Adding Layer      : Bottom Layer
+
+    Adding Layer      : Multi-Layer
+
+
+Used DCodes :
+    D108
+*************************************************************
+
+*************************************************************
+Generating : Bottom Overlay
+      File : Snap4.GBO
+
+    Adding Layer      : Bottom Overlay
+
+
+Used DCodes :
+    D11
+*************************************************************
+
+*************************************************************
+Generating : Mechanical 1
+      File : Snap4.GM1
+
+    Adding Layer      : Mechanical 1
+
+
+Used DCodes :
+    D11
+    D110
 *************************************************************
 
 *************************************************************
@@ -152,7 +367,6 @@ Generating : Top Paste
 
 
 Used DCodes :
-    D16
     D17
     D18
     D19
@@ -182,219 +396,6 @@ Used DCodes :
     D43
     D44
     D45
-*************************************************************
-
-*************************************************************
-Generating : Top Overlay
-      File : Snap4.GTO
-
-    Adding Layer      : Top Overlay
-
-
-Used DCodes :
-    D10
-    D11
-    D12
-    D13
-    D14
-    D15
-*************************************************************
-
-*************************************************************
-Generating : Top Pad Master
-      File : Snap4.GPT
-
-    Adding Layer      : Top Layer
-
-    Adding Layer      : Multi-Layer
-
-
-Used DCodes :
-    D16
-    D17
-    D18
-    D19
-    D20
-    D21
-    D22
-    D23
-    D24
-    D25
-    D26
-    D27
-    D28
-    D29
-    D30
-    D31
-    D32
-    D33
-    D34
-    D35
-    D36
-    D38
-    D39
-    D40
-    D41
-    D42
-    D43
-    D44
-    D45
-    D88
-    D89
-    D90
-    D91
-    D92
-    D93
-    D94
-    D95
-*************************************************************
-
-*************************************************************
-Generating : Bottom Pad Master
-      File : Snap4.GPB
-
-    Adding Layer      : Bottom Layer
-
-    Adding Layer      : Multi-Layer
-
-
-Used DCodes :
-    D45
-    D90
-    D91
-    D92
-    D93
-    D94
-    D95
-    D108
-*************************************************************
-
-*************************************************************
-Generating : Bottom Layer
-      File : Snap4.GBL
-
-    Adding Layer      : Bottom Layer
-
-    Adding Layer      : Multi-Layer
-
-
-Used DCodes :
-    D10
-    D13
-    D45
-    D71
-    D84
-    D86
-    D90
-    D91
-    D92
-    D93
-    D94
-    D95
-    D96
-    D107
-    D108
-*************************************************************
-
-*************************************************************
-Generating : Internal Plane 2
-      File : Snap4.GP2
-
-    Adding Layer      : Internal Plane 2
-
-    Adding Layer      : Multi-Layer
-
-
-Used DCodes :
-    D10
-    D97
-    D98
-    D99
-    D100
-    D101
-    D102
-    D103
-    D104
-    D105
-*************************************************************
-
-*************************************************************
-Generating : Internal Plane 1
-      File : Snap4.GP1
-
-    Adding Layer      : Internal Plane 1
-
-    Adding Layer      : Multi-Layer
-
-
-Used DCodes :
-    D10
-    D97
-    D98
-    D99
-    D100
-    D101
-    D102
-    D103
-    D104
-    D105
-    D106
-*************************************************************
-
-*************************************************************
-Generating : Top Layer
-      File : Snap4.GTL
-
-    Adding Layer      : Top Layer
-
-    Adding Layer      : Multi-Layer
-
-
-Used DCodes :
-    D10
-    D13
-    D16
-    D17
-    D18
-    D19
-    D20
-    D21
-    D22
-    D23
-    D24
-    D25
-    D26
-    D27
-    D28
-    D29
-    D30
-    D31
-    D32
-    D33
-    D34
-    D35
-    D36
-    D38
-    D39
-    D40
-    D41
-    D42
-    D43
-    D44
-    D45
-    D71
-    D84
-    D85
-    D86
-    D87
-    D88
-    D89
-    D90
-    D91
-    D92
-    D93
-    D94
-    D95
-    D96
+    D46
 *************************************************************
 

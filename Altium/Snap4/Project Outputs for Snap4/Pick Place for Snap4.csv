@@ -4,9 +4,9 @@ C:\w\snap\Altium\Snap4\Project Outputs for Snap4\Pick Place for Snap4.csv
 ========================================================================================================================
 File Design Information:
 
-Date:       01/07/24
-Time:       13:39
-Revision:   d5d5bc1122725e80623d091c09173e6e468a39db
+Date:       09/09/24
+Time:       09:05
+Revision:   c0bfa2085a02e5146591e555ad6c94107807bf55
 Variant:    No variations
 Units used: mm
 
@@ -17,7 +17,7 @@ Units used: mm
 "Y1","FA-20H_16.0000MF10Z-AJ3","TopLayer","XTAL_FA-20H_16.0000MF10Z-AJ3","38.9890","-15.3670","0","16 MHz ±10ppm Crystal 8pF 80 Ohms 4-SMD, No Lead"
 "U9","ADP1712AUJZ-3.3-R7","TopLayer","MF05A_N","1.8131","-13.8343","0","Micropower, 150mA Low-Noise Ultra Low-Dropout CMOS Voltage Regulator"
 "R10","DNP","TopLayer","3-0603","35.8140","-33.7820","270","Precision Thick Film Chip Resistor, 10 Ohm to 1M Ohm Range, 1% and 0.5% Tolerance, 0603 Size, 0.063 W"
-"P14","20021121-00010C4LF","TopLayer","AMPHENOL_20021121-00010C4LF","44.1960","-21.2090","270","Conn Rect BrdtoBrd UnshroudedHeader 10Cnts SMT 1.27x1.27mmSpng | Amphenol FCI (Amphenol CS) 20021121-00010C4LF"
+"P14","20021121-00010C4LF","TopLayer","AMPHENOL_20021121-00010C4LF","44.1960","-21.2090","270","Conn Rect BrdtoBrd UnshroudedHeader 10Cnts SMT 1.27x1.27mmSpng"
 "P13","microUSB","TopLayer","microUSB-B","29.6410","-33.1970","0",""
 "D3","Shottky","TopLayer","DFLS130","22.8600","-29.8500","90",""
 "C33","0.01uF","TopLayer","0402","5.8771","-14.8503","0","Ceramic Chip Capacitor - Standard"
