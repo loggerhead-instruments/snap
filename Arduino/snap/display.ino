@@ -168,7 +168,7 @@ void manualSettings(){
 
     t = getTeensy3Time();
 
-    if (t - autoStartTime > 600) startRec = 1; //autostart if no activity for 10 minutes
+    if (t - autoStartTime > 10) startRec = 1; //autostart if no activity for 10 minutes
     switch (curSetting){
       case noSet:
         if (settingsChanged) {
