@@ -642,7 +642,7 @@ void displaySettings(){
     display.print("d");
   }
 
-  display.setCursor(115, BOTTOM);
+  display.setCursor(118, 46);
   if(recMode==MODE_DIEL){
     display.print("D");
   }
