@@ -1,7 +1,7 @@
 float mAmpRec = 50;  
 float mAmpSleep = 3.2; 
 byte nBatPacks = 1;
-float mAhPerBat = 12000.0; // assume 12.0Ah per battery pack; good batteries should be 14000
+float mAhPerBat = 24000.0;
 float fileMB;
 
 float mAmpMono[9] = { 35, 37, 38, 41, 41, 48, 64, 69, 79};
