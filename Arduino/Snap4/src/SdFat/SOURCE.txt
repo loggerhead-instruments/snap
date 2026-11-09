@@ -1,0 +1,8 @@
+SdFat 2.1.2 as shipped with Teensyduino: https://github.com/PaulStoffregen/SdFat
+commit 1e8c3320c293e34865dcdae1a9e6eb0b406c6193 2026-06-01
+The same copy is in SDWriteTest/src/SdFat and LS1-LS2-v4/src/SdFat (LS1-LS2 repo) and
+Snap4/src/SdFat (snap repo); only those three sketches use it.
+Changed for use inside the sketch: the includes in ExFatLib/ExFatConfig.h, common/FsStructs.h,
+FsLib/FsFormatter.h, FsLib/FsFile.h and common/FsBlockDevice.h that named files from the library
+root are now relative to their own folder (the IDE does not add a sketch src folder to the
+include path).

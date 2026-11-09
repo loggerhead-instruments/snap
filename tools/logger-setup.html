@@ -1,0 +1,802 @@
+<!doctype html>
+<!-- Shared by the LS1-LS2 and snap repos (tools/logger-setup.html in each): change both copies together -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Loggerhead Snap/LS1</title>
+<style>
+  :root {
+    --bg: #f6f7f9;
+    --panel: #ffffff;
+    --text: #1b1f24;
+    --muted: #5d6670;
+    --border: #d9dee4;
+    --accent: #0b6bcb;
+    --accent-text: #ffffff;
+    --ok: #1a7f37;
+    --ok-bg: #e8f5ec;
+    --warn: #9a4d00;
+    --warn-bg: #fff4e5;
+    --err: #b42318;
+    --err-bg: #fdecea;
+    --mono-bg: #f0f2f5;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #14171b;
+      --panel: #1d2126;
+      --text: #e6e9ed;
+      --muted: #9aa4af;
+      --border: #333a42;
+      --accent: #4c9be8;
+      --accent-text: #0b1520;
+      --ok: #5fd07c;
+      --ok-bg: #16281c;
+      --warn: #f3ad5c;
+      --warn-bg: #2d2214;
+      --err: #f27b72;
+      --err-bg: #301b19;
+      --mono-bg: #171a1e;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  main { max-width: 720px; margin: 0 auto; padding: 24px 16px 48px; }
+  h1 { font-size: 1.5rem; margin: 0 0 4px; }
+  h2 { font-size: 1.05rem; margin: 0 0 12px; }
+  .sub { color: var(--muted); margin: 0 0 24px; }
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+  .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .spacer { flex: 1; }
+  .label { color: var(--muted); font-size: 0.85rem; margin-bottom: 2px; }
+  .clock { font: 600 1.5rem/1.2 ui-monospace, "Cascadia Mono", Consolas, monospace; }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 560px) { .two { grid-template-columns: 1fr; } }
+  .detail { color: var(--muted); font-size: 0.9rem; margin-top: 4px; min-height: 1.4em; }
+  button {
+    font: inherit;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--panel);
+    color: var(--text);
+    padding: 8px 14px;
+    cursor: pointer;
+  }
+  button.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-text); font-weight: 600; }
+  button.big { width: 100%; padding: 12px; font-size: 1.05rem; margin-top: 16px; }
+  button:disabled { opacity: 0.45; cursor: not-allowed; }
+  #status { font-weight: 600; }
+  .ok { color: var(--ok); }
+  .warn { color: var(--warn); }
+  .err { color: var(--err); }
+  .muted { color: var(--muted); }
+  ol { margin: 0; padding-left: 20px; }
+  li { margin-bottom: 4px; }
+  .needs-conn { display: none; }
+  body.connected .needs-conn { display: block; }
+
+  .issue {
+    border-radius: 8px;
+    padding: 10px 12px;
+    margin-bottom: 8px;
+  }
+  .issue:last-child { margin-bottom: 0; }
+  .issue.err { background: var(--err-bg); }
+  .issue.warn { background: var(--warn-bg); }
+  .issue.ok { background: var(--ok-bg); }
+  .issue b { display: block; }
+  .issue span { color: var(--text); font-size: 0.92rem; }
+  .issue button { margin-top: 8px; padding: 4px 10px; font-size: 0.9rem; }
+
+  .facts { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px 16px; }
+  .fact .v { font-weight: 600; font-variant-numeric: tabular-nums; }
+
+  .form { display: grid; grid-template-columns: minmax(140px, 220px) 1fr; gap: 10px 16px; align-items: center; }
+  @media (max-width: 560px) { .form { grid-template-columns: 1fr; gap: 4px; } .form .help { margin-bottom: 8px; } }
+  .form label { font-weight: 500; }
+  .field { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+  input, select {
+    font: inherit;
+    color: var(--text);
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 6px 8px;
+  }
+  input[type=number] { width: 110px; }
+  input.changed, select.changed { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+  input.bad { border-color: var(--err); box-shadow: 0 0 0 1px var(--err); }
+  .help { color: var(--muted); font-size: 0.85rem; }
+  .form .help { grid-column: 2; margin-top: -6px; }
+  @media (max-width: 560px) { .form .help { grid-column: 1; margin-top: 0; } }
+  .hidden { display: none !important; }
+  #saveMsg { min-height: 1.4em; margin-top: 8px; }
+
+  details summary { cursor: pointer; color: var(--muted); }
+  pre {
+    background: var(--mono-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px;
+    max-height: 220px;
+    overflow: auto;
+    font: 0.8rem/1.4 ui-monospace, Consolas, monospace;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  #unsupported { display: none; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Loggerhead Snap/LS1</h1>
+  <p class="sub">Check a logger, set its clock to UTC, and change its settings over USB.</p>
+
+  <div class="panel err" id="unsupported"></div>
+
+  <div class="panel">
+    <ol>
+      <li>Plug the logger into USB and turn it on. Wait for the menu screen.</li>
+      <li>Click <b>Connect</b> and pick the logger's port (usually a USB Serial / COM port).</li>
+      <li>Fix any issues listed, set the clock, and save your settings.</li>
+    </ol>
+  </div>
+
+  <div class="panel">
+    <div class="row">
+      <button id="connect" class="primary">Connect</button>
+      <button id="disconnect" disabled>Disconnect</button>
+      <span id="status">Not connected</span>
+      <span class="spacer"></span>
+      <span id="device" class="muted"></span>
+    </div>
+  </div>
+
+  <div class="panel needs-conn">
+    <div class="row" style="margin-bottom: 12px;">
+      <h2 style="margin: 0;">Device check</h2>
+      <span class="spacer"></span>
+      <button id="refresh">Refresh</button>
+    </div>
+    <div id="issues"><span class="muted">Waiting for the logger...</span></div>
+    <div class="facts" id="facts" style="margin-top: 16px;"></div>
+  </div>
+
+  <div class="panel">
+    <h2>Clock</h2>
+    <div class="two">
+      <div>
+        <div class="label">This computer (UTC)</div>
+        <div class="clock" id="pcClock">--</div>
+        <div class="detail">Must be correct. Windows: Settings &gt; Time &gt; Sync now.</div>
+      </div>
+      <div>
+        <div class="label">Logger (UTC)</div>
+        <div class="clock" id="loggerClock">--</div>
+        <div class="detail" id="loggerDetail"></div>
+      </div>
+    </div>
+    <button id="setTime" class="primary big" disabled>Set logger to UTC now</button>
+  </div>
+
+  <div class="panel needs-conn">
+    <h2>Settings</h2>
+    <div class="form" id="form"><span class="muted">Waiting for the logger...</span></div>
+    <div class="row" style="margin-top: 16px;">
+      <button id="save" class="primary" disabled>Save to logger</button>
+      <button id="revert" disabled>Undo changes</button>
+    </div>
+    <div id="saveMsg"></div>
+  </div>
+
+  <details class="panel">
+    <summary>Serial log</summary>
+    <pre id="log"></pre>
+  </details>
+</main>
+
+<script>
+const $ = id => document.getElementById(id);
+
+// ---------- Settings the page knows about. Only those the logger reports are shown. ----------
+const RATES = [8000, 16000, 32000, 44100, 48000, 96000, 200000, 250000, 300000];
+const GAINS = [3.12, 2.63, 2.22, 1.87, 1.58, 1.33, 1.11, 0.94, 0.79, 0.67, 0.56, 0.48, 0.40, 0.34, 0.29, 0.24];
+const range = (a, b, step = 1) => { const r = []; for (let i = a; i <= b; i += step) r.push(i); return r; };
+
+const FIELDS = [
+  { key: 'rec_dur', label: 'Record duration', type: 'number', min: 1, max: 3600, unit: 's' },
+  { key: 'rec_int', label: 'Sleep between recordings', type: 'number', min: 0, max: 86400, unit: 's',
+    help: '0 records continuously, in files of the record duration.' },
+  { key: 'rate', label: 'Sample rate', type: 'select',
+    options: RATES.map((r, i) => [i, (r / 1000) + ' kHz']) },
+  { key: 'gain', label: 'Gain', type: 'select',
+    options: GAINS.map((g, i) => [i, i + '  (' + (-20 * Math.log10(g / 2)).toFixed(1) + ' dB)']) },
+  { key: 'chan', label: 'Channels', type: 'select', options: [[1, 'Mono'], [2, 'Stereo']] },
+  { key: 'batpacks', label: 'Battery packs', type: 'number', min: 1, max: 8,
+    help: 'Used only for the battery-life estimate.' },
+  { key: 'delay', label: 'Delay start', type: 'number', min: 0, max: 365, unit: 'days' },
+  { key: 'mode', label: 'Mode', type: 'select', options: [[0, 'Normal'], [1, 'Diel (record only in a daily window)']] },
+  { key: 'diel', label: 'Diel window (UTC)', type: 'diel', keys: ['start_h', 'start_m', 'end_h', 'end_m'] },
+  { key: 'cutoff', label: 'Low battery cutoff', type: 'select',
+    options: [[0, 'Off']].concat(range(30, 34).map(v => [v, (v / 10).toFixed(1) + ' V'])),
+    help: 'Stops recording after 3 files in a row below this voltage.' },
+  { key: 'sd_sleep', label: 'microSD card during sleeps of 2 min or more', type: 'select',
+    options: [[0, 'Keep powered'], [1, 'Power off (default; saves current, card restarts each wake)']],
+    help: 'Power off saves current with cards that draw a lot when idle.' },
+];
+const KNOWN_KEYS = new Set(FIELDS.flatMap(f => f.keys || [f.key]));
+
+// ---------- State ----------
+let port = null, reader = null, readClosed = null;
+let loggerOffset = null;   // logger time minus computer time, in seconds
+let clockSource = null;
+let deviceName = '';       // from the DEVICE line: LS1/LS2-v4 or Snap4
+let settings = null;       // last values read from the logger
+let status = null;
+let replyTimer = null;
+let pendingSaves = null;   // keys waiting for OK/ERR
+let saveErrors = [];
+
+function fmt(ms) { return new Date(ms).toISOString().replace('T', ' ').slice(0, 19); }
+const pad = n => String(n).padStart(2, '0');
+
+function log(text) {
+  const el = $('log');
+  el.textContent += text + '\n';
+  el.scrollTop = el.scrollHeight;
+}
+
+function setStatus(text, cls) {
+  $('status').textContent = text;
+  $('status').className = cls || '';
+}
+
+function setConnected(on) {
+  document.body.classList.toggle('connected', on);
+  $('connect').disabled = on;
+  $('disconnect').disabled = !on;
+  $('setTime').disabled = !on;
+}
+
+function tick() {
+  const now = Date.now();
+  $('pcClock').textContent = fmt(now);
+  if (loggerOffset !== null) $('loggerClock').textContent = fmt(now + loggerOffset * 1000);
+  setTimeout(tick, 1000 - (Date.now() % 1000) + 5);
+}
+
+// ---------- Serial ----------
+async function send(text) {
+  const writer = port.writable.getWriter();
+  try {
+    await writer.write(new TextEncoder().encode(text));
+  } finally {
+    writer.releaseLock();
+  }
+  text.trim().split('\n').forEach(l => log('> ' + l));
+}
+
+// Ask for everything and warn if no reply comes back
+async function requestAll() {
+  await send('G\n');
+  clearTimeout(replyTimer);
+  replyTimer = setTimeout(() => {
+    setStatus('No reply. Is the logger on the menu screen with firmware 4.40 or later?', 'warn');
+  }, 2500);
+}
+
+function parsePairs(text) {
+  const out = {};
+  text.trim().split(/\s+/).forEach(p => {
+    const i = p.indexOf('=');
+    if (i > 0) out[p.slice(0, i)] = p.slice(i + 1);
+  });
+  return out;
+}
+
+function handleLine(line) {
+  if (!line) return;
+  log(line);
+  let m;
+  if ((m = line.match(/^DEVICE (\S+) (\S+)/))) {
+    deviceName = m[1];
+    $('device').textContent = m[1] + ' · firmware ' + m[2];
+  } else if ((m = line.match(/^TIME (\d+) (\S+) (\S+)/))) {
+    clearTimeout(replyTimer);
+    loggerOffset = parseInt(m[1], 10) - Math.floor(Date.now() / 1000);  // both whole seconds
+    clockSource = m[2];
+    const source = m[2] === 'DS3231' ? 'DS3231 clock'
+                 : m[2] === 'INTERNAL' ? 'internal clock (DS3231 failed)'
+                 : 'backup timer (both clocks failed)';
+    const diff = loggerOffset === 0 ? 'matches this computer'
+               : (loggerOffset > 0 ? '+' : '') + loggerOffset + ' s from this computer';
+    $('loggerDetail').textContent = diff + ' · ' + source;
+    $('loggerDetail').className = 'detail' + (m[2] === 'DS3231' ? '' : ' warn');
+    $('loggerClock').textContent = fmt(Date.now() + loggerOffset * 1000);
+    setStatus('Connected', 'ok');
+    renderIssues();
+  } else if (line.startsWith('SETTINGS ')) {
+    const fresh = parsePairs(line.slice(9));
+    const firstLoad = !settings || Object.keys(fresh).join() !== Object.keys(settings).join();
+    settings = fresh;
+    if (firstLoad || !formChanged()) buildForm();
+    renderIssues();
+  } else if (line.startsWith('STATUS ')) {
+    status = parsePairs(line.slice(7));
+    renderFacts();
+    renderIssues();
+  } else if ((m = line.match(/^(OK|ERR) (\S+)/))) {
+    if (m[2] === 'clear') { requestAll(); return; }
+    if (pendingSaves) {
+      pendingSaves.delete(m[2]);
+      if (m[1] === 'ERR') saveErrors.push(m[2]);
+      if (pendingSaves.size === 0) finishSave();
+    }
+  }
+}
+
+async function readLoop() {
+  const decoder = new TextDecoderStream();
+  readClosed = port.readable.pipeTo(decoder.writable).catch(() => {});
+  reader = decoder.readable.getReader();
+  let buf = '';
+  try {
+    while (true) {
+      const { value, done } = await reader.read();
+      if (done) break;
+      buf += value;
+      let i;
+      while ((i = buf.indexOf('\n')) >= 0) {
+        handleLine(buf.slice(0, i).trim());
+        buf = buf.slice(i + 1);
+      }
+    }
+  } catch (e) {
+    log('Read stopped: ' + e.message);
+  } finally {
+    reader.releaseLock();
+  }
+}
+
+async function connect() {
+  try {
+    port = await navigator.serial.requestPort();
+  } catch (e) {
+    return; // picker cancelled
+  }
+  try {
+    await port.open({ baudRate: 115200 });
+    try { await port.setSignals({ dataTerminalReady: true }); } catch (e) {}
+  } catch (e) {
+    setStatus('Could not open port: ' + e.message + ' (is another program, such as the Arduino serial monitor, using it?)', 'err');
+    port = null;
+    return;
+  }
+  setConnected(true);
+  setStatus('Connected', 'ok');
+  readLoop();
+  setTimeout(() => { if (port) requestAll(); }, 300);
+}
+
+async function disconnect() {
+  clearTimeout(replyTimer);
+  if (reader) { try { await reader.cancel(); } catch (e) {} }
+  if (readClosed) await readClosed;
+  if (port) { try { await port.close(); } catch (e) {} }
+  port = null;
+  reader = null;
+  loggerOffset = null;
+  clockSource = null;
+  settings = null;
+  status = null;
+  pendingSaves = null;
+  $('loggerClock').textContent = '--';
+  $('loggerDetail').textContent = '';
+  $('device').textContent = '';
+  $('issues').innerHTML = '<span class="muted">Waiting for the logger...</span>';
+  $('facts').innerHTML = '';
+  $('form').innerHTML = '<span class="muted">Waiting for the logger...</span>';
+  $('saveMsg').textContent = '';
+  setConnected(false);
+  setStatus('Not connected');
+}
+
+// Send on a second boundary, so the logger starts its new second in step with this computer
+function setTime() {
+  $('setTime').disabled = true;
+  setStatus('Setting clock...');
+  const wait = 1000 - (Date.now() % 1000);
+  setTimeout(async () => {
+    try {
+      await send('T' + Math.round(Date.now() / 1000) + '\n');
+      setTimeout(() => { if (port) requestAll(); }, 700);
+    } catch (e) {
+      setStatus('Send failed: ' + e.message, 'err');
+    }
+    $('setTime').disabled = !port;
+  }, wait);
+}
+
+// ---------- Device check ----------
+function issue(level, title, text, action) {
+  return { level, title, text, action };
+}
+
+function findIssues() {
+  const list = [];
+  if (clockSource === 'INTERNAL') {
+    list.push(issue('err', 'DS3231 clock has failed',
+      'The logger is keeping time with its internal clock, which is less accurate. Replace the DS3231.'));
+  } else if (clockSource === 'LPTMR') {
+    list.push(issue('err', 'Both clocks have failed',
+      'The logger is keeping time with a backup timer and will drift. Replace the DS3231 and check the 32 kHz crystal.'));
+  }
+  if (status) {
+    if (status.internal_rtc === '0' && clockSource === 'DS3231') {
+      list.push(issue('warn', 'Internal backup clock is not running',
+        'Recording works, but there is no backup clock if the DS3231 fails. Check the 32 kHz crystal.'));
+    }
+    if (status.osc_stopped === '1') {
+      list.push(issue('warn', 'DS3231 lost power before this start-up',
+        'Its time may be wrong. Click Set logger to UTC now. If this shows after every power-up, check that the coin cell is fitted and reads about 3 V.'));
+    }
+  }
+  if (loggerOffset !== null && Math.abs(loggerOffset) > 2 && !(status && status.osc_stopped === '1')) {
+    list.push(issue('warn', 'Clock is ' + Math.abs(loggerOffset) + ' s ' + (loggerOffset > 0 ? 'ahead' : 'behind'),
+      'Click Set logger to UTC now.'));
+  }
+  if (status) {
+    const volt = parseFloat(status.volt);
+    const cutoff = settings && settings.cutoff ? parseInt(settings.cutoff, 10) / 10 : 0;
+    if (cutoff > 0 && volt < cutoff) {
+      list.push(issue('err', 'Battery below the cutoff',
+        'Battery reads ' + volt.toFixed(2) + ' V, below the ' + cutoff.toFixed(1) + ' V cutoff. The logger will stop recording after 3 files. Replace the batteries.'));
+    } else if (cutoff > 0 && volt < cutoff + 0.2) {
+      list.push(issue('warn', 'Battery close to the cutoff',
+        'Battery reads ' + volt.toFixed(2) + ' V; the cutoff is ' + cutoff.toFixed(1) + ' V.'));
+    }
+    if (status.files === '0') {
+      list.push(issue('err', 'Card is full',
+        'There is not enough free space for one file with these settings.'));
+    }
+    const restarts = parseInt(status.sd_restarts || '0', 10);
+    if (restarts > 0) {
+      list.push(issue('warn', 'Restarted ' + restarts + (restarts === 1 ? ' time' : ' times') + ' after SD card errors',
+        'Counted since the last clear. If this logger was just recovered, the card may be slow or worn: use a new card or a full (overwrite) format.',
+        { label: 'Clear count', cmd: 'C\n' }));
+    }
+    if (status.low_batt_stop === '1') {
+      list.push(issue('warn', 'Recording stopped on low battery',
+        'A previous deployment stopped because the battery fell below the cutoff.',
+        { label: 'Clear', cmd: 'C\n' }));
+    }
+    if (status.card_full_stop === '1') {
+      list.push(issue('warn', 'Recording stopped with the card full',
+        'A previous deployment recorded all the files that fit on the card. Offload the data and format the card before reuse.',
+        { label: 'Clear', cmd: 'C\n' }));
+    }
+    if (status.clk_switch === '1') {
+      const when = parseInt(status.clk_switch_time || '0', 10);
+      list.push(issue('err', 'DS3231 failed during a deployment' + (when > 0 ? ' at ' + fmt(when * 1000) + ' UTC' : ''),
+        'The logger switched to its internal clock from then on, so later file times are less accurate. Replace the DS3231.',
+        { label: 'Clear', cmd: 'C\n' }));
+    }
+    const count = k => parseInt(status[k] || '0', 10);
+    const times = n => n + (n === 1 ? ' time' : ' times');
+    if (count('wdog_resets') > 0) {
+      list.push(issue('warn', 'Restarted ' + times(count('wdog_resets')) + ' by the watchdog',
+        'The firmware stopped responding and was restarted; a deployment resumes recording after each one. Tell Loggerhead if this keeps happening.',
+        { label: 'Clear count', cmd: 'C\n' }));
+    }
+    if (count('audio_restarts') > 0) {
+      list.push(issue('warn', 'Audio restarted ' + times(count('audio_restarts')),
+        'A recording got no audio for 3 s and the audio was restarted. Tell Loggerhead if this keeps happening.',
+        { label: 'Clear count', cmd: 'C\n' }));
+    }
+    if (count('clock_gaps') > 0) {
+      list.push(issue('warn', 'Clocks were more than 10 s apart ' + times(count('clock_gaps')),
+        'The DS3231 and the internal clock disagreed at a check; the DS3231 time was kept.',
+        { label: 'Clear count', cmd: 'C\n' }));
+    }
+  }
+  return list;
+}
+
+function renderIssues() {
+  if (!status && !clockSource) return;
+  const list = findIssues();
+  const el = $('issues');
+  el.innerHTML = '';
+  if (list.length === 0) {
+    const d = document.createElement('div');
+    d.className = 'issue ok';
+    d.innerHTML = '<b class="ok">No issues found</b>';
+    el.appendChild(d);
+    return;
+  }
+  list.forEach(it => {
+    const d = document.createElement('div');
+    d.className = 'issue ' + it.level;
+    const b = document.createElement('b');
+    b.className = it.level;
+    b.textContent = it.title;
+    const s = document.createElement('span');
+    s.textContent = it.text;
+    d.append(b, s);
+    if (it.action) {
+      const btn = document.createElement('button');
+      btn.textContent = it.action.label;
+      btn.onclick = () => send(it.action.cmd);
+      d.append(document.createElement('br'), btn);
+    }
+    el.appendChild(d);
+  });
+}
+
+function renderFacts() {
+  const el = $('facts');
+  el.innerHTML = '';
+  if (!status) return;
+  const facts = [];
+  const num = k => parseFloat(status[k]);
+  if ('volt' in status) facts.push(['Battery', num('volt').toFixed(2) + ' V']);
+  if ('free_mb' in status && 'total_mb' in status) {
+    facts.push(['Card free / total', (num('free_mb') / 1000).toFixed(1) + ' / ' + (num('total_mb') / 1000).toFixed(1) + ' GB']);
+  }
+  if ('file_mb' in status) facts.push(['File size', num('file_mb').toFixed(1) + ' MB']);
+  if ('files' in status) facts.push(['Files that fit', Number(status.files).toLocaleString()]);
+  if ('power_days' in status) facts.push(['Batteries last', '~' + Math.floor(num('power_days')) + ' days']);
+  if ('mem_days' in status) facts.push(['Card lasts', '~' + Math.floor(num('mem_days')) + ' days']);
+  if ('power_days' in status && 'mem_days' in status) {
+    facts.push(['Limited by', num('power_days') < num('mem_days') ? 'Batteries' : 'Card space']);
+  }
+  if ('gain_db' in status) facts.push(['Gain', num('gain_db').toFixed(1) + ' dB']);
+  facts.forEach(([k, v]) => {
+    const d = document.createElement('div');
+    d.className = 'fact';
+    d.innerHTML = '<div class="label"></div><div class="v"></div>';
+    d.children[0].textContent = k;
+    d.children[1].textContent = v;
+    el.appendChild(d);
+  });
+}
+
+// ---------- Settings form ----------
+function makeSelect(id, options, value) {
+  const s = document.createElement('select');
+  s.id = id;
+  options.forEach(([v, text]) => {
+    const o = document.createElement('option');
+    o.value = v;
+    o.textContent = text;
+    s.appendChild(o);
+  });
+  s.value = value;
+  return s;
+}
+
+function makeNumber(id, value, min, max) {
+  const i = document.createElement('input');
+  i.type = 'number';
+  i.id = id;
+  i.step = 1;
+  if (min !== undefined) i.min = min;
+  if (max !== undefined) i.max = max;
+  i.value = value;
+  return i;
+}
+
+function makeTime(id, h, m) {
+  const i = document.createElement('input');
+  i.type = 'time';
+  i.id = id;
+  i.value = pad(h) + ':' + pad(m);
+  return i;
+}
+
+function buildForm() {
+  const form = $('form');
+  form.innerHTML = '';
+  if (!settings) return;
+  // the firmware accepts up to 12 battery packs on a Snap and 8 on an LS1/LS2
+  FIELDS.find(f => f.key === 'batpacks').max = /^Snap/i.test(deviceName) ? 12 : 8;
+
+  const fields = FIELDS.filter(f => (f.keys || [f.key]).every(k => k in settings));
+  // settings this page does not know yet (e.g. from newer firmware) as plain numbers
+  Object.keys(settings).filter(k => !KNOWN_KEYS.has(k))
+    .forEach(k => fields.push({ key: k, label: k, type: 'number' }));
+
+  fields.forEach(f => {
+    const label = document.createElement('label');
+    label.textContent = f.label;
+    label.id = 'row_' + f.key;
+    const box = document.createElement('div');
+    box.className = 'field';
+    box.id = 'box_' + f.key;
+    let input;
+    if (f.type === 'select') {
+      input = makeSelect('f_' + f.key, f.options, settings[f.key]);
+      box.appendChild(input);
+    } else if (f.type === 'diel') {
+      const s = makeTime('f_diel_start', settings.start_h, settings.start_m);
+      const e = makeTime('f_diel_end', settings.end_h, settings.end_m);
+      const to = document.createElement('span');
+      to.textContent = 'to';
+      box.append(s, to, e);
+    } else {
+      input = makeNumber('f_' + f.key, settings[f.key], f.min, f.max);
+      box.appendChild(input);
+      if (f.unit) {
+        const u = document.createElement('span');
+        u.className = 'help';
+        u.textContent = f.unit;
+        box.appendChild(u);
+      }
+    }
+    form.append(label, box);
+    if (f.help) {
+      const h = document.createElement('div');
+      h.className = 'help';
+      h.id = 'help_' + f.key;
+      h.textContent = f.help;
+      form.appendChild(h);
+    }
+  });
+
+  form.querySelectorAll('input, select').forEach(el => {
+    el.addEventListener('input', onFormInput);
+    el.addEventListener('change', onFormInput);
+  });
+  updateFormState();
+}
+
+// Values in the form, as the logger's setting names
+function formValues() {
+  const out = {};
+  FIELDS.concat(Object.keys(settings || {}).filter(k => !KNOWN_KEYS.has(k)).map(k => ({ key: k })))
+    .forEach(f => {
+      if (f.type === 'diel') {
+        const s = $('f_diel_start'), e = $('f_diel_end');
+        if (!s || !e) return;
+        const [sh, sm] = s.value.split(':');
+        const [eh, em] = e.value.split(':');
+        out.start_h = String(parseInt(sh, 10));
+        out.start_m = String(parseInt(sm, 10));
+        out.end_h = String(parseInt(eh, 10));
+        out.end_m = String(parseInt(em, 10));
+        return;
+      }
+      const el = $('f_' + f.key);
+      if (el) out[f.key] = el.value.trim();
+    });
+  return out;
+}
+
+function changedKeys() {
+  if (!settings) return [];
+  const vals = formValues();
+  return Object.keys(vals).filter(k => k in settings && String(parseInt(vals[k], 10)) !== String(parseInt(settings[k], 10)));
+}
+
+function formChanged() { return $('form').querySelector('input, select') && changedKeys().length > 0; }
+
+function validate() {
+  let ok = true;
+  FIELDS.concat(Object.keys(settings || {}).filter(k => !KNOWN_KEYS.has(k)).map(k => ({ key: k, type: 'number' })))
+    .filter(f => f.type === 'number')
+    .forEach(f => {
+      const el = $('f_' + f.key);
+      if (!el) return;
+      const v = Number(el.value);
+      const bad = el.value.trim() === '' || !Number.isInteger(v) ||
+                  (f.min !== undefined && v < f.min) || (f.max !== undefined && v > f.max);
+      el.classList.toggle('bad', bad);
+      if (bad) ok = false;
+    });
+  const s = $('f_diel_start'), e = $('f_diel_end');
+  [s, e].forEach(el => { if (el) { const bad = !el.value; el.classList.toggle('bad', bad); if (bad) ok = false; } });
+  return ok;
+}
+
+function onFormInput(ev) {
+  // as in the menu: switching to continuous recording sets 600 s files
+  if (ev && ev.target.id === 'f_rec_int' && ev.type === 'change' && ev.target.value === '0') {
+    const d = $('f_rec_dur');
+    if (d && Number(d.value) < 600) d.value = 600;
+  }
+  updateFormState();
+}
+
+function updateFormState() {
+  const changed = new Set(changedKeys());
+  document.querySelectorAll('#form input, #form select').forEach(el => {
+    const key = el.id.replace(/^f_/, '');
+    const isChanged = key === 'diel_start' ? changed.has('start_h') || changed.has('start_m')
+                    : key === 'diel_end' ? changed.has('end_h') || changed.has('end_m')
+                    : changed.has(key);
+    el.classList.toggle('changed', isChanged);
+  });
+  // diel window only matters in diel mode
+  const mode = $('f_mode');
+  const diel = mode && mode.value === '1';
+  ['row_diel', 'box_diel'].forEach(id => { const el = $(id); if (el) el.classList.toggle('hidden', !diel); });
+
+  const valid = validate();
+  $('save').disabled = !port || changed.size === 0 || !valid || !!pendingSaves;
+  $('revert').disabled = changed.size === 0 || !!pendingSaves;
+  if (changed.size > 0) {
+    $('saveMsg').className = 'muted';
+    $('saveMsg').textContent = valid ? changed.size + ' unsaved ' + (changed.size === 1 ? 'change' : 'changes')
+                                     : 'Fix the highlighted values before saving.';
+  } else if (!pendingSaves && $('saveMsg').className === 'muted') {
+    $('saveMsg').textContent = '';
+  }
+}
+
+async function save() {
+  const keys = changedKeys();
+  if (keys.length === 0 || !validate()) return;
+  const vals = formValues();
+  pendingSaves = new Set(keys);
+  saveErrors = [];
+  $('saveMsg').className = 'muted';
+  $('saveMsg').textContent = 'Saving...';
+  updateFormState();
+  await send(keys.map(k => 'S ' + k + '=' + parseInt(vals[k], 10)).join('\n') + '\n');
+  setTimeout(() => { if (pendingSaves) finishSave(true); }, 4000);
+}
+
+function finishSave(timedOut) {
+  const missing = pendingSaves ? [...pendingSaves] : [];
+  pendingSaves = null;
+  if (timedOut && missing.length) saveErrors = saveErrors.concat(missing);
+  if (saveErrors.length) {
+    $('saveMsg').className = 'err';
+    $('saveMsg').textContent = 'Not saved: ' + saveErrors.join(', ') + '. Check the values and try again.';
+  } else {
+    $('saveMsg').className = 'ok';
+    $('saveMsg').textContent = 'Saved to the logger.';
+  }
+  settings = null;  // rebuild the form from what the logger now reports
+  requestAll();
+}
+
+// ---------- Start-up ----------
+if (!('serial' in navigator)) {
+  const el = $('unsupported');
+  el.style.display = 'block';
+  el.textContent = window.isSecureContext
+    ? 'This browser cannot open serial ports. Use Google Chrome or Microsoft Edge on a computer.'
+    : 'This page was opened from a location the browser does not trust for serial ports. Open the file directly from disk in Chrome or Edge, or from an https:// address.';
+  $('connect').disabled = true;
+} else {
+  navigator.serial.addEventListener('disconnect', e => {
+    if (e.target === port) {
+      log('Logger unplugged');
+      disconnect();
+    }
+  });
+}
+
+$('connect').onclick = connect;
+$('disconnect').onclick = disconnect;
+$('setTime').onclick = setTime;
+$('refresh').onclick = requestAll;
+$('save').onclick = save;
+$('revert').onclick = () => { buildForm(); $('saveMsg').textContent = ''; };
+tick();
+</script>
+</body>
+</html>

@@ -482,8 +482,27 @@ void audio_bypass_adc_hp(){
 }
 
 void audio_power_down(void){
+  chipWrite(CHIP_DIG_POWER, 0x0000); // digital power down first: ADC and I2S data path
   chipWrite(CHIP_ANA_POWER, 0x0000); // analog power down: everything
-  chipWrite(CHIP_DIG_POWER, 0x0000); // digital power down: everything
+}
+
+// Before deep sleep: codec down over I2C while MCLK is still running, then stop the Teensy I2S.
+// On waking, AudioInit() restarts the I2S clocks first and then powers the codec up.
+void audioSleep(){
+  audio_power_down();
+  i2sStop();
+}
+
+// Before the codec power (SGTL_EN) is cut: drive the I2S clock pins low so they cannot
+// power the codec through its I/O pins. i2sStart() returns them to I2S.
+void i2sPinsLow(){
+  I2S0_MCR &= ~I2S_MCR_MOE;  // MCLK off
+  pinMode(11, OUTPUT);       // MCLK
+  pinMode(9, OUTPUT);        // BCLK
+  pinMode(23, OUTPUT);       // LRCLK
+  digitalWrite(11, LOW);
+  digitalWrite(9, LOW);
+  digitalWrite(23, LOW);
 }
 
 void audio_power_up(void){
@@ -540,11 +559,16 @@ void I2S_modification(uint32_t fsamp, uint16_t nbits)
         F_CPU, fcpu, fsamp, (int)fs, nbits,iscl[0]+1,iscl[1]+1,iscl[2]+1);
   
 
-  // stop I2S
-  I2S0_RCSR &= ~(I2S_RCSR_RE | I2S_RCSR_BCE);
+  // stop I2S: the clock and frame settings may only change while it is disabled
+  i2sStop();
 
   // modify sampling frequency
+  uint32_t start = micros();
+  while(!(MCG_S & MCG_S_LOCK0) && (micros() - start < 2000)) ;  // PLL locked again after deep sleep
+  I2S0_MCR = I2S_MCR_MICS(3) | I2S_MCR_MOE;  // MCLK output on, from the 96 MHz PLL as in the audio library
   I2S0_MDR = I2S_MDR_FRACT(iscl[0]) | I2S_MDR_DIVIDE(iscl[1]);
+  start = micros();
+  while((I2S0_MCR & I2S_MCR_DUF) && (micros() - start < 2000)) ;  // divider update
 
   // configure transmitter
   I2S0_TCR2 = I2S_TCR2_SYNC(0) | I2S_TCR2_BCP | I2S_TCR2_MSEL(1)
@@ -554,6 +578,58 @@ void I2S_modification(uint32_t fsamp, uint16_t nbits)
   I2S0_RCR2 = I2S_RCR2_SYNC(1) | I2S_TCR2_BCP | I2S_RCR2_MSEL(1)
     | I2S_RCR2_BCD | I2S_RCR2_DIV(iscl[2]);
 
-  //restart I2S
-  I2S0_RCSR |= I2S_RCSR_RE | I2S_RCSR_BCE;
+  i2sStart();
+}
+
+// DMA channel the audio library uses for I2S receive, or -1
+int i2sRxDmaChannel(){
+  volatile uint8_t *chcfg = &DMAMUX0_CHCFG0;
+  for(int n = 0; n < 16; n++){
+    if((chcfg[n] & 0x3F) == DMAMUX_SOURCE_I2S0_RX) return n;
+  }
+  return -1;
+}
+
+// DMA transfer control descriptor fields
+#define TCD_ADDR(ch) (0x40009000 + (ch) * 32)
+#define TCD_DADDR(ch) (*(volatile uint32_t *)(TCD_ADDR(ch) + 0x10))
+#define TCD_CITER(ch) (*(volatile uint16_t *)(TCD_ADDR(ch) + 0x16))
+#define TCD_CSR(ch)   (*(volatile uint16_t *)(TCD_ADDR(ch) + 0x1C))
+#define TCD_BITER(ch) (*(volatile uint16_t *)(TCD_ADDR(ch) + 0x1E))
+
+// Stop the I2S receiver and transmitter at the end of a frame, empty the FIFOs and clear
+// their error flags, and park the receive DMA at the start of its buffer.
+void i2sStop(){
+  uint32_t start;
+  I2S0_RCSR &= ~(I2S_RCSR_RE | I2S_RCSR_FRDE);  // no more DMA requests
+  start = micros();
+  while((I2S0_RCSR & I2S_RCSR_RE) && (micros() - start < 2000)) ;  // clears at the end of the frame
+  I2S0_TCSR &= ~I2S_TCSR_TE;
+  start = micros();
+  while((I2S0_TCSR & I2S_TCSR_TE) && (micros() - start < 2000)) ;
+  // BCE off; reset the FIFOs; the error and sync flags clear by writing 1
+  I2S0_RCSR = I2S_RCSR_FR | I2S_RCSR_FEF | I2S_RCSR_SEF | I2S_RCSR_WSF;
+  I2S0_TCSR = I2S_TCSR_FR | I2S_TCSR_FEF | I2S_TCSR_SEF | I2S_TCSR_WSF;
+
+  int ch = i2sRxDmaChannel();
+  if(ch < 0) return;
+  DMA_CERQ = ch;
+  start = micros();
+  while((TCD_CSR(ch) & DMA_TCD_CSR_ACTIVE) && (micros() - start < 2000)) ;
+  DMA_CERR = ch;
+  DMA_CINT = ch;
+  TCD_DADDR(ch) = TCD_DADDR(ch) - (TCD_BITER(ch) - TCD_CITER(ch)) * 2;  // 2 bytes per sample
+  TCD_CITER(ch) = TCD_BITER(ch);
+}
+
+// Start the receive DMA, then the receiver and the transmitter that clocks it, as the audio
+// library does. MCLK must already be running.
+void i2sStart(){
+  CORE_PIN23_CONFIG = PORT_PCR_MUX(6);  // LRCLK, in case i2sPinsLow() was used
+  CORE_PIN9_CONFIG  = PORT_PCR_MUX(6);  // BCLK
+  CORE_PIN11_CONFIG = PORT_PCR_MUX(6);  // MCLK
+  int ch = i2sRxDmaChannel();
+  if(ch >= 0) DMA_SERQ = ch;
+  I2S0_RCSR = I2S_RCSR_RE | I2S_RCSR_BCE | I2S_RCSR_FRDE | I2S_RCSR_FR;
+  I2S0_TCSR = I2S_TCSR_TE | I2S_TCSR_BCE;
 }

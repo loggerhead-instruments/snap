@@ -1,12 +1,12 @@
 float mAmpRec = 50;  
-float mAmpSleep = 3.2; 
+float mAmpSleep = 2.0; // measured 1.38 mA at 4 V with deep sleep (v4.40); rounded up to be conservative
+float mAmpSleepCardOff = 1.0; // SD Sleep set to Power off: measured 0.7 mA at 4 V (v4.50); rounded up
 byte nBatPacks = 1;
-float mAhPerBat = 24000.0;
-float fileMB;
+float mAhPerBat = 24000.0; // Snap LiPo pack; 12000.0 for the D-cell build (hex/Snap4-D-cell.ino.hex)
 
 float mAmpMono[9] = { 35, 37, 38, 41, 41, 48, 64, 69, 79};
-float mAmpStereo[9] = { 36, 38, 43, 47, 48, 62, 90, 100, 107};
-// stereo record power consumption 1 TB SanDisk exFAT; sleep 4.2 mA
+float mAmpStereo[9] = { 36, 38, 43, 47, 53, 65, 91, 100, 107};
+// stereo record power consumption 1 TB SanDisk exFAT
 // 8 kHz = 36 mA
 // 16 kHz = 38 mA
 // 32 kHz = 43 mA
@@ -28,7 +28,7 @@ float mAmpStereo[9] = { 36, 38, 43, 47, 48, 62, 90, 100, 107};
 // 250 kHz = 69 mA
 // 300 kHz = 79 mA
 
-// stereo record power consumption 256 GB Samsung exFAT; 14 mA sleep (2.8 mA if power down SD and disable SPI)
+// stereo record power consumption 256 GB Samsung exFAT; 14 mA sleep 
 // 8 kHz = 46 mA
 // 16 kHz = 46 mA
 // 32 kHz = 48 mA
@@ -40,9 +40,13 @@ float mAmpStereo[9] = { 36, 38, 43, 47, 48, 62, 90, 100, 107};
 // 300 kHz = 95 mA
 
 csd_t m_csd;
+uint32_t cardTotalMB = 0;
+uint32_t clusterBytes = 32768;  // card's cluster size, set when the card is read (512 KB on a 1 TB exFAT card)
+uint32_t powerSeconds;       // deployment length the batteries allow
+float totalSecondsMemory;    // deployment length the card allows
 
 int curMenuItem = 0;
-volatile int maxMenuItem = 8;
+volatile int maxMenuItem = 10;
 char *menuItem[] = {"Start",
                      "Record",
                      "Sleep",
@@ -50,7 +54,9 @@ char *menuItem[] = {"Start",
                      "Gain",
                      "Time",
                      "Battery",
-                     "Delay"
+                     "Delay",
+                     "Cutoff",
+                     "SD Sleep"
                      };
 
 char *helpText[] = {"ENTER:Start RecordingUP/DN:scroll menu",
@@ -60,7 +66,9 @@ char *helpText[] = {"ENTER:Start RecordingUP/DN:scroll menu",
                     "ENTER:Set Gain (dB)\nUP/DN:scroll menu",
                     "ENTER:Set Date/Time\nUP/DN:scroll menu",
                     "ENTER:Set #Bat Packs\nUP/DN:scroll menu",
-                    "ENTER:Set Delay Start\nUP/DN:scroll menu",
+                    "ENTER:Set Delay Days\nUP/DN:scroll menu",
+                    "ENTER:Set Low V Stop\nUP/DN:scroll menu",
+                    "ENTER:SD power down\nUP/DN:scroll menu"
                     };
 
 /* DISPLAY FUNCTIONS
@@ -88,14 +96,18 @@ void printZero(int val){
 #define setDateTime 5
 #define setBatPacks 6
 #define setDelay 7
+#define setCutoff 8
+#define setSdSleep 9
+// Snap: no Channel (one channel connected), Mode or Diel items; diel mode can still be set
+// from the setup page or setup.txt
 
 void manualSettings(){
   boolean startRec = 0, startUp, startDown;
   readEEPROM();
   calcGain();
-  Serial.println("settings");
+
   autoStartTime = getTeensy3Time(0);
-  
+
 // get free space on cards
     cDisplay();
     display.print("Snap 4");
@@ -103,10 +115,35 @@ void manualSettings(){
     display.setCursor(0, 16);
     display.println("Card Free/Total MB");
 
+    // After 5 card failures in a row during a deployment, rest for an hour with the card,
+    // codec and hydrophone off before trying again, for as long as the batteries last
+    if(resumeDeployment & (cardFailCount() >= 5)){
+      Serial.printf("Card failed %d times in a row: retry in 1 hour\n", cardFailCount());
+      display.println("Card failed");
+      display.println("Retry in 1 hour");
+      display.display();
+      delay(5000);
+      display.ssd1306_command(SSD1306_DISPLAYOFF);
+      digitalWrite(hydroPowPin, LOW);
+      audioSleep();
+      i2sPinsLow();
+      cardOff();
+      sleepUntil(getTeensy3Time(1) + 3600, 1);
+      digitalWrite(hydroPowPin, HIGH);
+      AudioInit(isf);  // restores the I2S pins; setup() sets up the audio again after the menu
+      display.begin(SSD1306_SWITCHCAPVCC, 0x3C);
+      cDisplay();
+      display.print("Snap 4");
+      display.setTextSize(1);
+      display.setCursor(0, 16);
+      display.println("Card Free/Total MB");
+    }
+
     // power cards on
     for (int n=0; n<1; n++){
       digitalWrite(sdPowSelect[n], HIGH);
     }
+    cardIsOn = true;
     delay(1000);
     
     // Initialize the SD card
@@ -123,18 +160,52 @@ void manualSettings(){
       display.display();
       delay(100);
 
-      if(sd.begin(chipSelect[n])){
-        int32_t volFree = sd.vol()->freeClusterCount();
+      // Start the card and count its free space. A failure right after a reset
+      // is often temporary, so retry with a power cycle before giving up.
+      int32_t volFree = 0;
+      boolean cardBegun = 0;
+      for(int attempt = 0; attempt < 5; attempt++){
+        watchdogRefresh();
+        if(attempt > 0){
+          Serial.print("Card retry ");
+          Serial.println(attempt);
+          sdPowerCycle(n);
+        }
+        cardBegun = sd.begin(chipSelect[n]);
+        if(cardBegun){
+          volFree = sd.vol()->freeClusterCount();
+          if(volFree == 0){  // 0 is also returned if any read fails while counting
+            delay(3000);
+            volFree = sd.vol()->freeClusterCount();
+          }
+          if(volFree > 0) break;
+        }
+      }
+
+      // A free count of 0 (exFAT) or -1 (FAT32) means a read failed: a card this logger
+      // filled still has the 200 MB margin free. Restart and try again, as for a card that
+      // does not start, rather than stopping as if the card were full.
+      if(cardBegun & (volFree <= 0)){
+        Serial.println("Unable to count free space");
+        display.print("Card Read Fail");
+        display.display();
+        delay(5000);
+        resetFunc();
+      }
+
+      if(cardBegun){
         Serial.print("volFree:");
         Serial.println(volFree);
 
-        float fs = 0.000512 * volFree * sd.vol()->blocksPerCluster();
+        float fs = 0.000512 * volFree * sd.vol()->sectorsPerCluster();
+        clusterBytes = sd.vol()->sectorsPerCluster() * 512UL;
 
         uint32_t freeSpace = (uint32_t) fs;
-        uint32_t volumeMB = uint32_t ( 0.000512 * (float) sd.card()->cardSize());
+        uint32_t volumeMB = uint32_t ( 0.000512 * (float) sd.card()->sectorCount());
 
         Serial.print("Volume MB ");
         Serial.println(volumeMB);
+        cardTotalMB = volumeMB;
         
         if (freeSpace < 200) freeMB[n] = 0;
         else
@@ -153,7 +224,8 @@ void manualSettings(){
         Serial.println("Unable to access the SD card");
         display.print("Card Fail");
         display.display();
-        while(1);
+        delay(5000);
+        resetFunc();  // power-cycle the card and restart rather than halting
     }
     // digitalWrite(sdPowSelect[n], LOW);
   }
@@ -211,10 +283,38 @@ void manualSettings(){
     delayDays = 0;
     writeEEPROMlong(18, delayDays);
   }
+  if (voltCutoff!=0 & (voltCutoff<30 | voltCutoff>34)) {
+    voltCutoff = 33;  // default 3.3 V
+    EEPROM.write(24, voltCutoff); //byte
+  }
+  if (sdSleep > 1) {
+    sdSleep = 1;  // default: power the card off
+    EEPROM.write(EE_SD_SLEEP, sdSleep);
+  }
+  if (EEPROM.read(EE_SD_RESTARTS) == 255) EEPROM.write(EE_SD_RESTARTS, 0);     // never written
+  if (EEPROM.read(EE_LOW_BATT_STOP) == 255) EEPROM.write(EE_LOW_BATT_STOP, 0);
+  if (EEPROM.read(EE_CARD_FULL_STOP) == 255) EEPROM.write(EE_CARD_FULL_STOP, 0);
+  if (EEPROM.read(EE_WDOG_RESETS) == 255) EEPROM.write(EE_WDOG_RESETS, 0);
+  if (EEPROM.read(EE_CLOCK_SWITCH) == 255) EEPROM.write(EE_CLOCK_SWITCH, 0);
+  if (EEPROM.read(EE_AUDIO_RESTARTS) == 255) EEPROM.write(EE_AUDIO_RESTARTS, 0);
+  if (EEPROM.read(EE_CLOCK_GAPS) == 255) EEPROM.write(EE_CLOCK_GAPS, 0);
+
+  // After a restart during a deployment, skip the menu and go back to recording
+  if(resumeDeployment){
+    cDisplay();
+    display.println("Resuming");
+    display.setTextSize(1);
+    display.print("after restart");
+    display.display();
+    delay(2000);
+    startRec = 1;
+  }
 
   // Main Menu Loop
    while(startRec==0){
     static int newYear, newMonth, newDay, newHour, newMinute, newSecond, oldYear, oldMonth, oldDay, oldHour, oldMinute, oldSecond;
+    watchdogRefresh();
+    checkSerialCommands();  // settings and time from USB (tools/logger-setup.html)
     t = getTeensy3Time(0);
     if (t - autoStartTime > 600) startRec = 1; //autostart if no activity for 10 minutes
     
@@ -281,7 +381,7 @@ void manualSettings(){
         case setRecSleep:
           while(digitalRead(SELECT)==1){
             rec_int = updateVal(rec_int, 0, 3600 * 24);
-            // if(rec_int == 0) rec_dur = 600; // continuous record shortest file 600s
+            // Snap: no minimum file length in continuous mode (LS1/LS2 force 600 s)
             cDisplay();
             display.println("Sleep:");
             display.print(rec_int);
@@ -331,7 +431,7 @@ void manualSettings(){
         case setDateTime:
           while(digitalRead(SELECT)==1){
             oldYear = year(t);
-            newYear = updateVal(oldYear,2000, 2100);
+            newYear = updateVal(oldYear, 2026, 2100);  // a DS3231 reading before 2026 counts as failed
             if(oldYear!=newYear){
 //              Serial.print("Old year "); Serial.println(oldYear);
 //              Serial.print("New year "); Serial.println(newYear);
@@ -441,20 +541,18 @@ void manualSettings(){
           curMenuItem = setStart;
           break;
 
-
-        case setDelay:
-          while(digitalRead(SELECT)==1){
-              delayDays = updateVal(delayDays, 0, 365);
-              cDisplay();
-              display.print("delayDays:");
-              display.print(delayDays);
-              display.display();
-              delay(2);
-            }
-            while(digitalRead(SELECT)==0); // wait to let go
-            curMenuItem = setStart;
-            break;
-          
+          case setDelay:
+            while(digitalRead(SELECT)==1){
+                delayDays = updateVal(delayDays, 0, 365);
+                cDisplay();
+                display.print("delayDays:");
+                display.print(delayDays);
+                display.display();
+                delay(2);
+              }
+              while(digitalRead(SELECT)==0); // wait to let go
+              curMenuItem = setStart;
+              break;
 
         case setBatPacks:
           while(digitalRead(SELECT)==1){
@@ -468,6 +566,49 @@ void manualSettings(){
             while(digitalRead(SELECT)==0); // wait to let go
             curMenuItem = setStart;
             break;
+
+        case setCutoff:
+          {
+            int cutoffVal = (voltCutoff == 0) ? 29 : voltCutoff;  // 29 shows as Off, below 3.0 V
+            while(digitalRead(SELECT)==1){
+              cutoffVal = updateVal(cutoffVal, 29, 34);
+              voltCutoff = (cutoffVal == 29) ? 0 : cutoffVal;
+              cDisplay();
+              display.println("V Cutoff:");
+              if(voltCutoff == 0) display.print("Off");
+              else{
+                display.print(voltCutoff / 10.0, 1);
+                display.print("V");
+              }
+              displaySettings();
+              displayVoltage();
+              display.display();
+              delay(2);
+            }
+          }
+          while(digitalRead(SELECT)==0); // wait to let go
+          curMenuItem = setStart;
+          break;
+
+        case setSdSleep:
+          while(digitalRead(SELECT)==1){
+            sdSleep = updateVal(sdSleep, 0, 1);
+            cDisplay();
+            display.println("SD Sleep");
+            display.setTextSize(1);
+            display.setCursor(0, 16);
+            display.println(sdSleep ? "Power off" : "Keep powered");
+            display.setCursor(0, 26);
+            display.print("Sleeps 2 min or more");
+            displaySettings();
+            displayVoltage();
+            display.display();
+            delay(2);
+          }
+          while(digitalRead(SELECT)==0); // wait to let go
+          curMenuItem = setStart;
+          break;
+
       }
       
       if (settingsChanged) {
@@ -486,8 +627,10 @@ void manualSettings(){
     display.display();
     delay(10);
   }
+  calcDeployment();  // files that fit, also when the menu was skipped
 }
 
+// Keep the internal RTC on DS3231 time so it can take over if the DS3231 fails
 void setTeensyTime(int hr, int mn, int sc, int dy, int mh, int yr){
   tmElements_t tm;
   tm.Year = yr - 1970;
@@ -497,12 +640,13 @@ void setTeensyTime(int hr, int mn, int sc, int dy, int mh, int yr){
   tm.Minute = mn;
   tm.Second = sc;
   time_t newtime;
-  newtime = makeTime(tm); 
-  Teensy3Clock.set(newtime); 
-  autoStartTime = getTeensy3Time(0);
+  newtime = makeTime(tm);
+  if(internalRtcOK & (Teensy3Clock.get() != newtime)) Teensy3Clock.set(newtime);
+  autoStartTime = newtime;  // not getTeensy3Time(): this runs inside it, mid-sync
 }
   
 int updateVal(long curVal, long minVal, long maxVal){
+  watchdogRefresh();  // every setting screen loops here
   boolean upVal = digitalRead(UP);
   boolean downVal = digitalRead(DOWN);
   static int heldDown = 0;
@@ -570,62 +714,8 @@ void displaySettings(){
   display.setCursor(75, 46);
   display.printf("%.0f",gainDb);
 
-  float totalRecSeconds = 0;
+  calcDeployment();
 
-  if(NCHAN==1) mAmpRec = mAmpMono[isf];
-  if(NCHAN==2) mAmpRec = mAmpStereo[isf];
-
-  float fileBytes = ((float) NCHAN * 2.0 * (float) rec_dur * (float) lhi_fsamps[isf]) + 44.0;
-  
-  fileMB = (fileBytes + 32768.0) / 1000.0 / 1000.0; // add cluster size so don't underestimate fileMB
-  float dielFraction = 1.0; //diel mode decreases time spent recording, increases time in sleep
-  if(recMode==MODE_DIEL){
-    float dielHours, dielMinutes;
-    if(startHour>endHour){
-      dielHours = (24 - startHour) + endHour; //  22 to 05 = 7
-    }
-    else{
-      dielHours = endHour - startHour; //e.g. 10 to 12 = 2; 
-    }
-    if(startMinute > endMinute){
-      dielMinutes = (60-startMinute) + endMinute;
-    }
-    else{
-      dielMinutes = endMinute - startMinute;
-    }
-    dielMinutes += (dielHours * 60);
-    dielFraction = dielMinutes / (24.0 * 60.0); // fraction of day recording in diel mode
-  }
-
-  float recDraw = mAmpRec;
-  float recFraction = ((float) rec_dur * dielFraction) / (float) (rec_dur + rec_int);
-  float sleepFraction = 1 - recFraction;
-  float avgCurrentDraw = (recDraw * recFraction) + (mAmpSleep * sleepFraction);
-
-  uint32_t powerSeconds = uint32_t (3600.0 * (nBatPacks * mAhPerBat / avgCurrentDraw));
-
-//  Serial.print("fileMB FreeMBCards totalRecSeconds: ");
-//  Serial.print(fileMB); Serial.print(" ");
-
-  for(int n=0; n<4; n++){
-    filesPerCard[n] = 0;
-    if(freeMB[n]<=fileMB) filesPerCard[n] = 0;
-    else{
-      filesPerCard[n] = (uint32_t) floor(freeMB[n] / fileMB);
-    }
-    
-    totalRecSeconds += (filesPerCard[n] * rec_dur);
-  }
-
-  float totalSecondsMemory = totalRecSeconds / recFraction;
-  float totalSecondsCamMemory = 43200 / recFraction;
-//
-//  Serial.print("Power Sec:");
-//  Serial.print(powerSeconds);
-//  Serial.print(" "); Serial.print((float) powerSeconds / 86400.0);
-//  Serial.print("  Mem Sec:");
-//  Serial.print(totalSecondsMemory);
-  
   if(powerSeconds < totalSecondsMemory){
    // displayClock(getTeensy3Time(0) + powerSeconds, 45, 0);
     display.setCursor(92, 38);
@@ -649,6 +739,69 @@ void displaySettings(){
   else{
     display.print("N");
   }
+}
+
+// Estimate how long the batteries and the card will last with the current settings.
+// Also sets filesPerCard, which checkSD() counts down while recording.
+void calcDeployment(){
+  float totalRecSeconds = 0;
+
+  if(NCHAN==1) mAmpRec = mAmpMono[isf];
+  if(NCHAN==2) mAmpRec = mAmpStereo[isf];
+
+  // A file takes whole clusters, up to almost a cluster more than its size
+  uint64_t fileBytes = (uint64_t) NCHAN * 2 * rec_dur * lhi_fsamps[isf] + 44;
+  uint64_t fileClusters = (fileBytes + clusterBytes - 1) / clusterBytes;
+  fileMB = (float) (fileClusters * clusterBytes) / 1000.0 / 1000.0;
+  float dielFraction = 1.0; //diel mode decreases time spent recording, increases time in sleep
+  if(recMode==MODE_DIEL){
+    float dielHours, dielMinutes;
+    if(startHour>endHour){
+      dielHours = (24 - startHour) + endHour; //  22 to 05 = 7
+    }
+    else{
+      dielHours = endHour - startHour; //e.g. 10 to 12 = 2; 
+    }
+    if(startMinute > endMinute){
+      dielMinutes = (60-startMinute) + endMinute;
+    }
+    else{
+      dielMinutes = endMinute - startMinute;
+    }
+    dielMinutes += (dielHours * 60);
+    dielFraction = dielMinutes / (24.0 * 60.0); // fraction of day recording in diel mode
+  }
+
+  float recDraw = mAmpRec;
+  float recFraction = ((float) rec_dur * dielFraction) / (float) (rec_dur + rec_int);
+  float sleepFraction = 1 - recFraction;
+  // the card is switched off only for sleeps of 2 min or more (diel nights are not counted)
+  boolean cardOffInSleep = sdSleep & (rec_int >= SD_SLEEP_SECONDS + wakeahead);
+  float sleepDraw = cardOffInSleep ? mAmpSleepCardOff : mAmpSleep;
+  float avgCurrentDraw = (recDraw * recFraction) + (sleepDraw * sleepFraction);
+
+  powerSeconds = uint32_t (3600.0 * (nBatPacks * mAhPerBat / avgCurrentDraw));
+
+//  Serial.print("fileMB FreeMBCards totalRecSeconds: ");
+//  Serial.print(fileMB); Serial.print(" ");
+
+  for(int n=0; n<4; n++){
+    filesPerCard[n] = 0;
+    if(freeMB[n]<=fileMB) filesPerCard[n] = 0;
+    else{
+      filesPerCard[n] = (uint32_t) floor(freeMB[n] / fileMB);
+    }
+    
+    totalRecSeconds += (filesPerCard[n] * rec_dur);
+  }
+
+  totalSecondsMemory = totalRecSeconds / recFraction;
+//
+//  Serial.print("Power Sec:");
+//  Serial.print(powerSeconds);
+//  Serial.print(" "); Serial.print((float) powerSeconds / 86400.0);
+//  Serial.print("  Mem Sec:");
+//  Serial.print(totalSecondsMemory);
 }
 
 
@@ -693,7 +846,10 @@ void readEEPROM(){
   nBatPacks = EEPROM.read(14);
   gainSetting = EEPROM.read(15);
   NCHAN = EEPROM.read(16);
+  NCHAN = 1;  // Snap: one channel connected, always mono; byte 16 is kept as on LS1/LS2
   delayDays = readEEPROMlong(18);
+  voltCutoff = EEPROM.read(24);
+  sdSleep = EEPROM.read(EE_SD_SLEEP);
 }
 
 union {
@@ -730,6 +886,8 @@ void writeEEPROM(){
   EEPROM.write(15, gainSetting); //byte
   EEPROM.write(16, NCHAN); //byte
   writeEEPROMlong(18, delayDays); //long
+  EEPROM.write(24, voltCutoff); //byte
+  EEPROM.write(EE_SD_SLEEP, sdSleep); //byte
 }
 
 void displayMenu(){
@@ -742,14 +900,15 @@ void displayMenu(){
 void displayVoltage(){
   display.setTextSize(1);
   display.setCursor(100, 0);
-  display.print(readVoltage(), 1);
+  display.print(readVoltage(),1);
   display.print("V");
 }
 
 void displayChannels(){
   display.setTextSize(1);
   display.setCursor(100, 8);
-  if(NCHAN==1) display.print("Mono");
+  if(rtcFail & ((millis() / 1000) % 2)) display.print("RTC!");  // alternate with channels each second
+  else if(NCHAN==1) display.print("Mono");
   else {
     display.setCursor(90, 8);
     display.print("Stereo");
