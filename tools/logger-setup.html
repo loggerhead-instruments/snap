@@ -610,8 +610,13 @@ function buildForm() {
   const form = $('form');
   form.innerHTML = '';
   if (!settings) return;
-  // the firmware accepts up to 12 battery packs on a Snap and 8 on an LS1/LS2
-  FIELDS.find(f => f.key === 'batpacks').max = /^Snap/i.test(deviceName) ? 12 : 8;
+  // the firmware accepts up to 12 battery packs on a Snap and 8 on an LS1/LS2; a Snap's
+  // 24 Ah LiPo counts as 2 packs
+  const snap = /^Snap/i.test(deviceName);
+  const batpacks = FIELDS.find(f => f.key === 'batpacks');
+  batpacks.max = snap ? 12 : 8;
+  batpacks.help = snap ? 'Used only for the battery-life estimate. 1 = D-cell pack, 2 = 24 Ah lithium pack.'
+                       : 'Used only for the battery-life estimate.';
 
   const fields = FIELDS.filter(f => (f.keys || [f.key]).every(k => k in settings));
   // settings this page does not know yet (e.g. from newer firmware) as plain numbers

@@ -35,7 +35,7 @@ must show only the differences below (plus the main sketch's file name).
 |---|---|
 | Snap4.ino | Header comment names Snap4 and points here |
 | Snap4.ino, display.ino | `NCHAN` is 1 and is forced to 1 in `readEEPROM()`: one channel is connected. EEPROM byte 16 is still used, as on LS1/LS2 |
-| display.ino | Battery: `nBatPacks` default 1, range 1–12; `mAhPerBat` 24000 for the LiPo build, 12000 for the D-cell build (the one-line difference between the two hex files) |
+| display.ino | Battery: `nBatPacks` default 1, range 1–12, 12000 mAh each. The Battery menu shows 1 as "D-cell" and 2 as "Lithium" (the 24 Ah LiPo counts as two packs), so one build serves both batteries |
 | display.ino | Button menu has 10 items: no Channel, Mode or Diel. Diel mode can still be set from the setup page or setup.txt |
 | display.ino | Splash says "Snap 4" |
 | display.ino | Continuous mode does not force 600 s files |
@@ -53,20 +53,20 @@ sketches) and tools/logger-setup.html (its battery-pack limit follows the DEVICE
 ## Build
 
 Teensy 3.2, 96 MHz, same libraries as LS1-LS2-v4 (the sketch carries its own SdFat).
-Two builds as before, into Arduino/Snap4/hex and hex/:
-- Snap4-25AhLiPo.ino.hex: `mAhPerBat = 24000.0` (as committed)
-- Snap4-D-cell.ino.hex: `mAhPerBat = 12000.0`
+One build for both batteries (the user picks D-cell or Lithium in the Battery menu), so the
+separate LiPo and D-cell hex files are no longer needed.
 
 ## Bench tests (Snap4 board)
 
 - Power-up: splash, DS3231 check, card free/total, 10-item menu, "Snap 4" wording.
-- Setup page: connects, shows Snap4 and 4.51, no Channels field, battery packs up to 12,
-  settings read and write, status counts.
+- Setup page: connects, shows Snap4 and 4.51, no Channels field, battery packs up to 12 with
+  the D-cell/lithium hint, settings read and write, status counts.
 - Mono recording at the usual Snap rates; files land in day folders; WAV header says 1 channel.
 - Duty cycle with SD Sleep Power off and a sleep of 2 min or more: card restarts each wake.
 - Delay start of 1 day; a power cycle during the delay serves the delay again.
 - Pull the card while recording: restart, resume, SD restart count on the setup page.
-- Battery estimate on the display for both hex variants (1 pack × 24000 / 12000).
+- Battery menu: 1 shows "D-cell", 2 shows "Lithium", 3 and up show the count; the battery
+  estimate doubles from 1 to 2.
 - Overnight run on battery.
 
 ## Out of scope

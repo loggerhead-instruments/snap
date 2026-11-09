@@ -2,7 +2,7 @@ float mAmpRec = 50;
 float mAmpSleep = 2.0; // measured 1.38 mA at 4 V with deep sleep (v4.40); rounded up to be conservative
 float mAmpSleepCardOff = 1.0; // SD Sleep set to Power off: measured 0.7 mA at 4 V (v4.50); rounded up
 byte nBatPacks = 1;
-float mAhPerBat = 24000.0; // Snap LiPo pack; 12000.0 for the D-cell build (hex/Snap4-D-cell.ino.hex)
+float mAhPerBat = 12000.0; // one D-cell pack; the 24 Ah LiPo is set as 2 packs (Battery menu shows "Lithium")
 
 float mAmpMono[9] = { 35, 37, 38, 41, 41, 48, 64, 69, 79};
 float mAmpStereo[9] = { 36, 38, 43, 47, 53, 65, 91, 100, 107};
@@ -558,8 +558,13 @@ void manualSettings(){
           while(digitalRead(SELECT)==1){
               nBatPacks = updateVal(nBatPacks, 1, 12);
               cDisplay();
-              display.print("BatPacks:");
-              display.print(nBatPacks);
+              // Snap: 1 is the D-cell pack, 2 is the 24 Ah LiPo (two packs' worth)
+              if(nBatPacks==1) display.print("BatPack:D-cell");
+              else if(nBatPacks==2) display.print("BatPack:Lithium");
+              else{
+                display.print("BatPacks:");
+                display.print(nBatPacks);
+              }
               display.display();
               delay(2);
             }
