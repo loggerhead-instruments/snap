@@ -3,41 +3,11 @@ float mAmpSleep = 2.0; // measured 1.38 mA at 4 V with deep sleep (v4.40); round
 float mAmpSleepCardOff = 1.0; // SD Sleep set to Power off: measured 0.7 mA at 4 V (v4.50); rounded up
 byte nBatPacks = 1;
 float mAhPerBat = 12000.0; // one D-cell pack; the 24 Ah LiPo is set as 2 packs (Battery menu shows "Lithium")
-
-float mAmpMono[9] = { 35, 37, 38, 41, 41, 48, 64, 69, 79};
-float mAmpStereo[9] = { 36, 38, 43, 47, 53, 65, 91, 100, 107};
-// stereo record power consumption 1 TB SanDisk exFAT
-// 8 kHz = 36 mA
-// 16 kHz = 38 mA
-// 32 kHz = 43 mA
-// 44.1 kHz = 47 mA
-// 48 kHz = 48 mA
-// 96 kHz = 62 mA
-// 200 kHz = 90 mA
-// 250 kHz = 100 mA
-// 300 kHz = 107 mA
-
-// mono
-// 8 kHz = 35 mA
-// 16 kHz = 37 mA
-// 32 kHz = 38 mA
-// 44.1 kHz = 41 mA
-// 48 kHz = 41 mA
-// 96 kHz = 48 mA
-// 200 kHz = 64 mA
-// 250 kHz = 69 mA
-// 300 kHz = 79 mA
-
-// stereo record power consumption 256 GB Samsung exFAT; 14 mA sleep 
-// 8 kHz = 46 mA
-// 16 kHz = 46 mA
-// 32 kHz = 48 mA
-// 44.1 kHz = 49 mA
-// 48 kHz = 49 mA
-// 96 kHz = 53 mA
-// 200 kHz = 60 mA
-// 250 kHz = 64 mA
-// 300 kHz = 95 mA
+// power consumption 1 TB SanDisk Extreme exFAT 4Vin
+// measured with Nordic Power Profiler II
+//                  kHz: 8  16  32 44.1 48  96 200 250 300 
+float mAmpMono[9]   = { 42, 43, 46, 47, 48, 64, 68, 75, 82};
+float mAmpStereo[9] = { 44, 46, 50, 53, 54, 65, 91, 101, 108};
 
 csd_t m_csd;
 uint32_t cardTotalMB = 0;
