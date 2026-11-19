@@ -242,7 +242,7 @@ const KNOWN_KEYS = new Set(FIELDS.flatMap(f => f.keys || [f.key]));
 let port = null, reader = null, readClosed = null;
 let loggerOffset = null;   // logger time minus computer time, in seconds
 let clockSource = null;
-let deviceName = '';       // from the DEVICE line: LS1/LS2-v4 or Snap4
+let deviceName = '';       // from the DEVICE line: LS1/LS2-v4, LS1/LS2-v3 or Snap4
 let settings = null;       // last values read from the logger
 let status = null;
 let replyTimer = null;
